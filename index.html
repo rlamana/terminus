@@ -1,4 +1,4 @@
-<!--<!doctype html>-->
+<!doctype html>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -7,9 +7,10 @@
 			body {
 				margin: 0;
 				padding: 0;
+				background-color: #000;
 			}
 
-			#terminal {
+			.terminaljs {
 				width: 100%;
 				height: 100%;
 				padding: 10px;
@@ -19,20 +20,31 @@
 
 				font-family: monospace;
 				font-size: 1.1em;
+
+				min-height: 500px;
+			}
+
+			.terminaljs .terminaljs-prompt {
+				margin-right: 5px;
 			}
 		</style>
 	</head>
 	<body>
-		<textarea id="terminal"></textarea>	
+		<div id="terminal"></div>	
 
-		<script type="text/javascript" src="events.js"></script>
-		<script type="text/javascript" src="shell.js"></script>
-		<script type="text/javascript" src="terminal.js"></script>
-		<script type="text/javascript" src="commander.js"></script>
-		<script type="text/javascript" src="testcommander.js"></script>
+		<script type="text/javascript" src="src/util.js"></script>
+		<script type="text/javascript" src="src/events.js"></script>
+		<script type="text/javascript" src="src/shell.js"></script>
+		<script type="text/javascript" src="src/client.js"></script>
+		<script type="text/javascript" src="src/terminal.js"></script>
+		<script type="text/javascript" src="src/commander.js"></script>
+
+		<script type="text/javascript" src="commanders/testcommander.js"></script>
 		<script type="text/javascript">
-			var shell = new Shell(new TestCommander());
-			var terminal = new Terminal(shell, document.getElementById('terminal'));
+			var shell = new Shell(
+				new Terminal(document.getElementById('terminal')),
+				new TestCommander()
+			);
 		</script>
 	</body>
 </html>
