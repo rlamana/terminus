@@ -127,6 +127,10 @@
 			return this;
 		},
 
+		isVisible: function() {
+			return this.element.style.display !== 'none';
+		},
+
 		placeCursorToEnd: function() {
 			var range, selection;
 		    if(document.createRange) { // Firefox, Chrome, Opera, Safari, IE 9+

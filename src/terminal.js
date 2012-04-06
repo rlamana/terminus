@@ -8,6 +8,7 @@
 
 	var Terminal = function(element) {
 		var self = this;
+		this.element = element;
 
 		// Events support
 		this.events = new global.Events();
@@ -25,6 +26,13 @@
 		this.inputElement.events.on('historyBack', this.historyBack, this);
 		this.inputElement.events.on('historyForward', this.historyForward, this);
 		this.inputElement.appendTo(element);
+
+		// CTRL + C support
+		element.addEventListener('keydown', function(e) {
+			if(e.ctrlKey && e.keyCode == 67) {
+				self.read();
+			}
+		});
 
 		// Init history
 		this.historyInit();
@@ -82,6 +90,7 @@
 
 		idle: function() {
 			this.inputElement.hide();
+			this.element.focus();
 		},
 
 		/**
