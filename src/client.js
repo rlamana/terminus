@@ -28,13 +28,11 @@
 
 		// DOM elements structure
 		this.element = document.createElement('div');
-
-		// Crossbrowser css box model support
 		
 		this.element.className = 'terminaljs-input-line';
 		this.element.style.boxOrient = this.element.style.MozBoxOrient = this.element.style.WebkitBoxOrient  = 'horizontal';
-		this.element.style.width = '98%';
 		this.element.style.display = 'none';
+		this.element.style.clear = 'both';
 
 		this.prompt = document.createElement('div');
 		this.prompt.className = 'terminaljs-prompt';
@@ -51,6 +49,8 @@
 		if(!!this.settings.editable) {
 			this.text.contentEditable = true;
 			this.text.addEventListener('keydown', function(e) {
+				// When a key event, alway scroll to bottom
+				window.scrollTo(0,document.body.scrollHeight);
 				switch(e.keyCode) {
 					case 13: // Enter key
 						e.preventDefault();
@@ -167,8 +167,10 @@
 			var newOutput = document.createElement('div');
 			newOutput.innerHTML = output;
 			newOutput.className = className;
-			this.element.style.width = '98%';
 			this.element.appendChild(newOutput);
+
+			// When new output is generated, always scroll to bottom
+			window.scrollTo(0,document.body.scrollHeight);
 		},
 
 		appendTo: function(element) {
