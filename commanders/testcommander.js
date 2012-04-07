@@ -51,8 +51,9 @@
 			this.output(output, 'WEB');
 			this.done();
 		},
-		cat: function() {
 
+		exit: function() {
+			location.reload();
 		}
 	};
 

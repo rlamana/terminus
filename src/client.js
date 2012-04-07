@@ -52,21 +52,28 @@
 			this.text.contentEditable = true;
 			this.text.addEventListener('keydown', function(e) {
 				switch(e.keyCode) {
-					case 13:
+					case 13: // Enter key
 						e.preventDefault();
 						e.stopPropagation();
 						self.events.emit('enter', self);
 						break;
 
-					case 38:
+					case 38: // Up key
 						self.events.emit('historyBack', self);
 
 						e.preventDefault();
 						e.stopPropagation();
 						break;
 
-					case 40:
+					case 40: // Down key
 						self.events.emit('historyForward', self);
+
+						e.preventDefault();
+						e.stopPropagation();
+						break;
+
+					case 9: // Tab key
+						self.events.emit('autocomplete', self);
 
 						e.preventDefault();
 						e.stopPropagation();
@@ -152,6 +159,7 @@
 	var ClientOutput = function() {
 		this.element = document.createElement('div');
 		this.element.className = 'terminaljs-output';
+		this.element.style.clear = 'both';
 	};
 
 	ClientOutput.prototype = {

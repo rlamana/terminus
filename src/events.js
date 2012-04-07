@@ -15,6 +15,9 @@
 			if(!this.__listeners[eventName])
 				this.__listeners[eventName] = [];
 
+			if (!listener)
+				console.error('events.on(): The listener doesn\'t exist');
+
 			this.__listeners[eventName].push(listener.bind(scope?scope:this));
 		},
 

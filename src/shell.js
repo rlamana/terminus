@@ -5,7 +5,6 @@
 
 	var Shell = function(terminal, commander) {
 		this._environment = {
-			prompt: '<b>shell></b>'
 		};
 
 		this.setCommander(commander);
@@ -21,13 +20,6 @@
 
 		getEnv: function(key) {
 			return this._environment[key] ? this._environment[key] : null;
-		},
-
-		getPrompt: function() {
-			if(this.commander && this.commander.pwd)
-				return this.commander.pwd.getBasePath() + this._environment['prompt'];
-			else 
-				return this._environment['prompt'];
 		},
 
 		exec: function(input) {
@@ -93,6 +85,20 @@
 			clear: function() {
 				this.terminal.clear();
 				this.terminal.read();
+			},
+
+			_autocomplete: function(command) {
+				var found = 0, output = '', commands = this.commander.getCommands();
+				var regexp = new RegExp('^'+command, "i");
+
+				for (var i = commands.length; i--;) {
+					if (regexp.test(commands[i])) {
+						output += commands[i] + '   ';
+						found++;
+					}
+				}
+
+				this.terminal.autocompleteProposal(!!found ? output : null);
 			}
 		}
 	};

@@ -23,6 +23,15 @@
 			this.events.emit('done', content);
 		},
 
+		getCommands: function() {
+			var commands = [], command;
+			for (var commandName in this.commands) {
+				if (this.commands.hasOwnProperty(commandName)) 
+					commands.push(commandName);
+			}
+			return commands;
+		},
+
 		commands: {
 		}
 	};

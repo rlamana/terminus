@@ -32,6 +32,7 @@
 		this.inputElement.events.on('enter', this.enter, this);
 		this.inputElement.events.on('historyBack', this.historyBack, this);
 		this.inputElement.events.on('historyForward', this.historyForward, this);
+		this.inputElement.events.on('autocomplete', this.autocomplete, this);
 		this.inputElement.appendTo(element);
 
 		// CTRL + Z support
@@ -135,6 +136,20 @@
 			
 			// Execute command
 			this.events.emit('read', command);
+		},
+
+		autocomplete: function() {
+			// Execute the internal _autocomplete method with 
+			// the input as parameter
+			this.events.emit('read', '_autocomplete ' + this.inputElement.getValue());
+		},
+
+		autocompleteProposal: function(values) {
+			if(values !== null) {
+				this._printInput();
+				this.print(values, "STDOUT");
+				this.read(this.inputElement.getValue());
+			}
 		},
 		
 		setPrompt: function(prompt) {

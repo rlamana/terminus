@@ -81,6 +81,10 @@
 		wget: function(url) {
 			this.output("Not implemented yet.");
 			this.done();
+		},
+
+		exit: function() {
+			location.reload();
 		}
 	};
 
