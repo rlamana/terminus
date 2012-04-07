@@ -1,6 +1,8 @@
 Terminal.js
 ===========================
 
+An open library to create your own shells.
+
 License
 -------
 
