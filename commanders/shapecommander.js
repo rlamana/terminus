@@ -27,8 +27,12 @@
 		ls: function() {
 			var browse, output = '';
 			var icon = function(type, name) {
-				var image = type==='dir' ? 'images/folder.png' : 'images/file.png';
-				return '<div style="display: inline-block; margin-left: 20px; clear: both;"><img src="'+image+'" style="margin-left: 3px; width:20px; height:20px; float: left;" />'+name+'</div>'
+				var output, image = type==='dir' ? 'images/folder.png' : 'images/file.png';
+				output = '<div style="display: inline-block; margin-left: 20px; clear: both;">';
+				output += 	'<img src="'+image+'" style="padding-right: 5px; width:18px; height:18px; float: left;" />';
+				output += 	'<div style="padding-top:2px; float: right">'+name+'</div>'
+				output += '</div>'
+				return output;
 			};
 
 			for(var i=this.data.browse.length; i--;)
@@ -41,8 +45,12 @@
 		ll: function() {
 			var browse, output = '';
 			var icon = function(type, name) {
-				var image = type==='dir' ? 'images/folder.png' : 'images/file.png';
-				return '<div style="display: block; margin-left: 20px; clear: both;"><img src="'+image+'" style="margin-left: 3px; width:20px; height:20px; float: left;" />'+name+'</div>'
+				var output, image = type==='dir' ? 'images/folder.png' : 'images/file.png';
+				output = '<div style="display: block; margin-left: 20px; clear: both;">';
+				output += 	'<img src="'+image+'" style="padding-right: 5px; width:18px; height:18px; float: left;" />';
+				output += 	'<div style="padding-top:2px">'+name+'</div>'
+				output += '</div>'
+				return output;
 			};
 
 			for(var i=this.data.browse.length; i--;)
@@ -55,7 +63,6 @@
 		shape: function(n1, n2, n3, n4) {
 			var id = 'supertag_' + Math.floor(Math.random()*10e7);
 			this.output('<div id="'+id+'" />','WEB');
-
 			var image = new Supertags.Image(300, 300, {
 				n1: n1 ? n1 : 5,
 				n2: n2 ? n2 : 10,
@@ -64,6 +71,15 @@
 			});
 			image.appendTo(document.getElementById(id));
 			image.animate();
+			this.done();
+		},
+
+		block: function() {
+			this.output('This will block the terminal until read() is called. Test CTRL+Z...');
+		},
+
+		wget: function(url) {
+			this.output("Not implemented yet.");
 			this.done();
 		}
 	};

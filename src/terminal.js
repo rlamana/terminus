@@ -34,9 +34,9 @@
 		this.inputElement.events.on('historyForward', this.historyForward, this);
 		this.inputElement.appendTo(element);
 
-		// CTRL + C support
+		// CTRL + Z support
 		element.addEventListener('keydown', function(e) {
-			if(e.ctrlKey && e.keyCode == 67) {
+			if(e.ctrlKey && e.keyCode == 90) {
 				self.read();
 			}
 		});
