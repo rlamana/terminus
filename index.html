@@ -6,8 +6,9 @@
 		<style type="text/css">
 			body {
 				margin: 0;
-				padding: 0;
-				background-color: #000;
+				padding: 5px;
+				background-color: #111;
+				height: auto;
 			}
 
 			.terminaljs {
@@ -15,11 +16,11 @@
 				height: 100%;
 				padding: 10px;
 
-				background-color: #000;
 				color: #fff;
+				background-color: #111;
 
-				font-family: monospace;
-				font-size: 1.1em;
+				font-family: "Andale Mono", monospace;
+				font-size: 1em;
 
 				min-height: 500px;
 			}
@@ -41,10 +42,10 @@
 
 		<script type="text/javascript" src="commanders/testcommander.js"></script>
 		<script type="text/javascript">
-			var shell = new Shell(
-				new Terminal(document.getElementById('terminal')),
-				new TestCommander()
-			);
+			var terminal = new Terminal(document.getElementById('terminal'), {
+				welcome: "<img src='images/logo.png' style='float: left; '/><p>Terminal.js 0.2<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+			});
+			var shell = new Shell(terminal, new TestCommander());
 		</script>
 	</body>
 </html>

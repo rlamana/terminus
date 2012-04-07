@@ -6,12 +6,19 @@
 	
 	'use strict';
 
-	var Terminal = function(element) {
+	var Terminal = function(element, settings) {
 		var self = this;
 		this.element = element;
 
 		// Events support
 		this.events = new global.Events();
+
+		// Load settings
+		for(var key in settings) {
+			if (!settings.hasOwnProperty(key))
+				continue;
+			this.settings[key] = settings[key];
+		}
 
 		// Create DOM elements structure
 		element.className = 'terminaljs';
@@ -37,7 +44,7 @@
 		// Init history
 		this.historyInit();
 
-		this.print("Terminal.js 0.1\n\n"); //\nCopyright Ramón Lamana 2012.\n\n");
+		this.print(this.settings.welcome, 'WEB');
 		this.read();
 		
 		element.addEventListener('click', function(e){
@@ -46,6 +53,10 @@
 	};
 
 	Terminal.prototype = {
+		settings: {
+			welcome: "<p>Terminal.js 0.2<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+		},
+
 		historyInit: function() {
 			this._historyIndex = 0;
 			this._history = [];

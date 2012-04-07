@@ -46,8 +46,6 @@
 			}
 		},
 
-
-
 		output: function(content, target) {
 			target = target || 'STDOUT';
 			this.terminal.print(content, target);
