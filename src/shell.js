@@ -22,18 +22,26 @@
 			return this._environment[key] ? this._environment[key] : null;
 		},
 
-		exec: function(input) {
-			var func, args = input.split(' ');
-			var command = args[0];
+		parse: function(input) {
+			var command, args = input.split(' ');
+			command = args[0];
 			args.shift();
+			return {
+				command: command,
+				args: args
+			};
+		},
 
-			if (this.native[command]) {
-				this.native[command].apply(this, args);
+		exec: function(input) {
+			input = this.parse(input);
+
+			if (this.native[input.command]) {
+				this.native[input.command].apply(this, input.args);
 			}
-			else if (this.commander.commands[command]) {
-				this.commander.commands[command].apply(this.commander, args); // Call commanders command, always with the scope of the commander itself
+			else if (this.commander.commands[input.command]) {
+				this.commander.commands[input.command].apply(this.commander, input.args); // Call commanders command, always with the scope of the commander itself
 			} else {
-				this.terminal.print("Command '"+command+"' not found.", 'STDERR');
+				this.terminal.print("Command '"+input.command+"' not found.", 'STDERR');
 				this.terminal.read();
 			}
 		},
@@ -88,17 +96,20 @@
 			},
 
 			_autocomplete: function(command) {
-				var found = 0, output = '', commands = this.commander.getCommands();
+				var found = [], commands = this.commander.getCommands();
 				var regexp = new RegExp('^'+command, "i");
 
-				for (var i = commands.length; i--;) {
-					if (regexp.test(commands[i])) {
-						output += commands[i] + '   ';
-						found++;
+				// Proposal only for commands not for arguments
+				if(arguments.length <= 1) {
+					for (var i = commands.length; i--;) {
+						if (regexp.test(commands[i])) {
+							found.push(commands[i]);
+						}
 					}
 				}
+				// @todo proposal for arguments asking the commander. Adding else here.
 
-				this.terminal.autocompleteProposal(!!found ? output : null);
+				this.terminal.autocompleteProposal(found);
 			}
 		}
 	};

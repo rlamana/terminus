@@ -144,11 +144,14 @@
 			this.events.emit('read', '_autocomplete ' + this.inputElement.getValue());
 		},
 
-		autocompleteProposal: function(values) {
-			if(values !== null) {
+		autocompleteProposal: function(commands) {
+			if(commands.length > 1) {
 				this._printInput();
-				this.print(values, "STDOUT");
+				this.print(commands.join(' '), "STDOUT");
 				this.read(this.inputElement.getValue());
+			}
+			else if(commands.length === 1) {
+				this.read(commands[0]);
 			}
 		},
 		
