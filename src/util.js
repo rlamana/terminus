@@ -32,6 +32,21 @@
 			var prop = (nav && nav === 'moz') ? (nav[0].toUpperCase() + nav.substr(1) + property[0].toUpperCase() + property.substr(1)) : 
 					   (nav ? nav + property : property);
 			element.style[prop] = value;
+		},
+
+		Array: {
+			merge: function(/* variable number of arrays */){
+				var result = [];
+			    for(var i = 0; i < arguments.length; i++){
+			        var array = arguments[i];
+			        for(var j = 0; j < array.length; j++){
+			            if(result.indexOf(array[j]) === -1) {
+			                result.push(array[j]);
+			            }
+			        }
+			    }
+			    return result;
+			}
 		}
 	};
 

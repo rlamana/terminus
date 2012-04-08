@@ -7,12 +7,14 @@
 		this._environment = {
 		};
 
-		this.setCommander(commander);
+		if(commander)
+			this.addCommander(commander);
+
 		this.setTerminal(terminal);
 	};
 
 	Shell.prototype = {
-		commander: null,
+		commanders: [],
 		terminal: null,
 
 		_environment: null,
@@ -33,17 +35,26 @@
 		},
 
 		exec: function(input) {
+			var commander;
 			input = this.parse(input);
 
 			if (this.native[input.command]) {
 				this.native[input.command].apply(this, input.args);
+				return;
 			}
-			else if (this.commander.commands[input.command]) {
-				this.commander.commands[input.command].apply(this.commander, input.args); // Call commanders command, always with the scope of the commander itself
-			} else {
-				this.terminal.print("Command '"+input.command+"' not found.", 'STDERR');
-				this.terminal.read();
+
+			// Search command in commander stack
+			for(var i = this.commanders.length; i--;) {
+				commander = this.commanders[i];
+				if (commander.commands && commander.commands[input.command]) {
+					// Call commander's command, always with the scope of the commander itself
+					commander.commands[input.command].apply(commander, input.args); 
+					return;
+				} 
 			}
+
+			this.terminal.print("Command '"+input.command+"' not found.", 'STDERR');
+			this.terminal.read();
 		},
 
 		output: function(content, target) {
@@ -73,11 +84,11 @@
 		/**
 		 * Attaches a commander and start listening to its done event
 		 */
-		setCommander: function(commander) {
-			this.commander = commander; 
-			this.commander.events.on('output', this.output, this);
-			this.commander.events.on('done', this.done, this);
-			this.commander.events.on('info', this.info, this);
+		addCommander: function(commander) {
+			this.commanders.push(commander); 
+			commander.events.on('output', this.output, this);
+			commander.events.on('done', this.done, this);
+			commander.events.on('info', this.info, this);
 		},
 
 		native: {
@@ -96,7 +107,11 @@
 			},
 
 			_autocomplete: function(command) {
-				var found = [], commands = this.commander.getCommands();
+				var found = [], commands = [];
+
+				for(var i = this.commanders.length; i--;) 
+					commands = Util.Array.merge(commands, this.commanders[i].getCommands());
+				
 				var regexp = new RegExp('^'+command, "i");
 
 				// Proposal only for commands not for arguments
