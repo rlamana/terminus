@@ -6,6 +6,47 @@
 
 	'use strict';
 
+	// Class to support cross box model
+	global.Styles.addRule('.terminaljs-box', "\
+		display: -webkit-box; \
+		display: -moz-box; \
+		display: -o-box; \
+		display: -ms-box; \
+		display: box; \
+	");
+
+	// Default stylesheet rules for input and output elements
+	global.Styles.addRule('.terminaljs-input-line', {
+		'display': 'none',
+		'clear': 'both',
+		'-moz-box-orient': 'horizontal',
+		'-webkit-box-orient': 'horizontal',
+		'-ms-box-orient': 'horizontal',
+		'-o-box-orient': 'horizontal',
+		'box-orient': 'horizontal'
+	});
+
+	global.Styles.addRule('.terminaljs-input', {
+		'display': 'block',
+		'outline': 'none',
+		'-moz-box-flex': '1',
+		'-webkit-box-flex': '1',
+		'-o-box-flex': '1',
+		'-ms-box-flex': '1',
+		'box-flex': '1'
+	});
+
+	global.Styles.addRule('.terminaljs .terminaljs-prompt', {
+		'margin-right': '5px'
+	});
+
+	global.Styles.addRule('.terminaljs-output', {
+		'clear': 'both'
+	});
+
+	global.Styles.addRule('.terminaljs-output .terminaljs-web', {
+	});
+
 	/**
 	 * Client Input class
 	 */
@@ -30,9 +71,6 @@
 		this.element = document.createElement('div');
 		
 		this.element.className = 'terminaljs-input-line';
-		this.element.style.boxOrient = this.element.style.MozBoxOrient = this.element.style.WebkitBoxOrient  = 'horizontal';
-		this.element.style.display = 'none';
-		this.element.style.clear = 'both';
 
 		this.prompt = document.createElement('div');
 		this.prompt.className = 'terminaljs-prompt';
@@ -40,9 +78,6 @@
 
 		this.text = document.createElement('div');
 		this.text.className = 'terminaljs-input';
-		this.text.style.display = 'block';
-		this.text.style.outline = 'none';
-		Util.setCrossStyle(this.text, 'BoxFlex', '1');
 		this.text.innerHTML = '';
 		this.element.appendChild(this.text);
 
@@ -125,17 +160,17 @@
 		},
 
 		show: function () {
-			this.element.style.display = Util.getCrossCss(this.element, 'box');
+			global.Styles.addClass(this.element,'terminaljs-box');
 			return this;
 		},
 
 		hide: function () {
-			this.element.style.display = 'none';
+			global.Styles.removeClass(this.element,'terminaljs-box');
 			return this;
 		},
 
 		isVisible: function() {
-			return this.element.style.display !== 'none';
+			return (this.element.style.display !== 'none') && global.Styles.hasClass(this.element, 'terminaljs-box');
 		},
 
 		placeCursorToEnd: function() {
@@ -159,7 +194,6 @@
 	var ClientOutput = function() {
 		this.element = document.createElement('div');
 		this.element.className = 'terminaljs-output';
-		this.element.style.clear = 'both';
 	};
 
 	ClientOutput.prototype = {
@@ -187,10 +221,10 @@
 			target = target || 'STDOUT';
 			switch(target) {
 				case 'STDOUT': 
-					this._print(Util.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stdout');
+					this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stdout');
 				break;
 				case 'STDERR':
-					this._print(Util.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stderr');
+					this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stderr');
 				break;
 				case 'WEB':
 					this._print(content, 'terminaljs-web');

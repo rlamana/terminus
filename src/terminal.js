@@ -6,6 +6,15 @@
 	
 	'use strict';
 
+	// Default stylesheet rule
+	global.Styles.addRule('.terminaljs', {
+		'height': '100%',
+		'padding': '10px',
+		'color': '#fff',
+		'background-color': '#111',
+		'font-family': 'monospace'
+	});
+
 	var Terminal = function(element, settings) {
 		var self = this;
 		this.element = element;
