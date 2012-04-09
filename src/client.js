@@ -48,7 +48,10 @@
 
 	global.Styles.addRule('.terminaljs-output .terminaljs-output-line', {
 		'height': '0',
-		'overflow': 'hidden',
+		'overflow': 'hidden'
+	});
+
+	global.Styles.addRule('.terminaljs-output .terminaljs-output-line.animate', {
 		'-webkit-transition': 'height '+transitionTime+'s ease-in-out',
 		'-moz-transition': 'height '+transitionTime+'s ease-in-out',
 		'-ms-transition': 'height '+transitionTime+'s ease-in-out',
@@ -57,12 +60,20 @@
 	});
 
 	global.Styles.addRule('.terminaljs-output .terminaljs-output-line.terminaljs-userinput', {
-		'-webkit-transition': 'none',
-		'-moz-transition': 'none',
-		'-ms-transition': 'none',
-		'-o-transition': 'none',
-		'transition': 'none'
+		'-webkit-transition': 'none !important',
+		'-moz-transition': 'none !important',
+		'-ms-transition': 'none !important',
+		'-o-transition': 'none !important',
+		'transition': 'none !important'
 	});
+
+	/**
+	 * Client Object with client configuration
+	 */
+	var Client = {
+		animations: true
+	};
+
 
 	/**
 	 * Client Input class
@@ -211,10 +222,12 @@
 	 */
 	var ClientOutputLine = function(className) {
 		var outputContent, outputLine = this.element = document.createElement('div');
-		outputLine.className = 'terminaljs-output-line ' + (className || '');
+		outputLine.className = 'terminaljs-output-line ' + 
+			(className || '') + 
+			(global.Client.animations ? ' animate' : '');
 
 		outputContent = this.outputContent = document.createElement('div');
-		outputContent.className = 'terminaljs-output-content'
+		outputContent.className = 'terminaljs-output-content';
 		outputLine.appendChild(outputContent);
 
 		// When new output is generated, always scroll to bottom
@@ -237,11 +250,14 @@
 
 		show: function() {
 			var self = this;
+			var animations = global.Client.animations;
 
-			setTimeout(function() {
+			var func = function() {
 				global.Styles.addClass(self.element, 'visible');
-				self.element.style.height = self.outputContent.clientHeight + 'px';
-			}, 30);
+				self.element.style.height = animations ? self.outputContent.clientHeight + 'px' : 'auto';
+			};
+
+			animations ? setTimeout(func, 30) : func();
 		},
 
 		hide: function() {
@@ -327,6 +343,7 @@
 		}
 	};
 
+	global.Client = Client;
 	global.ClientInput = ClientInput;
 	global.ClientOutput = ClientOutput;
 	global.ClientInfo = ClientInfo;
