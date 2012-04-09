@@ -14,17 +14,7 @@
 
 			.terminaljs {
 				font-family: 'Ubuntu Mono', monospace;
-				min-height: 500px;
 			}
-
-			.terminaljs .terminaljs-prompt {
-				margin-right: 5px;
-			}
-
-			.terminaljs .terminaljs-input-line {
-				/*margin-top: 10px;*/
-			}
-
 		</style>
 	</head>
 	<body>
@@ -48,7 +38,7 @@
 		<script type="text/javascript" src="commanders/shapecommander.js"></script>
 		<script type="text/javascript">
 			var terminal = new Terminal(document.getElementById('terminal'), {
-				welcome: "<img src='images/logo.png' style='float: left; '/><p>Terminal.js 0.2<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+				welcome: "<img src='images/logo.png' style=''/><p>Terminal.js 0.2<br/>Copyright 2011-2012 Ramón Lamana.</p>"
 			});
 
 			var shell = new Shell(terminal);

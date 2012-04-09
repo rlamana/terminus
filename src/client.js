@@ -6,6 +6,8 @@
 
 	'use strict';
 
+	var transitionTime = .2;
+
 	// Class to support cross box model
 	global.Styles.addRule('.terminaljs-box', "\
 		display: -webkit-box; \
@@ -19,8 +21,8 @@
 	global.Styles.addRule('.terminaljs-input-line', {
 		'display': 'none',
 		'clear': 'both',
-		'-moz-box-orient': 'horizontal',
 		'-webkit-box-orient': 'horizontal',
+		'-moz-box-orient': 'horizontal',
 		'-ms-box-orient': 'horizontal',
 		'-o-box-orient': 'horizontal',
 		'box-orient': 'horizontal'
@@ -29,10 +31,10 @@
 	global.Styles.addRule('.terminaljs-input', {
 		'display': 'block',
 		'outline': 'none',
-		'-moz-box-flex': '1',
 		'-webkit-box-flex': '1',
-		'-o-box-flex': '1',
+		'-moz-box-flex': '1',
 		'-ms-box-flex': '1',
+		'-o-box-flex': '1',
 		'box-flex': '1'
 	});
 
@@ -44,7 +46,22 @@
 		'clear': 'both'
 	});
 
-	global.Styles.addRule('.terminaljs-output .terminaljs-web', {
+	global.Styles.addRule('.terminaljs-output .terminaljs-output-line', {
+		'height': '0',
+		'overflow': 'hidden',
+		'-webkit-transition': 'height '+transitionTime+'s ease-in-out',
+		'-moz-transition': 'height '+transitionTime+'s ease-in-out',
+		'-ms-transition': 'height '+transitionTime+'s ease-in-out',
+		'-o-transition': 'height '+transitionTime+'s ease-in-out',
+		'transition': 'height '+transitionTime+'s ease-in-out'
+	});
+
+	global.Styles.addRule('.terminaljs-output .terminaljs-output-line.terminaljs-userinput', {
+		'-webkit-transition': 'none',
+		'-moz-transition': 'none',
+		'-ms-transition': 'none',
+		'-o-transition': 'none',
+		'transition': 'none'
 	});
 
 	/**
@@ -189,6 +206,52 @@
 
 
 	/**
+	 * Client OutputLine class.
+	 * Represents a line output element in the whole output stream.
+	 */
+	var ClientOutputLine = function(className) {
+		var outputContent, outputLine = this.element = document.createElement('div');
+		outputLine.className = 'terminaljs-output-line ' + (className || '');
+
+		outputContent = this.outputContent = document.createElement('div');
+		outputContent.className = 'terminaljs-output-content'
+		outputLine.appendChild(outputContent);
+
+		// When new output is generated, always scroll to bottom
+		window.scrollTo(0,document.body.scrollHeight);
+		
+	};
+
+	ClientOutputLine.prototype = {
+		element: null,
+		outputContent: null,
+
+		appendTo: function(element) {
+			element.appendChild(this.element);
+			return this;
+		},
+
+		setContent: function(content) {
+			this.outputContent.innerHTML = content;
+		},
+
+		show: function() {
+			var self = this;
+
+			setTimeout(function() {
+				global.Styles.addClass(self.element, 'visible');
+				self.element.style.height = self.outputContent.clientHeight + 'px';
+			}, 30);
+		},
+
+		hide: function() {
+			global.Styles.removeClass(this.element, 'visible');
+			this.element.style.height = '0';
+		}
+	};
+
+
+	/**
 	 * Client Output class
 	 */
 	var ClientOutput = function() {
@@ -197,14 +260,11 @@
 	};
 
 	ClientOutput.prototype = {
-		_print: function(output, className) {
-			var newOutput = document.createElement('div');
-			newOutput.innerHTML = output;
-			newOutput.className = className;
-			this.element.appendChild(newOutput);
-
-			// When new output is generated, always scroll to bottom
-			window.scrollTo(0,document.body.scrollHeight);
+		_print: function(content, className) {
+			var outputLine = new ClientOutputLine(className);
+			outputLine.appendTo(this.element);
+			outputLine.setContent(content);
+			return outputLine;
 		},
 
 		appendTo: function(element) {
@@ -218,19 +278,26 @@
 		 * @return {ClientOutput} Itself to call in cascade.
 		 */
 		print: function(content, target) {
+			var output;
 			target = target || 'STDOUT';
 			switch(target) {
 				case 'STDOUT': 
-					this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stdout');
+					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stdout');
 				break;
 				case 'STDERR':
-					this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stderr');
+					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stderr');
 				break;
 				case 'WEB':
-					this._print(content, 'terminaljs-web');
+					output = this._print(content, 'terminaljs-web');
 				break;
 			}
+
+			output.show();
 			return this;
+		},
+
+		printUserInput: function(content) {
+			this._print(content, 'terminaljs-userinput').show();
 		},
 
 		clear: function() {

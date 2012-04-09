@@ -179,7 +179,7 @@
 				.setValue(this.inputElement.text.innerHTML)
 				.show();
 
-			this.print(commandElement.element.outerHTML, 'WEB'); 
+			this.outputElement.printUserInput(commandElement.element.outerHTML);
 		}
 	}
 
