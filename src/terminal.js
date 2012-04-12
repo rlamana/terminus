@@ -67,6 +67,10 @@
 			welcome: "<p>Terminal.js 0.2<br/>Copyright 2011-2012 Ramón Lamana.</p>"
 		},
 
+		focus: function(){
+			this.inputElement.focus();
+		},
+
 		historyInit: function() {
 			this._historyIndex = 0;
 			this._history = [];

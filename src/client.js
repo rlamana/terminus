@@ -298,10 +298,10 @@
 			target = target || 'STDOUT';
 			switch(target) {
 				case 'STDOUT': 
-					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stdout');
+					output = this._print(global.Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stdout');
 				break;
 				case 'STDERR':
-					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stderr');
+					output = this._print(global.Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stderr');
 				break;
 				case 'WEB':
 					output = this._print(content, 'terminaljs-web');

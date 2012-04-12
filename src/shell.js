@@ -10,7 +10,8 @@
 		if(commander)
 			this.addCommander(commander);
 
-		this.setTerminal(terminal);
+		if(terminal)
+			this.setTerminal(terminal);
 	};
 
 	Shell.prototype = {
@@ -110,7 +111,7 @@
 				var found = [], commands = [];
 
 				for(var i = this.commanders.length; i--;) 
-					commands = Util.Array.merge(commands, this.commanders[i].getCommands());
+					commands = global.Util.Array.merge(commands, this.commanders[i].getCommands());
 				
 				var regexp = new RegExp('^'+command, "i");
 
