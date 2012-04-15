@@ -8,7 +8,7 @@
 
 	var Events = function() {
 		this.__listeners = {};
-	}
+	};
 
 	Events.prototype = {
 		on: function(eventName, listener, scope) {
