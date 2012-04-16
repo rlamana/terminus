@@ -6,6 +6,9 @@
 	
 	'use strict';
 
+	/**
+	 * @singleton
+	 */
 	var Util = {
 		String: {
 			htmlEntities: function (str) {

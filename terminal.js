@@ -6,6 +6,9 @@
 	
 	'use strict';
 
+	/**
+	 * @singleton
+	 */
 	var Util = {
 		String: {
 			htmlEntities: function (str) {
@@ -38,11 +41,13 @@
 ( window );/**
  * Copyright © 2012 Ramón Lamana
  */
- 
 (function(global) {
 	
 	'use strict';
 
+	/**
+	 * @class
+	 */
 	var Events = function() {
 		this.__listeners = {};
 	};
@@ -84,6 +89,9 @@
 	
 	'use strict';
 
+	/**
+	 * @singleton
+	 */
 	var Styles = {
 		_styleSheet: null,
 
@@ -145,7 +153,79 @@
 	
 	'use strict';
 
+	/**
+	 * @namespace
+	 */
+	var io = {
+	};
+
+	global.io = io;
+	
+})( window );/**
+ * Copyright © 2012 Ramón Lamana
+ */
+ 
+(function(global) {
+	
+	'use strict';
+
+	var InputStream = function() {
+	};
+
+	InputStream.prototype = {
+	};
+
+	global.io.InputStream = InputStream;
+	
+})( window );/**
+ * Copyright © 2012 Ramón Lamana
+ */
+
+(function(global) {
+	
+	'use strict';
+
+	/**
+	 * @class
+	 */
+	var OutputStream = function() {
+	};
+
+	OutputStream.prototype = {
+	};
+
+	global.io.OutputStream = OutputStream;
+	
+})( window );/**
+ * Copyright © 2012 Ramón Lamana
+ */
+ 
+(function(global) {
+	
+	'use strict';
+
+	/**
+	 * @private
+	 */
+	var ProcessTable = {
+		list: [],
+
+		register: function(process) {
+			if(!(process instanceof global.Process))
+				console.error('Trying to register a non Process object');
+
+			this.list.push(process);
+			return this.list.length - 1;
+		}
+	};
+
+	/**
+	 * @class
+	 */
 	var Process = function(input, outputStd, outputErr, outputWeb) {
+		this.pid = ProcessTable.register(this);
+		this.events = new global.Events;
+
 		this.inputStream = input;
 		this.outputStream.std = outputStd;
 		this.outputStream.err = outputErr;
@@ -153,13 +233,19 @@
 	};
 
 	Process.prototype = {
+		pid: null,
+
 		inputStream: null,
 		outputStream: {
 			std: null,
 			err: null,
 			web: null
 		},
-		
+
+		toString: function() {
+			return '[Process:' + this.pid + ']';
+		},
+
 		read: function() {
 			this.events.emit('output', output || '', target || 'STDOUT');
 		},
@@ -182,11 +268,13 @@
 })( window );/**
  * Copyright © 2012 Ramón Lamana
  */
- 
 (function(global) {
 	
 	'use strict';
-
+	
+	/**
+	 * @class
+	 */
 	var Commander = function() {
 		this.events = new global.Events;
 	};
@@ -224,6 +312,9 @@
 	
 	'use strict';
 
+	/**
+	 * @class
+	 */
 	var Shell = function(terminal, commander) {
 		this._environment = {
 		};
@@ -429,6 +520,7 @@
 
 	/**
 	 * Client Object with client configuration
+	 * @singleton
 	 */
 	var Client = {
 		animations: true
@@ -437,6 +529,7 @@
 
 	/**
 	 * Client Input class
+	 * @class
 	 */
 	var ClientInput = function(settings) {
 		var self = this;
@@ -579,6 +672,7 @@
 	/**
 	 * Client OutputLine class.
 	 * Represents a line output element in the whole output stream.
+	 * @class
 	 */
 	var ClientOutputLine = function(className) {
 		var outputContent, outputLine = this.element = document.createElement('div');
@@ -629,6 +723,7 @@
 
 	/**
 	 * Client Output class
+	 * @class
 	 */
 	var ClientOutput = function() {
 		this.element = document.createElement('div');
@@ -708,7 +803,8 @@
 	global.ClientOutput = ClientOutput;
 	global.ClientInfo = ClientInfo;
 })
-( window );/**
+( window );
+/**
  * Copyright © 2012 Ramón Lamana
  */
  
@@ -725,6 +821,9 @@
 		'font-family': 'monospace'
 	});
 
+	/**
+	 * @class
+	 */
 	var Terminal = function(element, settings) {
 		var self = this;
 		this.element = element;

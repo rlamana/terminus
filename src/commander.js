@@ -1,11 +1,13 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
 (function(global) {
 	
 	'use strict';
-
+	
+	/**
+	 * @class
+	 */
 	var Commander = function() {
 		this.events = new global.Events;
 	};

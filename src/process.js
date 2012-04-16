@@ -26,6 +26,7 @@
 	 */
 	var Process = function(input, outputStd, outputErr, outputWeb) {
 		this.pid = ProcessTable.register(this);
+		this.events = new global.Events;
 
 		this.inputStream = input;
 		this.outputStream.std = outputStd;

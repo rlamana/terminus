@@ -3,6 +3,9 @@
 	
 	'use strict';
 
+	/**
+	 * @class
+	 */
 	var Shell = function(terminal, commander) {
 		this._environment = {
 		};

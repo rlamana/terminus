@@ -1,11 +1,13 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
 (function(global) {
 	
 	'use strict';
 
+	/**
+	 * @class
+	 */
 	var Events = function() {
 		this.__listeners = {};
 	};

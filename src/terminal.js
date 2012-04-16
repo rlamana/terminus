@@ -15,6 +15,9 @@
 		'font-family': 'monospace'
 	});
 
+	/**
+	 * @class
+	 */
 	var Terminal = function(element, settings) {
 		var self = this;
 		this.element = element;

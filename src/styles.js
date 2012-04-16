@@ -6,6 +6,9 @@
 	
 	'use strict';
 
+	/**
+	 * @singleton
+	 */
 	var Styles = {
 		_styleSheet: null,
 
