@@ -13,6 +13,9 @@
 	};
 
 	OutputStream.prototype = {
+		write: function(output) {
+
+		}
 	};
 
 	global.io.OutputStream = OutputStream;

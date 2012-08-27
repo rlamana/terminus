@@ -7,6 +7,8 @@
 
 	var Process;
 	var Events = require('events');
+	var InputStream = require('io/inputstream');
+	var OutputStream = require('io/outputstream');
 
 	/**
 	 * @private
@@ -51,11 +53,26 @@
 		},
 
 		read: function() {
-			this.events.emit('output', output || '', target || 'STDOUT');
+			return this.inputStream.read();
 		},
 
 		write: function(output, target) {
-			
+			var ostream;
+
+			if (typeof target === 'OutputStream')
+				ostream = target;
+			else if(target === 'STDOUT') 
+				ostream = this.outputStream.std;
+			else if(target === 'STDERR') 
+				ostream = this.outputStream.err;
+			else if(target === 'STDWEB') 
+				ostream = this.outputStream.web;
+			else {
+				console.error(this.toString + ' Method write(): The target is not a valid stream');
+				return;
+			}
+
+			ostream.write(output);
 		},
 
 		exit: function(value) {

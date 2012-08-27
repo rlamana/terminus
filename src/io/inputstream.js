@@ -13,6 +13,9 @@
 	};
 
 	InputStream.prototype = {
+		read: function() {
+
+		}
 	};
 
 	global.io.InputStream = InputStream;
