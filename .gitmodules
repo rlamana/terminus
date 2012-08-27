@@ -1,6 +1,3 @@
-[submodule "deps/jsbase"]
-	path = deps/jsbase
-	url = git@github.com:amatiasq/jsbase.git
 [submodule "deps/specrunner"]
 	path = deps/specrunner
 	url = git://github.com/senchalabs/examples.git
