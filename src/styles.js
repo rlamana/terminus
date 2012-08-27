@@ -1,8 +1,7 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
-(function(global) {
+define(function(require) {
 	
 	'use strict';
 
@@ -59,6 +58,5 @@
 		}
 	};
 
-	global.Styles = Styles;
-})
-( window );
+	return Styles;
+});

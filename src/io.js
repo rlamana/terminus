@@ -1,17 +1,16 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
-(function(global) {
-	
-	'use strict';
+ define(function(require) {
 
+ 	'use strict';
+ 	
 	/**
 	 * @namespace
 	 */
 	var io = {
 	};
 
-	global.io = io;
+	return io;
 	
-})( window );
+});

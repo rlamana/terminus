@@ -20,25 +20,22 @@
 	<body>
 		<div id="terminal"></div>	
 
-		<script type="text/javascript" src="../terminal.js"></script>
+		<script type="text/javascript" src="../build/terminal.js"></script>
 		<!--<script type="text/javascript" src="/terminal.min.js"></script>-->
 
 		<script type="text/javascript" src="commanders/testcommander.js"></script>
-		<script type="text/javascript" src="commanders/filecommander.js"></script>
 
 		<script type="text/javascript" src="commanders/lib/three.js"></script>
 		<script type="text/javascript" src="commanders/lib/supertags.js"></script>
 		<script type="text/javascript" src="commanders/shapecommander.js"></script>
-		<script type="text/javascript">
+		<<script type="text/javascript">
 			var terminal = new Terminal(document.getElementById('terminal'), {
 				welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminal.js 0.2<br/>Copyright 2011-2012 Ramón Lamana.</p>"
 			});
 
-			var shell = new Shell(terminal);
+			var shell = new Terminal.Shell(terminal);
 			shell.addCommander(new TestCommander());
 			shell.addCommander(new ShapeCommander());
-			//shell.addCommander(new FileCommander());
-
 		</script>
 	</body>
 </html>

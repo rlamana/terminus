@@ -1,15 +1,17 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
-(function(global) {
-	
+ define(function(require) {
+
 	'use strict';
+
+	var Events = require('events');
 	
 	/**
 	 * @class
 	 */
 	var Commander = function() {
-		this.events = new global.Events;
+		this.events = new Events;
 	};
 
 	Commander.prototype = {		
@@ -38,6 +40,5 @@
 		}
 	};
 
-	global.Commander = Commander;
-})
-( window );
+	return Commander;
+});

@@ -1,7 +1,12 @@
-
-(function(global) {
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+ define(function(require) {
 	
 	'use strict';
+
+	var Util = require('util');
+	var Commander = require('commander');
 
 	/**
 	 * @class
@@ -114,7 +119,7 @@
 				var found = [], commands = [];
 
 				for(var i = this.commanders.length; i--;) 
-					commands = global.Util.Array.merge(commands, this.commanders[i].getCommands());
+					commands = Util.Array.merge(commands, this.commanders[i].getCommands());
 				
 				var regexp = new RegExp('^'+command, "i");
 
@@ -133,9 +138,8 @@
 		}
 	};
 
-	global.Shell = Shell;
-})
-( window );
+	return Shell;
+});
 
 
 

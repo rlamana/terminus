@@ -1,9 +1,9 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
-(function(global) {
-	
-	'use strict';
+ define(function(require) {
+
+ 	'use strict';
 
 	/**
 	 * @class
@@ -39,6 +39,6 @@
 		}
 	};
 
-	global.Events = Events;
+	return Events;
 	
-})( window );
+});

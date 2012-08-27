@@ -1,10 +1,12 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
-(function(global) {
+ define(function(require) {
 	
 	'use strict';
+
+	var Process;
+	var Events = require('events');
 
 	/**
 	 * @private
@@ -13,7 +15,7 @@
 		list: [],
 
 		register: function(process) {
-			if(!(process instanceof global.Process))
+			if(!(process instanceof Process))
 				console.error('Trying to register a non Process object');
 
 			this.list.push(process);
@@ -24,9 +26,9 @@
 	/**
 	 * @class
 	 */
-	var Process = function(input, outputStd, outputErr, outputWeb) {
+	Process = function(input, outputStd, outputErr, outputWeb) {
 		this.pid = ProcessTable.register(this);
-		this.events = new global.Events;
+		this.events = new Events;
 
 		this.inputStream = input;
 		this.outputStream.std = outputStd;
@@ -65,6 +67,6 @@
 		},
 	};
 
-	global.Process = Process;
+	return Process;
 	
-})( window );
+});

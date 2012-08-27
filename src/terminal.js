@@ -1,13 +1,22 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
- (function(global) {
+define(function(require) {
 	
 	'use strict';
 
+	var Events = require('events');
+	var Styles = require('styles');
+
+	var Commander = require('commander');
+	var Shell = require('shell');
+
+	var ClientOutput = require('client/output');
+	var ClientInput = require('client/input');
+
 	// Default stylesheet rule
-	global.Styles.addRule('.terminaljs', {
+	
+	Styles.addRule('.terminaljs', {
 		'height': '100%',
 		'padding': '10px',
 		'color': '#fff',
@@ -23,7 +32,7 @@
 		this.element = element;
 
 		// Events support
-		this.events = new global.Events();
+		this.events = new Events();
 
 		// Load settings
 		for(var key in settings) {
@@ -35,10 +44,10 @@
 		// Create DOM elements structure
 		element.className = 'terminaljs';
 
-		this.outputElement = new global.ClientOutput();
+		this.outputElement = new ClientOutput();
 		this.outputElement.appendTo(element);
 
-		this.inputElement = new global.ClientInput({
+		this.inputElement = new ClientInput({
 			editable: true
 		});
 		this.inputElement.events.on('enter', this.enter, this);
@@ -180,7 +189,7 @@
 		},
 
 		_printInput: function() {
-			var commandElement = new global.ClientInput();
+			var commandElement = new ClientInput();
 			commandElement
 				.setPrompt(this.inputElement.getPrompt())
 				.setValue(this.inputElement.text.innerHTML)
@@ -190,7 +199,9 @@
 		}
 	}
 
-	global.Terminal = Terminal;
+	Terminal.Commander = require('commander');
+	Terminal.Shell = require('shell');
 
-})
-( window );
+	return Terminal;
+
+});
