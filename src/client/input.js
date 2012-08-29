@@ -12,7 +12,7 @@ define(function(require) {
 	 * Client Input class
 	 * @class
 	 */
-	var ClientInput = function(settings) {
+	var Input = function(settings) {
 		var self = this;
 
 		this.settings = {
@@ -82,7 +82,7 @@ define(function(require) {
 		this.setPrompt(this.settings.prompt);
 	};
 
-	ClientInput.prototype = {
+	Input.prototype = {
 		getValue: function () {
 			var input = this.text.innerText || this.text.textContent;
 			var value = input ? input.replace(/\n/g, '') : '';
@@ -149,5 +149,5 @@ define(function(require) {
 		}
 	};
 
-	return ClientInput;
+	return Input;
 });

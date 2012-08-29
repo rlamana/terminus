@@ -8,23 +8,23 @@ define(function(require) {
 	var Events = require('events');
 	var Util = require('util');
 	
-	var ClientOutputLine = require('client/outputline');
+	//var ClientOutputLine = require('client/outputline');
 	
 	/**
 	 * Client Output class
 	 * @class
 	 */
-	var ClientOutput = function() {
+	var Output = function() {
 		this.element = document.createElement('div');
 		this.element.className = 'terminaljs-output';
 	};
 
-	ClientOutput.prototype = {
+	Output.prototype = {
 		_print: function(content, className) {
-			var outputLine = new ClientOutputLine(className);
+			/*var outputLine = new ClientOutputLine(className);
 			outputLine.appendTo(this.element);
 			outputLine.setContent(content);
-			return outputLine;
+			return outputLine;*/
 		},
 
 		appendTo: function(element) {
@@ -65,5 +65,5 @@ define(function(require) {
 		}
 	};
 
-	return ClientOutput;
+	return Output;
 });

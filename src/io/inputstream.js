@@ -2,22 +2,30 @@
  * Copyright © 2012 Ramón Lamana
  */
  
-(function(global) {
+define(function(require) {
 	
 	'use strict';
 
 	/**
 	 * @class
+	 *
+	 * methods: read, readLine
+	 * events: data
 	 */
 	var InputStream = function() {
+		this.stream = [];
 	};
 
 	InputStream.prototype = {
 		read: function() {
+			this.stream
+		}, 
+
+		readLine: function() {
 
 		}
 	};
 
-	global.io.InputStream = InputStream;
+	return InputStream;
 	
-})( window );
+});

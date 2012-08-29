@@ -387,69 +387,6 @@ define("../vendor/almond", function(){});
 /**
  * Copyright © 2012 Ramón Lamana
  */
-define('styles',['require'],function(require) {
-	
-	
-
-	/**
-	 * @singleton
-	 */
-	var Styles = {
-		_styleSheet: null,
-
-		addRule: function (selector, declaration) {  
-			var declarationStr = declaration;
-
-			// Create styleshee if it doesn't exist
-			if(!this._styleSheet) {
-				var style = document.createElement('style');
-
-				if(!document.head)
-					return;
-
-				//document.head.appendChild(style);
-				document.head.insertBefore(style, document.head.childNodes[0]); // Before all other defined styles
-				this._styleSheet = document.styleSheets[document.styleSheets.length - 1];
-			}
-
-			if (typeof declaration !== 'string') {
-				declarationStr = ''
-				
-
-				for(var style in declaration) {
-					if(!declaration.hasOwnProperty(style))
-						continue;
-
-					declarationStr += style + ': ' + declaration[style] + ';';
-				}
-	  		}
-
-			this._styleSheet.insertRule(selector + '{' + declarationStr + '}', 0);  
-		},  
-
-		hasClass: function (element, className) {
-			return element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
-		},
-
-		addClass: function(element, className) {
-			if (!this.hasClass(element, className)) 
-				element.className += " " + className;
-		},
-
-		removeClass: function(element, className) {
-			if (this.hasClass(element, className)) {
-				var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-				element.className = element.className.replace(reg,' ');
-			}
-		}
-	};
-
-	return Styles;
-});
-
-/**
- * Copyright © 2012 Ramón Lamana
- */
  define('commander',['require','events'],function(require) {
 
 	
@@ -680,216 +617,66 @@ define('util',['require'],function(require) {
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define('client',['require','styles'],function(require) {
-
+define('styles',['require'],function(require) {
+	
 	
 
-	var Styles = require('styles');
-
-	var transitionTime = .2;
-
-	// Class to support cross box model
-	Styles.addRule('.terminaljs-box', "\
-		display: -webkit-box; \
-		display: -moz-box; \
-		display: -o-box; \
-		display: -ms-box; \
-		display: box; \
-	");
-
-	// Default stylesheet rules for input and output elements
-	Styles.addRule('.terminaljs-input-line', {
-		'display': 'none',
-		'clear': 'both',
-		'-webkit-box-orient': 'horizontal',
-		'-moz-box-orient': 'horizontal',
-		'-ms-box-orient': 'horizontal',
-		'-o-box-orient': 'horizontal',
-		'box-orient': 'horizontal'
-	});
-
-	Styles.addRule('.terminaljs-input', {
-		'display': 'block',
-		'outline': 'none',
-		'-webkit-box-flex': '1',
-		'-moz-box-flex': '1',
-		'-ms-box-flex': '1',
-		'-o-box-flex': '1',
-		'box-flex': '1'
-	});
-
-	Styles.addRule('.terminaljs .terminaljs-prompt', {
-		'margin-right': '5px'
-	});
-
-	Styles.addRule('.terminaljs-output', {
-		'clear': 'both'
-	});
-
-	Styles.addRule('.terminaljs-output .terminaljs-output-line', {
-		'height': '0',
-		'overflow': 'hidden'
-	});
-
-	Styles.addRule('.terminaljs-output .terminaljs-output-line.animate', {
-		'-webkit-transition': 'height '+transitionTime+'s ease-in-out',
-		'-moz-transition': 'height '+transitionTime+'s ease-in-out',
-		'-ms-transition': 'height '+transitionTime+'s ease-in-out',
-		'-o-transition': 'height '+transitionTime+'s ease-in-out',
-		'transition': 'height '+transitionTime+'s ease-in-out'
-	});
-
-	Styles.addRule('.terminaljs-output .terminaljs-output-line.terminaljs-userinput', {
-		'-webkit-transition': 'none !important',
-		'-moz-transition': 'none !important',
-		'-ms-transition': 'none !important',
-		'-o-transition': 'none !important',
-		'transition': 'none !important'
-	});
-
 	/**
-	 * Client Object with client configuration
 	 * @singleton
 	 */
-	var Client = {
-		animations: true
-	};
+	var Styles = {
+		_styleSheet: null,
 
-	return Client;
-});
+		addRule: function (selector, declaration) {  
+			var declarationStr = declaration;
 
-/**
- * Copyright © 2012 Ramón Lamana
- */
- define('client/outputline',['require','client','styles'],function(require) {
-	
-	
+			// Create styleshee if it doesn't exist
+			if(!this._styleSheet) {
+				var style = document.createElement('style');
 
-	var Client = require('client');
-	var Styles = require('styles');
+				if(!document.head)
+					return;
 
-	/**
-	 * Client OutputLine class.
-	 * Represents a line output element in the whole output stream.
-	 * @class
-	 */
-	var ClientOutputLine = function(className) {
-		var outputContent, outputLine = this.element = document.createElement('div');
-		outputLine.className = 'terminaljs-output-line ' + 
-			(className || '') + 
-			(Client.animations ? ' animate' : '');
-
-		outputContent = this.outputContent = document.createElement('div');
-		outputContent.className = 'terminaljs-output-content';
-		outputLine.appendChild(outputContent);
-
-		// When new output is generated, always scroll to bottom
-		window.scrollTo(0,document.body.scrollHeight);
-		
-	};
-
-	ClientOutputLine.prototype = {
-		element: null,
-		outputContent: null,
-
-		appendTo: function(element) {
-			element.appendChild(this.element);
-			return this;
-		},
-
-		setContent: function(content) {
-			this.outputContent.innerHTML = content;
-		},
-
-		show: function() {
-			var self = this;
-			var animations = Client.animations;
-
-			var func = function() {
-				Styles.addClass(self.element, 'visible');
-				self.element.style.height = animations ? self.outputContent.clientHeight + 'px' : 'auto';
-			};
-
-			animations ? setTimeout(func, 30) : func();
-		},
-
-		hide: function() {
-			Styles.removeClass(this.element, 'visible');
-			this.element.style.height = '0';
-		}
-	};
-
-	return ClientOutputLine;
-});
-/**
- * Copyright © 2012 Ramón Lamana
- */
-define('client/output',['require','events','util','client/outputline'],function(require) {
-	
-	
-
-	var Events = require('events');
-	var Util = require('util');
-	
-	var ClientOutputLine = require('client/outputline');
-	
-	/**
-	 * Client Output class
-	 * @class
-	 */
-	var ClientOutput = function() {
-		this.element = document.createElement('div');
-		this.element.className = 'terminaljs-output';
-	};
-
-	ClientOutput.prototype = {
-		_print: function(content, className) {
-			var outputLine = new ClientOutputLine(className);
-			outputLine.appendTo(this.element);
-			outputLine.setContent(content);
-			return outputLine;
-		},
-
-		appendTo: function(element) {
-			element.appendChild(this.element);
-			return this;
-		},
-
-		/**
-		 * @param {String} target The output target: 'STDOUT', 'STDERR', 'WEB'.
-		 * @param {String} content Output content to be printed.
-		 * @return {ClientOutput} Itself to call in cascade.
-		 */
-		print: function(content, target) {
-			var output;
-			target = target || 'STDOUT';
-			switch(target) {
-				case 'STDOUT': 
-					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stdout');
-				break;
-				case 'STDERR':
-					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stderr');
-				break;
-				case 'WEB':
-					output = this._print(content, 'terminaljs-web');
-				break;
+				//document.head.appendChild(style);
+				document.head.insertBefore(style, document.head.childNodes[0]); // Before all other defined styles
+				this._styleSheet = document.styleSheets[document.styleSheets.length - 1];
 			}
 
-			output.show();
-			return this;
+			if (typeof declaration !== 'string') {
+				declarationStr = ''
+				
+
+				for(var style in declaration) {
+					if(!declaration.hasOwnProperty(style))
+						continue;
+
+					declarationStr += style + ': ' + declaration[style] + ';';
+				}
+	  		}
+
+			this._styleSheet.insertRule(selector + '{' + declarationStr + '}', 0);  
+		},  
+
+		hasClass: function (element, className) {
+			return element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
 		},
 
-		printUserInput: function(content) {
-			this._print(content, 'terminaljs-userinput').show();
+		addClass: function(element, className) {
+			if (!this.hasClass(element, className)) 
+				element.className += " " + className;
 		},
 
-		clear: function() {
-			this.element.innerHTML = '';
+		removeClass: function(element, className) {
+			if (this.hasClass(element, className)) {
+				var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+				element.className = element.className.replace(reg,' ');
+			}
 		}
 	};
 
-	return ClientOutput;
+	return Styles;
 });
+
 /**
  * Copyright © 2012 Ramón Lamana
  */
@@ -904,7 +691,7 @@ define('client/input',['require','events','styles'],function(require) {
 	 * Client Input class
 	 * @class
 	 */
-	var ClientInput = function(settings) {
+	var Input = function(settings) {
 		var self = this;
 
 		this.settings = {
@@ -974,7 +761,7 @@ define('client/input',['require','events','styles'],function(require) {
 		this.setPrompt(this.settings.prompt);
 	};
 
-	ClientInput.prototype = {
+	Input.prototype = {
 		getValue: function () {
 			var input = this.text.innerText || this.text.textContent;
 			var value = input ? input.replace(/\n/g, '') : '';
@@ -1041,27 +828,93 @@ define('client/input',['require','events','styles'],function(require) {
 		}
 	};
 
-	return ClientInput;
+	return Input;
 });
 
 /**
  * Copyright © 2012 Ramón Lamana
  */
-define('terminal',['require','events','styles','commander','shell','client/output','client/input','commander','shell'],function(require) {
+define('client/output',['require','events','util'],function(require) {
 	
 	
 
 	var Events = require('events');
-	var Styles = require('styles');
-
-	var Commander = require('commander');
-	var Shell = require('shell');
-
-	var ClientOutput = require('client/output');
-	var ClientInput = require('client/input');
-
-	// Default stylesheet rule
+	var Util = require('util');
 	
+	//var ClientOutputLine = require('client/outputline');
+	
+	/**
+	 * Client Output class
+	 * @class
+	 */
+	var Output = function() {
+		this.element = document.createElement('div');
+		this.element.className = 'terminaljs-output';
+	};
+
+	Output.prototype = {
+		_print: function(content, className) {
+			/*var outputLine = new ClientOutputLine(className);
+			outputLine.appendTo(this.element);
+			outputLine.setContent(content);
+			return outputLine;*/
+		},
+
+		appendTo: function(element) {
+			element.appendChild(this.element);
+			return this;
+		},
+
+		/**
+		 * @param {String} target The output target: 'STDOUT', 'STDERR', 'WEB'.
+		 * @param {String} content Output content to be printed.
+		 * @return {ClientOutput} Itself to call in cascade.
+		 */
+		print: function(content, target) {
+			var output;
+			target = target || 'STDOUT';
+			switch(target) {
+				case 'STDOUT': 
+					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stdout');
+				break;
+				case 'STDERR':
+					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stderr');
+				break;
+				case 'WEB':
+					output = this._print(content, 'terminaljs-web');
+				break;
+			}
+
+			output.show();
+			return this;
+		},
+
+		printUserInput: function(content) {
+			this._print(content, 'terminaljs-userinput').show();
+		},
+
+		clear: function() {
+			this.element.innerHTML = '';
+		}
+	};
+
+	return Output;
+});
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+ define('client',['require','styles','events','client/input','client/output'],function(require) {
+
+	
+
+	var Styles = require('styles');
+	var Events = require('events');
+
+	var Input = require('client/input');
+	var Output = require('client/output');
+
+	var transitionTime = .2;
+
 	Styles.addRule('.terminaljs', {
 		'height': '100%',
 		'padding': '10px',
@@ -1070,11 +923,72 @@ define('terminal',['require','events','styles','commander','shell','client/outpu
 		'font-family': 'monospace'
 	});
 
+	// Class to support cross box model
+	Styles.addRule('.terminaljs-box', "\
+		display: -webkit-box; \
+		display: -moz-box; \
+		display: -o-box; \
+		display: -ms-box; \
+		display: box; \
+	");
+
+	// Default stylesheet rules for input and output elements
+	Styles.addRule('.terminaljs-input-line', {
+		'display': 'none',
+		'clear': 'both',
+		'-webkit-box-orient': 'horizontal',
+		'-moz-box-orient': 'horizontal',
+		'-ms-box-orient': 'horizontal',
+		'-o-box-orient': 'horizontal',
+		'box-orient': 'horizontal'
+	});
+
+	Styles.addRule('.terminaljs-input', {
+		'display': 'block',
+		'outline': 'none',
+		'-webkit-box-flex': '1',
+		'-moz-box-flex': '1',
+		'-ms-box-flex': '1',
+		'-o-box-flex': '1',
+		'box-flex': '1'
+	});
+
+	Styles.addRule('.terminaljs .terminaljs-prompt', {
+		'margin-right': '5px'
+	});
+
+	Styles.addRule('.terminaljs-output', {
+		'clear': 'both'
+	});
+
+	Styles.addRule('.terminaljs-output .terminaljs-output-line', {
+		'height': '0',
+		'overflow': 'hidden'
+	});
+
+	Styles.addRule('.terminaljs-output .terminaljs-output-line.animate', {
+		'-webkit-transition': 'height '+transitionTime+'s ease-in-out',
+		'-moz-transition': 'height '+transitionTime+'s ease-in-out',
+		'-ms-transition': 'height '+transitionTime+'s ease-in-out',
+		'-o-transition': 'height '+transitionTime+'s ease-in-out',
+		'transition': 'height '+transitionTime+'s ease-in-out'
+	});
+
+	Styles.addRule('.terminaljs-output .terminaljs-output-line.terminaljs-userinput', {
+		'-webkit-transition': 'none !important',
+		'-moz-transition': 'none !important',
+		'-ms-transition': 'none !important',
+		'-o-transition': 'none !important',
+		'transition': 'none !important'
+	});
+
 	/**
-	 * @class
+	 * Client Object with client configuration
+	 * @singleton
 	 */
-	var Terminal = function(element, settings) {
+	var Client = function(element, settings) {
 		var self = this;
+
 		this.element = element;
 
 		// Events support
@@ -1087,6 +1001,85 @@ define('terminal',['require','events','styles','commander','shell','client/outpu
 			this.settings[key] = settings[key];
 		}
 
+		// Create DOM elements structure
+		element.className = 'terminaljs';
+
+		// Create DOM output element
+		this.outputElement = new Output();
+		this.outputElement.appendTo(element);
+
+		// Create DOM input element
+		this.inputElement = new Input({
+			editable: true
+		});
+		this.inputElement.appendTo(element).show();
+
+		/*this.inputElement.events.on('enter', this.enter, this);
+		this.inputElement.events.on('historyBack', this.historyBack, this);
+		this.inputElement.events.on('historyForward', this.historyForward, this);
+		this.inputElement.events.on('autocomplete', this.autocomplete, this);*/
+		
+
+		// CTRL + Z support
+		element.addEventListener('keydown', function(e) {
+			if(e.ctrlKey && e.keyCode == 90) {
+				self.read();
+			}
+		});
+
+		// Init history
+		/*this.historyInit();
+
+		this.print(this.settings.welcome, 'WEB');
+		this.read();
+		
+		element.addEventListener('click', function(e){
+			self.inputElement.focus();
+		});*/
+	};
+
+	Client.prototype = {
+	 	settings: {
+	 		welcome: "<p>Terminal.js 0.3<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+	 	},
+	};
+
+	return Client;
+});
+
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+define('terminal',['require','events','commander','shell','client'],function(require) {
+	
+	
+
+	var Events = require('events');
+	var Commander = require('commander');
+	var Shell = require('shell');
+
+	var Client = require('client');
+	//var InputStream = require('io/inputstream');
+	
+	/**
+	 * @class
+	 */
+	var Terminal = function(element, settings) {
+		var self = this;
+		this.client = new Client(element);
+
+		// Events support
+		/*this.events = new Events();
+
+		// Load settings
+		for(var key in settings) {
+			if (!settings.hasOwnProperty(key))
+				continue;
+			this.settings[key] = settings[key];
+		}*/
+
+
+/*
 		// Create DOM elements structure
 		element.className = 'terminaljs';
 
@@ -1117,136 +1110,136 @@ define('terminal',['require','events','styles','commander','shell','client/outpu
 		
 		element.addEventListener('click', function(e){
 			self.inputElement.focus();
-		});
+		});*/
 	};
 
-	Terminal.prototype = {
-		settings: {
-			welcome: "<p>Terminal.js 0.2<br/>Copyright 2011-2012 Ramón Lamana.</p>"
-		},
+	// Terminal.prototype = {
+	// 	settings: {
+	// 		welcome: "<p>Terminal.js 0.2<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+	// 	},
 
-		focus: function(){
-			this.inputElement.focus();
-		},
+	// 	focus: function(){
+	// 		this.inputElement.focus();
+	// 	},
 
-		historyInit: function() {
-			this._historyIndex = 0;
-			this._history = [];
-		},
+	// 	historyInit: function() {
+	// 		this._historyIndex = 0;
+	// 		this._history = [];
+	// 	},
 
-		historyReset: function() {
-			this._historyIndex = this._history.length;
-		},
+	// 	historyReset: function() {
+	// 		this._historyIndex = this._history.length;
+	// 	},
 
-		historyBack: function() {
-			this._historyIndex--;
-			var command = this._history[this._historyIndex];
+	// 	historyBack: function() {
+	// 		this._historyIndex--;
+	// 		var command = this._history[this._historyIndex];
 
-			if (command)
-				this.read(command);
-			else
-				this._historyIndex = 0;
-		},
+	// 		if (command)
+	// 			this.read(command);
+	// 		else
+	// 			this._historyIndex = 0;
+	// 	},
 
-		historyForward: function() {
-			this._historyIndex++;
-			var command = this._history[this._historyIndex];
+	// 	historyForward: function() {
+	// 		this._historyIndex++;
+	// 		var command = this._history[this._historyIndex];
 
-			if (command) 
-				this.read(command);
-			else 
-				this.historyReset();
-		},
+	// 		if (command) 
+	// 			this.read(command);
+	// 		else 
+	// 			this.historyReset();
+	// 	},
 
-		history: function() {
-			return this._history;
-		},
+	// 	history: function() {
+	// 		return this._history;
+	// 	},
 
-		read: function(withContent) {
-			this.inputElement.clear()
+	// 	read: function(withContent) {
+	// 		this.inputElement.clear()
 
-			if(typeof withContent !== 'undefined')
-				this.inputElement.setValue(withContent);
+	// 		if(typeof withContent !== 'undefined')
+	// 			this.inputElement.setValue(withContent);
 
-			this.inputElement.show().focus();
-		},
+	// 		this.inputElement.show().focus();
+	// 	},
 
-		idle: function() {
-			this.inputElement.hide();
-			this.element.focus();
-		},
+	// 	idle: function() {
+	// 		this.inputElement.hide();
+	// 		this.element.focus();
+	// 	},
 
-		/**
-		 * @param {String} target The output target: 'STDOUT', 'STDERR', 'WEB'.
-		 * @param {String} content Output content to be printed.
-		 * @return {OutputElement} Itself to call in cascade.
-		 */
-		print: function(content, target) {
-			target = target || 'STDOUT';
-			this.outputElement.print(content, target);
-		},
+	// 	/**
+	// 	 * @param {String} target The output target: 'STDOUT', 'STDERR', 'WEB'.
+	// 	 * @param {String} content Output content to be printed.
+	// 	 * @return {OutputElement} Itself to call in cascade.
+	// 	 */
+	// 	print: function(content, target) {
+	// 		target = target || 'STDOUT';
+	// 		this.outputElement.print(content, target);
+	// 	},
 
-		clear: function() {
-			this.outputElement.clear();
-		},
+	// 	clear: function() {
+	// 		this.outputElement.clear();
+	// 	},
 
-		enter: function(inputElement) {
-			var command = inputElement.getValue();
+	// 	enter: function(inputElement) {
+	// 		var command = inputElement.getValue();
 
-			// Show command entered in output and hide 
-			// prompt waiting for next read operation
-			this._printInput();
-			this.idle();
+	// 		// Show command entered in output and hide 
+	// 		// prompt waiting for next read operation
+	// 		this._printInput();
+	// 		this.idle();
 
-			if(command === '') {
-				this.read();
-				return
-			}
-			this._history.push(command);
-			this.historyReset();
+	// 		if(command === '') {
+	// 			this.read();
+	// 			return
+	// 		}
+	// 		this._history.push(command);
+	// 		this.historyReset();
 			
-			// Execute command
-			this.events.emit('read', command);
-		},
+	// 		// Execute command
+	// 		this.events.emit('read', command);
+	// 	},
 
-		autocomplete: function() {
-			// Execute the internal _autocomplete method with 
-			// the input as parameter
-			this.events.emit('read', '_autocomplete ' + this.inputElement.getValue());
-		},
+	// 	autocomplete: function() {
+	// 		// Execute the internal _autocomplete method with 
+	// 		// the input as parameter
+	// 		this.events.emit('read', '_autocomplete ' + this.inputElement.getValue());
+	// 	},
 
-		autocompleteProposal: function(commands) {
-			if(commands.length > 1) {
-				this._printInput();
-				this.print(commands.join(' '), "STDOUT");
-				this.read(this.inputElement.getValue());
-			}
-			else if(commands.length === 1) {
-				this.read(commands[0]);
-			}
-		},
+	// 	autocompleteProposal: function(commands) {
+	// 		if(commands.length > 1) {
+	// 			this._printInput();
+	// 			this.print(commands.join(' '), "STDOUT");
+	// 			this.read(this.inputElement.getValue());
+	// 		}
+	// 		else if(commands.length === 1) {
+	// 			this.read(commands[0]);
+	// 		}
+	// 	},
 		
-		setPrompt: function(prompt) {
-			this.inputElement.setPrompt(prompt);
-		},
+	// 	setPrompt: function(prompt) {
+	// 		this.inputElement.setPrompt(prompt);
+	// 	},
 
-		setInfo: function(content) {
-			this.infoElement.setContent(info);
-		},
+	// 	setInfo: function(content) {
+	// 		this.infoElement.setContent(info);
+	// 	},
 
-		_printInput: function() {
-			var commandElement = new ClientInput();
-			commandElement
-				.setPrompt(this.inputElement.getPrompt())
-				.setValue(this.inputElement.text.innerHTML)
-				.show();
+	// 	_printInput: function() {
+	// 		var commandElement = new ClientInput();
+	// 		commandElement
+	// 			.setPrompt(this.inputElement.getPrompt())
+	// 			.setValue(this.inputElement.text.innerHTML)
+	// 			.show();
 
-			this.outputElement.printUserInput(commandElement.element.outerHTML);
-		}
-	}
+	// 		this.outputElement.printUserInput(commandElement.element.outerHTML);
+	// 	}
+	// }
 
-	Terminal.Commander = require('commander');
-	Terminal.Shell = require('shell');
+	Terminal.Commander = Commander;
+	Terminal.Shell = Shell;
 
 	return Terminal;
 

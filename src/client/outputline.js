@@ -5,7 +5,7 @@
 	
 	'use strict';
 
-	var Client = require('client');
+	//var Client = {};//require('cliente');
 	var Styles = require('styles');
 
 	/**

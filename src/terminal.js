@@ -6,41 +6,31 @@ define(function(require) {
 	'use strict';
 
 	var Events = require('events');
-	var Styles = require('styles');
-
 	var Commander = require('commander');
 	var Shell = require('shell');
 
-	var ClientOutput = require('client/output');
-	var ClientInput = require('client/input');
-
-	// Default stylesheet rule
+	var Client = require('client');
+	//var InputStream = require('io/inputstream');
 	
-	Styles.addRule('.terminaljs', {
-		'height': '100%',
-		'padding': '10px',
-		'color': '#fff',
-		'background-color': '#111',
-		'font-family': 'monospace'
-	});
-
 	/**
 	 * @class
 	 */
 	var Terminal = function(element, settings) {
 		var self = this;
-		this.element = element;
+		this.client = new Client(element);
 
 		// Events support
-		this.events = new Events();
+		/*this.events = new Events();
 
 		// Load settings
 		for(var key in settings) {
 			if (!settings.hasOwnProperty(key))
 				continue;
 			this.settings[key] = settings[key];
-		}
+		}*/
 
+
+/*
 		// Create DOM elements structure
 		element.className = 'terminaljs';
 
@@ -71,136 +61,136 @@ define(function(require) {
 		
 		element.addEventListener('click', function(e){
 			self.inputElement.focus();
-		});
+		});*/
 	};
 
-	Terminal.prototype = {
-		settings: {
-			welcome: "<p>Terminal.js 0.2<br/>Copyright 2011-2012 Ramón Lamana.</p>"
-		},
+	// Terminal.prototype = {
+	// 	settings: {
+	// 		welcome: "<p>Terminal.js 0.2<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+	// 	},
 
-		focus: function(){
-			this.inputElement.focus();
-		},
+	// 	focus: function(){
+	// 		this.inputElement.focus();
+	// 	},
 
-		historyInit: function() {
-			this._historyIndex = 0;
-			this._history = [];
-		},
+	// 	historyInit: function() {
+	// 		this._historyIndex = 0;
+	// 		this._history = [];
+	// 	},
 
-		historyReset: function() {
-			this._historyIndex = this._history.length;
-		},
+	// 	historyReset: function() {
+	// 		this._historyIndex = this._history.length;
+	// 	},
 
-		historyBack: function() {
-			this._historyIndex--;
-			var command = this._history[this._historyIndex];
+	// 	historyBack: function() {
+	// 		this._historyIndex--;
+	// 		var command = this._history[this._historyIndex];
 
-			if (command)
-				this.read(command);
-			else
-				this._historyIndex = 0;
-		},
+	// 		if (command)
+	// 			this.read(command);
+	// 		else
+	// 			this._historyIndex = 0;
+	// 	},
 
-		historyForward: function() {
-			this._historyIndex++;
-			var command = this._history[this._historyIndex];
+	// 	historyForward: function() {
+	// 		this._historyIndex++;
+	// 		var command = this._history[this._historyIndex];
 
-			if (command) 
-				this.read(command);
-			else 
-				this.historyReset();
-		},
+	// 		if (command) 
+	// 			this.read(command);
+	// 		else 
+	// 			this.historyReset();
+	// 	},
 
-		history: function() {
-			return this._history;
-		},
+	// 	history: function() {
+	// 		return this._history;
+	// 	},
 
-		read: function(withContent) {
-			this.inputElement.clear()
+	// 	read: function(withContent) {
+	// 		this.inputElement.clear()
 
-			if(typeof withContent !== 'undefined')
-				this.inputElement.setValue(withContent);
+	// 		if(typeof withContent !== 'undefined')
+	// 			this.inputElement.setValue(withContent);
 
-			this.inputElement.show().focus();
-		},
+	// 		this.inputElement.show().focus();
+	// 	},
 
-		idle: function() {
-			this.inputElement.hide();
-			this.element.focus();
-		},
+	// 	idle: function() {
+	// 		this.inputElement.hide();
+	// 		this.element.focus();
+	// 	},
 
-		/**
-		 * @param {String} target The output target: 'STDOUT', 'STDERR', 'WEB'.
-		 * @param {String} content Output content to be printed.
-		 * @return {OutputElement} Itself to call in cascade.
-		 */
-		print: function(content, target) {
-			target = target || 'STDOUT';
-			this.outputElement.print(content, target);
-		},
+	// 	/**
+	// 	 * @param {String} target The output target: 'STDOUT', 'STDERR', 'WEB'.
+	// 	 * @param {String} content Output content to be printed.
+	// 	 * @return {OutputElement} Itself to call in cascade.
+	// 	 */
+	// 	print: function(content, target) {
+	// 		target = target || 'STDOUT';
+	// 		this.outputElement.print(content, target);
+	// 	},
 
-		clear: function() {
-			this.outputElement.clear();
-		},
+	// 	clear: function() {
+	// 		this.outputElement.clear();
+	// 	},
 
-		enter: function(inputElement) {
-			var command = inputElement.getValue();
+	// 	enter: function(inputElement) {
+	// 		var command = inputElement.getValue();
 
-			// Show command entered in output and hide 
-			// prompt waiting for next read operation
-			this._printInput();
-			this.idle();
+	// 		// Show command entered in output and hide 
+	// 		// prompt waiting for next read operation
+	// 		this._printInput();
+	// 		this.idle();
 
-			if(command === '') {
-				this.read();
-				return
-			}
-			this._history.push(command);
-			this.historyReset();
+	// 		if(command === '') {
+	// 			this.read();
+	// 			return
+	// 		}
+	// 		this._history.push(command);
+	// 		this.historyReset();
 			
-			// Execute command
-			this.events.emit('read', command);
-		},
+	// 		// Execute command
+	// 		this.events.emit('read', command);
+	// 	},
 
-		autocomplete: function() {
-			// Execute the internal _autocomplete method with 
-			// the input as parameter
-			this.events.emit('read', '_autocomplete ' + this.inputElement.getValue());
-		},
+	// 	autocomplete: function() {
+	// 		// Execute the internal _autocomplete method with 
+	// 		// the input as parameter
+	// 		this.events.emit('read', '_autocomplete ' + this.inputElement.getValue());
+	// 	},
 
-		autocompleteProposal: function(commands) {
-			if(commands.length > 1) {
-				this._printInput();
-				this.print(commands.join(' '), "STDOUT");
-				this.read(this.inputElement.getValue());
-			}
-			else if(commands.length === 1) {
-				this.read(commands[0]);
-			}
-		},
+	// 	autocompleteProposal: function(commands) {
+	// 		if(commands.length > 1) {
+	// 			this._printInput();
+	// 			this.print(commands.join(' '), "STDOUT");
+	// 			this.read(this.inputElement.getValue());
+	// 		}
+	// 		else if(commands.length === 1) {
+	// 			this.read(commands[0]);
+	// 		}
+	// 	},
 		
-		setPrompt: function(prompt) {
-			this.inputElement.setPrompt(prompt);
-		},
+	// 	setPrompt: function(prompt) {
+	// 		this.inputElement.setPrompt(prompt);
+	// 	},
 
-		setInfo: function(content) {
-			this.infoElement.setContent(info);
-		},
+	// 	setInfo: function(content) {
+	// 		this.infoElement.setContent(info);
+	// 	},
 
-		_printInput: function() {
-			var commandElement = new ClientInput();
-			commandElement
-				.setPrompt(this.inputElement.getPrompt())
-				.setValue(this.inputElement.text.innerHTML)
-				.show();
+	// 	_printInput: function() {
+	// 		var commandElement = new ClientInput();
+	// 		commandElement
+	// 			.setPrompt(this.inputElement.getPrompt())
+	// 			.setValue(this.inputElement.text.innerHTML)
+	// 			.show();
 
-			this.outputElement.printUserInput(commandElement.element.outerHTML);
-		}
-	}
+	// 		this.outputElement.printUserInput(commandElement.element.outerHTML);
+	// 	}
+	// }
 
-	Terminal.Commander = require('commander');
-	Terminal.Shell = require('shell');
+	Terminal.Commander = Commander;
+	Terminal.Shell = Shell;
 
 	return Terminal;
 

@@ -82,6 +82,20 @@
 		info: function(content) {
 			this.events.emit('done', content);
 		},
+
+		/**
+		 * Execute the command in the process context. That is 
+		 * calls the function passed as a parametes with this process
+		 * as scope.
+		 */
+		exec: function(command, args) {
+			if(typeof command !== 'function') {
+				console.error(this.toString + ': Could not execute process because the given command is not a function');
+				this.exit(1);
+			}
+
+			command.apply(this, args);
+		}
 	};
 
 	return Process;
