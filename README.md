@@ -1,4 +1,4 @@
-Terminal.js
+Termin.us
 ===========================
 
 An open library to create your own shells.
