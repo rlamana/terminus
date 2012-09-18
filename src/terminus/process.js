@@ -7,8 +7,7 @@
 
 	var Process;
 	var Events = require('terminus/events');
-	var InputStream = require('terminus/io/inputstream');
-	var OutputStream = require('terminus/io/outputstream');
+	var Streams = require('terminus/streams');
 
 	/**
 	 * @private

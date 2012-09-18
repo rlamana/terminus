@@ -5,11 +5,11 @@
 
 	'use strict';
 
-	var Styles = require('styles');
-	var Events = require('events');
+	var Styles = require('terminus/styles');
+	var Events = require('terminus/events');
 
-	var Input = require('client/input');
-	var Output = require('client/output');
+	var Input = require('terminus/client/input');
+	var Output = require('terminus/client/output');
 
 	var transitionTime = .2;
 

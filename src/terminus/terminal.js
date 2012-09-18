@@ -6,9 +6,6 @@ define(function(require) {
 	'use strict';
 
 	var Events = require('terminus/events');
-	var Commander = require('terminus/commander');
-	var Shell = require('terminus/shell');
-
 	var Client = require('terminus/client');
 	//var InputStream = require('io/inputstream');
 	
@@ -188,9 +185,6 @@ define(function(require) {
 	// 		this.outputElement.printUserInput(commandElement.element.outerHTML);
 	// 	}
 	// }
-
-	Terminal.Commander = Commander;
-	Terminal.Shell = Shell;
 
 	return Terminal;
 

@@ -9,7 +9,7 @@ describe("Process", function() {
 			toBeInstanceOf: function (expected) {return this.actual instanceof expected;}
 		});
 
-		input = new io.InputStream();
+		input = new Streams.Input();
 		stdout = new io.OutputStream();
 		stderr = new io.OutputStream();
 		stdweb = new io.OutputStream();
