@@ -6,9 +6,9 @@
 	'use strict';
 
 	var Process;
-	var Events = require('events');
-	var InputStream = require('io/inputstream');
-	var OutputStream = require('io/outputstream');
+	var Events = require('terminus/events');
+	var InputStream = require('terminus/io/inputstream');
+	var OutputStream = require('terminus/io/outputstream');
 
 	/**
 	 * @private

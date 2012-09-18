@@ -1,13 +1,13 @@
 ({
     baseUrl: 'src',
     name: '../vendor/almond',
-    include: ['terminal'],
+    include: ['terminus'],
     //insertRequire: ['terminal'],
-    out: 'build/terminal.js',
+    out: 'build/terminus.js',
    	
    	wrap: {
         start: "(function() {",
-        end: "window.Terminal = require('terminal');\n}());"
+        end: "window.Terminus = require('terminus');\n}());"
     },
 
   	// How to optimize all the JS files in the build output directory.

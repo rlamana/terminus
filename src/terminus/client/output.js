@@ -5,8 +5,8 @@ define(function(require) {
 	
 	'use strict';
 
-	var Events = require('events');
-	var Util = require('util');
+	var Events = require('terminus/events');
+	var Util = require('terminus/util');
 	
 	//var ClientOutputLine = require('client/outputline');
 	

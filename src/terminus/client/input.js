@@ -5,8 +5,8 @@ define(function(require) {
 	
 	'use strict';
 
-	var Events = require('events');
-	var Styles = require('styles');
+	var Events = require('terminus/events');
+	var Styles = require('terminus/styles');
 
 	/**
 	 * Client Input class

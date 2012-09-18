@@ -5,7 +5,7 @@
 
 	'use strict';
 
-	var Events = require('events');
+	var Events = require('terminus/events');
 	
 	/**
 	 * @class

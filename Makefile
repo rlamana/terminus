@@ -5,13 +5,13 @@ builddir = build/
 # Dependencies
 targets = config.js
 
-all: terminal.js terminal.min.js
+all: terminus.js terminus.min.js
 
-terminal.js: ${targets}
-	r.js -o config.js optimize=none out=${builddir}terminal.js
+terminus.js: ${targets}
+	r.js -o config.js optimize=none out=${builddir}terminus.js
 
-terminal.min.js: ${targets}
-	r.js -o config.js out=${builddir}terminal.min.js
+terminus.min.js: ${targets}
+	r.js -o config.js out=${builddir}terminus.min.js
 
 build-runner: 
 	cd deps/examples/specrunner
@@ -22,7 +22,7 @@ build-runner-mac:
 	qmake -spec macx-g++ && make
 
 clean:
-	rm ${builddir}terminal.js
-	rm ${builddir}terminal.min.js
+	rm ${builddir}terminus.js
+	rm ${builddir}terminus.min.js
 
 

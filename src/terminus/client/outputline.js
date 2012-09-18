@@ -6,7 +6,7 @@
 	'use strict';
 
 	//var Client = {};//require('cliente');
-	var Styles = require('styles');
+	var Styles = require('terminus/styles');
 
 	/**
 	 * Client OutputLine class.

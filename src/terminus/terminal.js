@@ -5,11 +5,11 @@ define(function(require) {
 	
 	'use strict';
 
-	var Events = require('events');
-	var Commander = require('commander');
-	var Shell = require('shell');
+	var Events = require('terminus/events');
+	var Commander = require('terminus/commander');
+	var Shell = require('terminus/shell');
 
-	var Client = require('client');
+	var Client = require('terminus/client');
 	//var InputStream = require('io/inputstream');
 	
 	/**
