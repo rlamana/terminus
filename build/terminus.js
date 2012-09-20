@@ -1,4 +1,4 @@
-(function() {
+(function(exports) {
 /**
  * almond 0.1.3 Copyright (c) 2011, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
@@ -1242,84 +1242,13 @@ define('terminus/terminal',['require','terminus/events','terminus/client'],funct
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
-define('terminus/streams/input',['require'],function(require) {
-	
-	
-
-	/**
-	 * @class
-	 *
-	 * methods: read, readLine
-	 * events: data
-	 */
-	var Input = function() {
-		this.stream = [];
-	};
-
-	Input.prototype = {
-		read: function() {
-			this.stream
-		}, 
-
-		readLine: function() {
-
-		}
-	};
-
-	return Input;
-	
-});
-/**
- * Copyright © 2012 Ramón Lamana
- */
- 
-define('terminus/streams/output',['require'],function(require) {
-	
-	
-
-	/**
-	 * @class
-	 */
-	var Output = function() {
-	};
-
-	Output.prototype = {
-		write: function(output) {
-
-		}
-	};
-
-	return Output;	
-});
-/**
- * Copyright © 2012 Ramón Lamana
- */
- define('terminus/streams',['require','terminus/streams/input','terminus/streams/output'],function(require) {
-
- 	
-
-	/**
-	 * @namespace
-	 */
-	var Streams = {
-		Input: require('terminus/streams/input'),
-		Output: require('terminus/streams/output')
-	};
-
-	return Streams;
-	
-});
-/**
- * Copyright © 2012 Ramón Lamana
- */
- define('terminus/process',['require','terminus/events','terminus/streams'],function(require) {
+ define('terminus/process',['require'],function(require) {
 	
 	
 
 	var Process;
-	var Events = require('terminus/events');
-	var Streams = require('terminus/streams');
+	//var Events = require('terminus/events');
+	//var Streams = require('terminus/streams');
 
 	/**
 	 * @private
@@ -1438,5 +1367,5 @@ define('terminus',['require','terminus/shell','terminus/commander','terminus/ter
 	return Terminus;
 
 });
-window.Terminus = require('terminus');
-}());
+exports.Terminus = require('terminus');
+})(window);

@@ -6,8 +6,8 @@
     out: 'build/terminus.js',
    	
    	wrap: {
-        start: "(function() {",
-        end: "window.Terminus = require('terminus');\n}());"
+        start: "(function(exports) {",
+        end: "exports.Terminus = require('terminus');\n})(window);"
     },
 
   	// How to optimize all the JS files in the build output directory.
