@@ -1,15 +1,13 @@
 
-define(['src/terminus/process'],function(Process) {
+define(['terminus/process'],function(Process) {
 	describe('Process', function(){
-	    describe('#indexOf()', function(){
-			it('should return -1 when the value is not present', function(){
-			    assert.equal(-1, [1,2,3].indexOf(5));
-			    assert.equal(-1, [1,2,3].indexOf(0));
+	    describe('Process()', function(){
+			it('debuti', function(){
+			   
 			})
 	    })
 	});
 });
-
 
 /**
  * Copyright © 2012 Ramón Lamana

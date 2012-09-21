@@ -9,14 +9,14 @@ define(function(require) {
 	/**
 	 * @class
 	 */
-	var Output = function() {
+	var OutputStream = function() {
 	};
 
-	Output.prototype = {
+	OutputStream.prototype = {
 		write: function(output) {
 
 		}
 	};
 
-	return Output;	
+	return OutputStream;
 });
