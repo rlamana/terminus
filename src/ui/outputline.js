@@ -1,26 +1,26 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define(function(require) {
+define(function(require) {
 	
 	'use strict';
 
 	//var Client = {};//require('cliente');
-	var Styles = require('terminus/styles');
+	var Styles = require('ui/styles');
 
 	/**
 	 * Client OutputLine class.
 	 * Represents a line output element in the whole output stream.
 	 * @class
 	 */
-	var ClientOutputLine = function(className) {
+	var OutputLine = function(className) {
 		var outputContent, outputLine = this.element = document.createElement('div');
-		outputLine.className = 'terminaljs-output-line ' + 
-			(className || '') + 
-			(Client.animations ? ' animate' : '');
+		outputLine.className = 'terminusjs-output-line ' + 
+			(className || '');/* + 
+			(Client.animations ? ' animate' : '');*/
 
 		outputContent = this.outputContent = document.createElement('div');
-		outputContent.className = 'terminaljs-output-content';
+		outputContent.className = 'terminusjs-output-content';
 		outputLine.appendChild(outputContent);
 
 		// When new output is generated, always scroll to bottom
@@ -28,7 +28,7 @@
 		
 	};
 
-	ClientOutputLine.prototype = {
+	OutputLine.prototype = {
 		element: null,
 		outputContent: null,
 
@@ -43,7 +43,7 @@
 
 		show: function() {
 			var self = this;
-			var animations = Client.animations;
+			var animations = false; //Client.animations;
 
 			var func = function() {
 				Styles.addClass(self.element, 'visible');
@@ -59,5 +59,5 @@
 		}
 	};
 
-	return ClientOutputLine;
+	return OutputLine;
 });

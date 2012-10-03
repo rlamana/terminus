@@ -9,8 +9,8 @@ define(function(require) {
 	/**
 	 * @dependecies
 	 */
-	var Promise = require('terminus/promise');
-	var Events = require('terminus/events');
+	var Promise = require('core/promise');
+	var Events = require('core/events');
 
 	/**
 	 * @class

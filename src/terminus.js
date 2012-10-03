@@ -5,20 +5,16 @@ define(function(require) {
 	
 	'use strict';
 
-	var Shell = require('terminus/shell');
-	var Commander = require('terminus/commander');
-
-	var Terminal = require('terminus/terminal');
-	
 	/**
 	 * @class
 	 */
 	var Terminus = function() {
 	};
 	
-	Terminus.Shell = Shell;
-	Terminus.Process = require('terminus/process');
-	//Terminus.Commander = Commander;
+	Terminus.Shell = require('system/shell');
+	Terminus.Process = require('system/process');
+	Terminus.Commander = require('commander');
+	Terminus.Terminal = require('ui/terminal');
 	//Terminus.Terminal = Terminal;
 
 	return Terminus;

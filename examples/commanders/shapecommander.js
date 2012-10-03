@@ -2,15 +2,15 @@
  * Copyright © 2012 Ramón Lamana
  */
  
-(function(global, Terminal) {
+(function(global, Terminus) {
 
 	'use strict';
 
 	var ShapeCommander = function(decorator) {
-		Terminal.Commander.apply(this);
+		Terminus.Commander.apply(this);
 	}
 
-	ShapeCommander.prototype = new Terminal.Commander();
+	ShapeCommander.prototype = new Terminus.Commander();
 
 	ShapeCommander.prototype.commands = {
 		shape: function(n1, n2, n3, n4) {
@@ -32,4 +32,4 @@
 
 	global.ShapeCommander = ShapeCommander;
 
-})( window, window.Terminal);
+})( window, window.Terminus);

@@ -5,8 +5,8 @@
 	
 	'use strict';
 
-	var Util = require('terminus/util');
-	var Commander = require('terminus/commander');
+	var Util = require('core/util');
+	var Commander = require('commander');
 
 	/**
 	 * @class

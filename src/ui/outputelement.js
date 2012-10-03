@@ -5,26 +5,26 @@ define(function(require) {
 	
 	'use strict';
 
-	var Events = require('terminus/events');
-	var Util = require('terminus/util');
+	var Events = require('core/events');
+	var Util = require('core/util');
 	
-	//var ClientOutputLine = require('client/outputline');
+	var OutputLine = require('ui/outputline');
 	
 	/**
 	 * Client Output class
 	 * @class
 	 */
-	var Output = function() {
+	var OutputElement = function() {
 		this.element = document.createElement('div');
-		this.element.className = 'terminaljs-output';
+		this.element.className = 'terminusjs-output';
 	};
 
-	Output.prototype = {
+	OutputElement.prototype = {
 		_print: function(content, className) {
-			/*var outputLine = new ClientOutputLine(className);
+			var outputLine = new OutputLine(className);
 			outputLine.appendTo(this.element);
 			outputLine.setContent(content);
-			return outputLine;*/
+			return outputLine;
 		},
 
 		appendTo: function(element) {
@@ -42,13 +42,13 @@ define(function(require) {
 			target = target || 'STDOUT';
 			switch(target) {
 				case 'STDOUT': 
-					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stdout');
+					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stdout');
 				break;
 				case 'STDERR':
-					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminaljs-stderr');
+					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stderr');
 				break;
 				case 'WEB':
-					output = this._print(content, 'terminaljs-web');
+					output = this._print(content, 'terminusjs-web');
 				break;
 			}
 
@@ -57,7 +57,7 @@ define(function(require) {
 		},
 
 		printUserInput: function(content) {
-			this._print(content, 'terminaljs-userinput').show();
+			this._print(content, 'terminusjs-userinput').show();
 		},
 
 		clear: function() {
@@ -65,5 +65,5 @@ define(function(require) {
 		}
 	};
 
-	return Output;
+	return OutputElement;
 });

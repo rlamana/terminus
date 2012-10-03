@@ -2,15 +2,15 @@
  * Copyright © 2012 Ramón Lamana
  */
  
-(function(global, Terminal) {
+(function(global, Terminus) {
 
 	'use strict';
 
 	var TestCommander = function(decorator) {
-		Terminal.Commander.apply(this);
+		Terminus.Commander.apply(this);
 	}
 
-	TestCommander.prototype = new Terminal.Commander();
+	TestCommander.prototype = new Terminus.Commander();
 
 	TestCommander.prototype.commands = {
 		block: function() {
@@ -24,4 +24,4 @@
 
 	global.TestCommander = TestCommander;
 
-})( window, window.Terminal );
+})( window, window.Terminus );

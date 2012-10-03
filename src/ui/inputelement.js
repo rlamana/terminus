@@ -5,14 +5,14 @@ define(function(require) {
 	
 	'use strict';
 
-	var Events = require('terminus/events');
-	var Styles = require('terminus/styles');
+	var Events = require('core/events');
+	var Styles = require('ui/styles');
 
 	/**
 	 * Client Input class
 	 * @class
 	 */
-	var Input = function(settings) {
+	var InputElement = function(settings) {
 		var self = this;
 
 		this.settings = {
@@ -32,14 +32,14 @@ define(function(require) {
 		// DOM elements structure
 		this.element = document.createElement('div');
 		
-		this.element.className = 'terminaljs-input-line';
+		this.element.className = 'terminusjs-input-line';
 
 		this.prompt = document.createElement('div');
-		this.prompt.className = 'terminaljs-prompt';
+		this.prompt.className = 'terminusjs-prompt';
 		this.element.appendChild(this.prompt);
 
 		this.text = document.createElement('div');
-		this.text.className = 'terminaljs-input';
+		this.text.className = 'terminusjs-input';
 		this.text.innerHTML = '';
 		this.element.appendChild(this.text);
 
@@ -82,7 +82,7 @@ define(function(require) {
 		this.setPrompt(this.settings.prompt);
 	};
 
-	Input.prototype = {
+	InputElement.prototype = {
 		getValue: function () {
 			var input = this.text.innerText || this.text.textContent;
 			var value = input ? input.replace(/\n/g, '') : '';
@@ -122,17 +122,17 @@ define(function(require) {
 		},
 
 		show: function () {
-			Styles.addClass(this.element,'terminaljs-box');
+			Styles.addClass(this.element,'terminusjs-box');
 			return this;
 		},
 
 		hide: function () {
-			Styles.removeClass(this.element,'terminaljs-box');
+			Styles.removeClass(this.element,'terminusjs-box');
 			return this;
 		},
 
 		isVisible: function() {
-			return (this.element.style.display !== 'none') && Styles.hasClass(this.element, 'terminaljs-box');
+			return (this.element.style.display !== 'none') && Styles.hasClass(this.element, 'terminusjs-box');
 		},
 
 		placeCursorToEnd: function() {
@@ -149,5 +149,5 @@ define(function(require) {
 		}
 	};
 
-	return Input;
+	return InputElement;
 });

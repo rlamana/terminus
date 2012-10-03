@@ -12,7 +12,7 @@
 				height: auto;
 			}
 
-			.terminaljs {
+			.terminusjs {
 				font-family: 'Ubuntu Mono', monospace;
 			}
 		</style>
@@ -20,8 +20,8 @@
 	<body>
 		<div id="terminal"></div>	
 
-		<script type="text/javascript" src="../build/terminal.js"></script>
-		<!--<script type="text/javascript" src="/terminal.min.js"></script>-->
+		<script type="text/javascript" src="../build/terminus.js"></script>
+		<!--<script type="text/javascript" src="/terminus.min.js"></script>-->
 
 		<script type="text/javascript" src="commanders/testcommander.js"></script>
 
@@ -29,13 +29,15 @@
 		<script type="text/javascript" src="commanders/lib/supertags.js"></script>
 		<script type="text/javascript" src="commanders/shapecommander.js"></script>
 		<script type="text/javascript">
-			var terminal = new Terminal(document.getElementById('terminal'), {
-				welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminal.js 0.3<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+			var terminal = new Terminus.Terminal(document.getElementById('terminal'), {
+				welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminus.js 0.4<br/>Copyright 2011-2012 Ramón Lamana.</p>"
 			});
 
-			//var shell = new Terminal.Shell(terminal);
-			//shell.addCommander(new TestCommander());
-			//shell.addCommander(new ShapeCommander());
+			// El terminal va ligado a un shell
+
+			var shell = new Terminus.Shell(terminal);
+			shell.addCommander(new TestCommander());
+			shell.addCommander(new ShapeCommander());
 		</script>
 	</body>
 </html>
