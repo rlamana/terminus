@@ -8,6 +8,8 @@
 	var Util = require('core/util');
 	var Commander = require('commander');
 
+	var Process = require('system/process');
+
 	/**
 	 * @class
 	 */
@@ -56,14 +58,20 @@
 			for(var i = this.commanders.length; i--;) {
 				commander = this.commanders[i];
 				if (commander.commands && commander.commands[input.command]) {
+					var proc = new Process();
+					proc.events.on('exit', this.done);
+
+					// Call commander's command with the scope of the new created process
+					commander.commands[input.command].apply(proc, input.args); 
+
 					// Call commander's command, always with the scope of the commander itself
-					commander.commands[input.command].apply(commander, input.args); 
+					//commander.commands[input.command].apply(commander, input.args); 
 					return;
 				} 
 			}
 
 			this.terminal.print("Command '"+input.command+"' not found.", 'STDERR');
-			this.terminal.read();
+			this.terminal.read();º	
 		},
 
 		output: function(content, target) {
@@ -72,8 +80,8 @@
 		},
 
 		done: function(content, target) {
-			if(content)
-				this.output(content, target);
+			//if(content)
+			//	this.output(content, target);
 
 			this.terminal.read();
 		},

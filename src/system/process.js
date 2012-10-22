@@ -6,7 +6,7 @@
 	'use strict';
 
 	var Process;
-	//var Events = require('terminus/events');
+	var Events = require('core/events');
 	//var Streams = require('terminus/streams');
 
 	/**

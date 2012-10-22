@@ -14,14 +14,31 @@
 
 	TestCommander.prototype.commands = {
 		block: function() {
-			this.output('This will block the terminal until read() is called. Test CTRL+Z...');
+			this.exit();
 		},
 
 		exit: function() {
 			location.reload();
+		},
+
+		sum: function(op1, op2) {
+			this.output(parseInt(op1) + parseInt(op2));
+			this.done();
 		}
 	};
 
 	global.TestCommander = TestCommander;
 
 })( window, window.Terminus );
+
+/*
+Terminus.addCommands({
+	exit: function() {
+		location.reload();
+	},
+
+	sum: function(op1, op2) {
+		this.output(parseInt(op1) + parseInt(op2));
+		this.done();
+	}
+});*/
