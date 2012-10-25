@@ -29,13 +29,11 @@
 		<script type="text/javascript" src="commanders/lib/supertags.js"></script>
 		<script type="text/javascript" src="commanders/shapecommander.js"></script>
 		<script type="text/javascript">
-			var terminal = new Terminus.Terminal(document.getElementById('terminal'), {
+			var display = new Terminus.Display(document.getElementById('terminal'), {
 				welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminus.js 0.4<br/>Copyright 2011-2012 Ramón Lamana.</p>"
 			});
 
-			// El terminal va ligado a un shell
-
-			var shell = new Terminus.Shell(terminal);
+			var shell = new Terminus.Shell(display);
 			shell.addCommander(new TestCommander());
 			//shell.addCommander(new ShapeCommander());
 		</script>

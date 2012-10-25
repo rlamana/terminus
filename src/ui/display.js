@@ -80,9 +80,9 @@
 	});
 
 	/**
-	 * Terminal 
+	 * Widget 
 	 */
-	var Terminal = function(element, settings) {
+	var Display = function(element, settings) {
 		var self = this;
 
 		// Events support
@@ -133,7 +133,7 @@
 		});
 	};
 
-	Terminal.prototype = {
+	Display.prototype = {
 		settings: {
 	 		welcome: "<p>Terminus.js 0.4<br/>Copyright 2011-2012 Ramón Lamana.</p>"
 		},
@@ -258,5 +258,5 @@
 		}
 	};
 
-	return Terminal;
+	return Display;
 });

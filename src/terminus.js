@@ -10,12 +10,14 @@ define(function(require) {
 	 */
 	var Terminus = function() {
 	};
+
+	Terminus.prototype = {
+	};
 	
+	Terminus.Display = require('ui/display');
 	Terminus.Shell = require('system/shell');
 	Terminus.Process = require('system/process');
 	Terminus.Commander = require('commander');
-	Terminus.Terminal = require('ui/terminal');
-	//Terminus.Terminal = Terminal;
 
 	return Terminus;
 

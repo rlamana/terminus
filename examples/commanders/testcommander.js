@@ -24,6 +24,10 @@
 		sum: function(op1, op2) {
 			this.output(parseInt(op1) + parseInt(op2));
 			this.done();
+		},
+
+		test: function() {
+			this.write("Hola mundo", 'STDOUT');
 		}
 	};
 

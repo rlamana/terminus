@@ -62,10 +62,10 @@
 					proc.events.on('exit', this.done);
 
 					// Call commander's command with the scope of the new created process
-					commander.commands[input.command].apply(proc, input.args); 
+					//commander.commands[input.command].apply(proc, input.args); 
 
 					// Call commander's command, always with the scope of the commander itself
-					//commander.commands[input.command].apply(commander, input.args); 
+					commander.commands[input.command].apply(commander, input.args); 
 					return;
 				} 
 			}
