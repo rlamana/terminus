@@ -13,20 +13,20 @@
 	/**
 	 * @class
 	 */
-	var Shell = function(terminal, commander) {
+	var Shell = function(display, commander) {
 		this._environment = {
 		};
 
 		if(commander)
 			this.addCommander(commander);
 
-		if(terminal)
-			this.setTerminal(terminal);
+		if(display)
+			this.setDisplay(display);
 	};
 
 	Shell.prototype = {
 		commanders: [],
-		terminal: null,
+		display: null,
 
 		_environment: null,
 		
@@ -70,32 +70,32 @@
 				} 
 			}
 
-			this.terminal.print("Command '"+input.command+"' not found.", 'STDERR');
-			this.terminal.read();º	
+			this.display.print("Command '"+input.command+"' not found.", 'STDERR');
+			this.display.read();
 		},
 
 		output: function(content, target) {
 			target = target || 'STDOUT';
-			this.terminal.print(content, target);
+			this.display.print(content, target);
 		},
 
 		done: function(content, target) {
 			//if(content)
 			//	this.output(content, target);
 
-			this.terminal.read();
+			this.display.read();
 		},
 
 		info: function(content) {
-			this.terminal.setInfo(content);
+			this.display.setInfo(content);
 		},
 
 		/**
-		 * Attaches a terminal and start listening to its read events 
+		 * Attaches a display and start listening to its read events 
 		 */
-		setTerminal: function(terminal) {
-			this.terminal = terminal; 
-			this.terminal.events.on('read', this.exec, this);
+		setDisplay: function(display) {
+			this.display = display; 
+			this.display.events.on('read', this.exec, this);
 		},
 
 		/**
@@ -110,7 +110,7 @@
 
 		native: {
 			history: function() {
-				var output = '', history = this.terminal.history();
+				var output = '', history = this.display.history();
 				for(var i=0, l=history.length; i<l; i++)
 					output += ' ' + i + ': ' + history[i] + '\n';
 
@@ -119,8 +119,8 @@
 			},
 
 			clear: function() {
-				this.terminal.clear();
-				this.terminal.read();
+				this.display.clear();
+				this.display.read();
 			},
 
 			_autocomplete: function(command) {
@@ -141,7 +141,7 @@
 				}
 				// @todo proposal for arguments asking the commander. Adding else here.
 
-				this.terminal.autocompleteProposal(found);
+				this.display.autocompleteProposal(found);
 			}
 		}
 	};

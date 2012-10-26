@@ -7,12 +7,13 @@ define(function(require) {
 
 	var Events = require('core/events');
 	var Styles = require('ui/styles');
+	var InputStream = require('io/inputstream');
 
 	/**
 	 * Client Input class
 	 * @class
 	 */
-	var InputElement = function(settings) {
+	var Input = function(settings) {
 		var self = this;
 
 		this.settings = {
@@ -82,7 +83,7 @@ define(function(require) {
 		this.setPrompt(this.settings.prompt);
 	};
 
-	InputElement.prototype = {
+	Input.prototype = {
 		getValue: function () {
 			var input = this.text.innerText || this.text.textContent;
 			var value = input ? input.replace(/\n/g, '') : '';
@@ -149,5 +150,5 @@ define(function(require) {
 		}
 	};
 
-	return InputElement;
+	return Input;
 });

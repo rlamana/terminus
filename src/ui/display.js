@@ -7,8 +7,8 @@
 
 	var Events 			= require('core/events');
 	var Styles 			= require('ui/styles');
-	var InputElement 	= require('ui/inputelement');
-	var OutputElement 	= require('ui/outputelement');
+	var InputElement 	= require('ui/input');
+	var OutputElement 	= require('ui/output');
 
 	var transitionTime = .2;
 
@@ -100,21 +100,20 @@
 		}
 
 		// Create DOM output element
-		this.outputElement = new OutputElement();
-		this.outputElement.appendTo(this.element);
+		this.output = new OutputElement();
+		this.output.appendTo(this.element);
 
 		// Create DOM input element
-		this.inputElement = new InputElement({
+		this.input = new InputElement({
 			editable: true
 		});
-		this.inputElement.appendTo(this.element).show();
+		this.input.appendTo(this.element).show();
 
-		this.inputElement.events.on('enter', this.enter, this);
-		this.inputElement.events.on('historyBack', this.historyBack, this);
-		this.inputElement.events.on('historyForward', this.historyForward, this);
-		this.inputElement.events.on('autocomplete', this.autocomplete, this);
+		this.input.events.on('enter', this.enter, this);
+		this.input.events.on('historyBack', this.historyBack, this);
+		this.input.events.on('historyForward', this.historyForward, this);
+		this.input.events.on('autocomplete', this.autocomplete, this);
 		
-
 		// CTRL + Z support
 		element.addEventListener('keydown', function(e) {
 			if(e.ctrlKey && e.keyCode == 90) {
@@ -139,7 +138,7 @@
 		},
 
 		focus: function(){
-			this.inputElement.focus();
+			this.input.focus();
 		},
 
 		historyInit: function() {
@@ -176,16 +175,16 @@
 		},
 
 		read: function(withContent) {
-			this.inputElement.clear()
+			this.input.clear()
 
 			if(typeof withContent !== 'undefined')
-				this.inputElement.setValue(withContent);
+				this.input.setValue(withContent);
 
-			this.inputElement.show().focus();
+			this.input.show().focus();
 		},
 
 		idle: function() {
-			this.inputElement.hide();
+			this.input.hide();
 			this.element.focus();
 		},
 
@@ -196,11 +195,11 @@
 		 */
 		print: function(content, target) {
 			target = target || 'STDOUT';
-			this.outputElement.print(content, target);
+			this.output.print(content, target);
 		},
 
 		clear: function() {
-			this.outputElement.clear();
+			this.output.clear();
 		},
 
 		enter: function(inputElement) {
@@ -225,14 +224,14 @@
 		autocomplete: function() {
 			// Execute the internal _autocomplete method with 
 			// the input as parameter
-			this.events.emit('read', '_autocomplete ' + this.inputElement.getValue());
+			this.events.emit('read', '_autocomplete ' + this.input.getValue());
 		},
 
 		autocompleteProposal: function(commands) {
 			if(commands.length > 1) {
 				this._printInput();
 				this.print(commands.join(' '), "STDOUT");
-				this.read(this.inputElement.getValue());
+				this.read(this.input.getValue());
 			}
 			else if(commands.length === 1) {
 				this.read(commands[0]);
@@ -240,7 +239,7 @@
 		},
 		
 		setPrompt: function(prompt) {
-			this.inputElement.setPrompt(prompt);
+			this.input.setPrompt(prompt);
 		},
 
 		setInfo: function(content) {
@@ -250,11 +249,11 @@
 		_printInput: function() {
 			var commandElement = new InputElement();
 			commandElement
-				.setPrompt(this.inputElement.getPrompt())
-				.setValue(this.inputElement.text.innerHTML)
+				.setPrompt(this.input.getPrompt())
+				.setValue(this.input.text.innerHTML)
 				.show();
 
-			this.outputElement.printUserInput(commandElement.element.outerHTML);
+			this.output.printUserInput(commandElement.element.outerHTML);
 		}
 	};
 

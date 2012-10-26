@@ -6,15 +6,20 @@ define(function(require) {
 	
 	'use strict';
 
+	var Promise = require('core/promise');
+	var Events = require('core/events');
+
 	/**
 	 * @class
 	 */
 	var OutputStream = function() {
+		this.stream = [];
 	};
 
 	OutputStream.prototype = {
 		write: function(output) {
-
+			this.stream.push(output);
+			this.events.emit('data', output);
 		}
 	};
 

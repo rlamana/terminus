@@ -448,20 +448,277 @@ define('ui/styles',['require'],function(require) {
 });
 
 /**
+ * Copyright © 2009-2012 A. Matías Quezada
+ * https://github.com/amatiasq
+ */
+ define('core/promise',['require'],function(require) {
+
+	
+
+	var slice = Array.prototype.slice;
+
+	function Promise() {
+		this._ondone = [];
+		this._onerror = [];
+		this._onprogress = [];
+		this._state = 'unfulfilled';
+		this._args = null; 
+	}
+
+	Promise.prototype = {
+		constructor: Promise,
+
+		done: function(var_args) {
+			if (checkValid(this._state)) {
+				this._state = 'fulfilled';
+				this._args = slice.call(arguments);
+				call(this._ondone, this._args);
+			}
+		},
+
+		fail: function(var_args) {
+			if (checkValid(this._state)) {
+				this._state = 'failed';
+				if (this._onerror.length === 0)
+					throw new Error('Promise failed without handler.');
+				this._args = slice.call(arguments);
+				call(this._onerror, this._args);
+			}
+		},
+
+		progress: function(var_args) {
+			if (this.isCanceled())
+				return;
+
+			for (var i = 0, len = this._onprogress.length; i < len; i++)
+				this._onprogress[i].apply(null, arguments);
+		},
+
+		onDone: function(callback) {
+			if (typeof callback == 'function') {
+				if (this.isDone())
+					call(callback, this._args);
+				else
+					this._ondone.push(callback);
+			}
+			return this;
+		},
+
+		onFail: function(callback) {
+			if (typeof callback == 'function') {
+				if (this.isFailed())
+					call(callback, this._args);
+				else
+					this._onerror.push(callback);
+			}
+			return this;
+		},
+
+		onProgress: function(callback) {
+			if (typeof callback == 'function')
+				this._onprogress.push(callback);
+
+			return this;
+		},
+
+		then: function(success, fail, progress) {
+			this.ondone(success);
+			this.onFail(fail);
+			this.onProgress(progress);
+			return this;
+		},
+
+		cancel: function() {
+			this._state = 'canceled';
+		},
+
+		isCanceled: function() {
+			return this._state === 'canceled';
+		},
+
+		isDone: function() {
+			return this._state === 'fulfilled';
+		},
+
+		isFailed: function() {
+			return this._state === 'failed';
+		},
+
+		isOpen: function() {
+			return this._state === 'unfulfilled';
+		}
+
+	};
+
+	function call(callbacks, args) {
+		setTimeout(function() {
+			if (typeof callbacks === 'function')
+				return callbacks.apply(null, args);
+
+			for (var i = 0, len = callbacks.length; i < len; i++)
+				callbacks[i].apply(null, args);
+		}, 0);
+	}
+
+	function checkValid(state) {
+		switch (state) {
+			case 'unfulfilled':
+				return true;
+			case 'canceled':
+				return false;
+			case 'fulfilled':
+				throw new Error('Promise is done')
+			case 'failed':
+				throw new Error('Promise is failed');
+			default:
+				throw new Error('Invalid promise state ' + state);
+		}
+	}
+
+	if (typeof Base === 'function')
+		Promise = Base.extend(Promise.prototype);
+
+	Promise.done = function() {
+		var prom = new Promise();
+		prom.done.apply(prom, arguments);
+		return prom;
+	};
+	Promise.failed = function() {
+		var prom = new Promise();
+		prom.fail.apply(prom, arguments);
+		return prom;
+	};
+	Promise.parallel = function(promises) {
+		var promise = new Promise();
+		var result = [];
+		var done = [];
+
+		if (arguments.length > 1)
+			promises = slice.call(arguments);
+
+		var len = done.length = promises.length;
+		if (len === 0)
+			return Promise.done();
+
+		for (var i = 0; i < len; i++)
+			queueParallel(promise, promises[i], i, done, results);
+
+		return promise;
+	};
+	Promise.serial = function(callbacks) {
+		var promise = new Promise();
+		if (arguments.length > 1)
+			callbacks = slice.call(arguments);
+
+		if (callbacks.length === 0)
+			return Promise.done();
+
+		nextSequential(promise, callbacks, 0, [])
+		return promise;
+	};
+
+	function queueParallel(prom, target, index, done, results) {
+		target.then(function() {
+
+			done[index] = true;
+			results[index] = slice.call(arguments);
+
+			if (!prom.isOpen())
+				return;
+
+			for (var i = done.length; i--; )
+				if (!done[i])
+					return;
+
+			prom.done.apply(prom, results);
+
+		}, function() {
+			if (prom.isOpen())
+				prom.fail.apply(prom, arguments);
+		});
+	}
+	
+	function nextSequential(prom, callbacks, index, args) {
+		if (index === callbacks.length)
+			return prom.done.apply(prom, args);
+
+		var result = callbacks[index].apply(null, args);
+
+		if (!(result instanceof Promise)) {
+			nextSecuencial(prom, callbacks, index + 1, [result]);
+		} else {
+			result.then(function() {
+				nextSecuencial(prom, callbacks, index + 1, arguments);
+			}, function(args) {
+				prom.fail.apply(prom, arguments);
+			});
+		}
+	}
+
+	return Promise;
+});
+/**
  * Copyright © 2012 Ramón Lamana
  */
-define('ui/inputelement',['require','core/events','ui/styles'],function(require) {
+ 
+define('io/inputstream',['require','core/promise','core/events'],function(require) {
+	
+	
+
+	/**
+	 * @dependecies
+	 */
+	var Promise = require('core/promise');
+	var Events = require('core/events');
+
+	/**
+	 * @class
+	 *
+	 * methods: read, readLine
+	 * events: data
+	 */
+	var InputStream = function() {
+		// Events support
+		this.events = new Events();
+
+		this.stream = [];
+	};
+
+	InputStream.prototype = {
+		read: function() {
+			var ret = this.stream;
+			this.stream = [];
+			return ret;
+		}, 
+
+		readLine: function() {
+		},
+
+		_put: function(data) {
+			this.stream.push(data);
+			this.events.emit('data');
+		}
+	};
+
+	return InputStream;
+	
+});
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+define('ui/input',['require','core/events','ui/styles','io/inputstream'],function(require) {
 	
 	
 
 	var Events = require('core/events');
 	var Styles = require('ui/styles');
+	var InputStream = require('io/inputstream');
 
 	/**
 	 * Client Input class
 	 * @class
 	 */
-	var InputElement = function(settings) {
+	var Input = function(settings) {
 		var self = this;
 
 		this.settings = {
@@ -531,7 +788,7 @@ define('ui/inputelement',['require','core/events','ui/styles'],function(require)
 		this.setPrompt(this.settings.prompt);
 	};
 
-	InputElement.prototype = {
+	Input.prototype = {
 		getValue: function () {
 			var input = this.text.innerText || this.text.textContent;
 			var value = input ? input.replace(/\n/g, '') : '';
@@ -598,7 +855,7 @@ define('ui/inputelement',['require','core/events','ui/styles'],function(require)
 		}
 	};
 
-	return InputElement;
+	return Input;
 });
 
 /**
@@ -706,7 +963,7 @@ define('ui/outputline',['require','ui/styles'],function(require) {
 /**
  * Copyright © 2012 Ramón Lamana
  */
-define('ui/outputelement',['require','core/events','core/util','ui/outputline'],function(require) {
+define('ui/output',['require','core/events','core/util','ui/outputline'],function(require) {
 	
 	
 
@@ -719,12 +976,12 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 	 * Client Output class
 	 * @class
 	 */
-	var OutputElement = function() {
+	var Output = function() {
 		this.element = document.createElement('div');
 		this.element.className = 'terminusjs-output';
 	};
 
-	OutputElement.prototype = {
+	Output.prototype = {
 		_print: function(content, className) {
 			var outputLine = new OutputLine(className);
 			outputLine.appendTo(this.element);
@@ -770,19 +1027,19 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 		}
 	};
 
-	return OutputElement;
+	return Output;
 });
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define('ui/display',['require','core/events','ui/styles','ui/inputelement','ui/outputelement'],function(require) {
+ define('ui/display',['require','core/events','ui/styles','ui/input','ui/output'],function(require) {
 
 	
 
 	var Events 			= require('core/events');
 	var Styles 			= require('ui/styles');
-	var InputElement 	= require('ui/inputelement');
-	var OutputElement 	= require('ui/outputelement');
+	var InputElement 	= require('ui/input');
+	var OutputElement 	= require('ui/output');
 
 	var transitionTime = .2;
 
@@ -874,19 +1131,19 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 		}
 
 		// Create DOM output element
-		this.outputElement = new OutputElement();
-		this.outputElement.appendTo(this.element);
+		this.output = new OutputElement();
+		this.output.appendTo(this.element);
 
 		// Create DOM input element
-		this.inputElement = new InputElement({
+		this.input = new InputElement({
 			editable: true
 		});
-		this.inputElement.appendTo(this.element).show();
+		this.input.appendTo(this.element).show();
 
-		this.inputElement.events.on('enter', this.enter, this);
-		this.inputElement.events.on('historyBack', this.historyBack, this);
-		this.inputElement.events.on('historyForward', this.historyForward, this);
-		this.inputElement.events.on('autocomplete', this.autocomplete, this);
+		this.input.events.on('enter', this.enter, this);
+		this.input.events.on('historyBack', this.historyBack, this);
+		this.input.events.on('historyForward', this.historyForward, this);
+		this.input.events.on('autocomplete', this.autocomplete, this);
 		
 
 		// CTRL + Z support
@@ -913,7 +1170,7 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 		},
 
 		focus: function(){
-			this.inputElement.focus();
+			this.input.focus();
 		},
 
 		historyInit: function() {
@@ -950,16 +1207,16 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 		},
 
 		read: function(withContent) {
-			this.inputElement.clear()
+			this.input.clear()
 
 			if(typeof withContent !== 'undefined')
-				this.inputElement.setValue(withContent);
+				this.input.setValue(withContent);
 
-			this.inputElement.show().focus();
+			this.input.show().focus();
 		},
 
 		idle: function() {
-			this.inputElement.hide();
+			this.input.hide();
 			this.element.focus();
 		},
 
@@ -970,11 +1227,11 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 		 */
 		print: function(content, target) {
 			target = target || 'STDOUT';
-			this.outputElement.print(content, target);
+			this.output.print(content, target);
 		},
 
 		clear: function() {
-			this.outputElement.clear();
+			this.output.clear();
 		},
 
 		enter: function(inputElement) {
@@ -999,14 +1256,14 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 		autocomplete: function() {
 			// Execute the internal _autocomplete method with 
 			// the input as parameter
-			this.events.emit('read', '_autocomplete ' + this.inputElement.getValue());
+			this.events.emit('read', '_autocomplete ' + this.input.getValue());
 		},
 
 		autocompleteProposal: function(commands) {
 			if(commands.length > 1) {
 				this._printInput();
 				this.print(commands.join(' '), "STDOUT");
-				this.read(this.inputElement.getValue());
+				this.read(this.input.getValue());
 			}
 			else if(commands.length === 1) {
 				this.read(commands[0]);
@@ -1014,7 +1271,7 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 		},
 		
 		setPrompt: function(prompt) {
-			this.inputElement.setPrompt(prompt);
+			this.input.setPrompt(prompt);
 		},
 
 		setInfo: function(content) {
@@ -1024,11 +1281,11 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 		_printInput: function() {
 			var commandElement = new InputElement();
 			commandElement
-				.setPrompt(this.inputElement.getPrompt())
-				.setValue(this.inputElement.text.innerHTML)
+				.setPrompt(this.input.getPrompt())
+				.setValue(this.input.text.innerHTML)
 				.show();
 
-			this.outputElement.printUserInput(commandElement.element.outerHTML);
+			this.output.printUserInput(commandElement.element.outerHTML);
 		}
 	};
 
@@ -1197,20 +1454,20 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 	/**
 	 * @class
 	 */
-	var Shell = function(terminal, commander) {
+	var Shell = function(display, commander) {
 		this._environment = {
 		};
 
 		if(commander)
 			this.addCommander(commander);
 
-		if(terminal)
-			this.setTerminal(terminal);
+		if(display)
+			this.setDisplay(display);
 	};
 
 	Shell.prototype = {
 		commanders: [],
-		terminal: null,
+		display: null,
 
 		_environment: null,
 		
@@ -1254,32 +1511,32 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 				} 
 			}
 
-			this.terminal.print("Command '"+input.command+"' not found.", 'STDERR');
-			this.terminal.read();º	
+			this.display.print("Command '"+input.command+"' not found.", 'STDERR');
+			this.display.read();
 		},
 
 		output: function(content, target) {
 			target = target || 'STDOUT';
-			this.terminal.print(content, target);
+			this.display.print(content, target);
 		},
 
 		done: function(content, target) {
 			//if(content)
 			//	this.output(content, target);
 
-			this.terminal.read();
+			this.display.read();
 		},
 
 		info: function(content) {
-			this.terminal.setInfo(content);
+			this.display.setInfo(content);
 		},
 
 		/**
-		 * Attaches a terminal and start listening to its read events 
+		 * Attaches a display and start listening to its read events 
 		 */
-		setTerminal: function(terminal) {
-			this.terminal = terminal; 
-			this.terminal.events.on('read', this.exec, this);
+		setDisplay: function(display) {
+			this.display = display; 
+			this.display.events.on('read', this.exec, this);
 		},
 
 		/**
@@ -1294,7 +1551,7 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 
 		native: {
 			history: function() {
-				var output = '', history = this.terminal.history();
+				var output = '', history = this.display.history();
 				for(var i=0, l=history.length; i<l; i++)
 					output += ' ' + i + ': ' + history[i] + '\n';
 
@@ -1303,8 +1560,8 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 			},
 
 			clear: function() {
-				this.terminal.clear();
-				this.terminal.read();
+				this.display.clear();
+				this.display.read();
 			},
 
 			_autocomplete: function(command) {
@@ -1325,7 +1582,7 @@ define('ui/outputelement',['require','core/events','core/util','ui/outputline'],
 				}
 				// @todo proposal for arguments asking the commander. Adding else here.
 
-				this.terminal.autocompleteProposal(found);
+				this.display.autocompleteProposal(found);
 			}
 		}
 	};

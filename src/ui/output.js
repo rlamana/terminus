@@ -14,12 +14,12 @@ define(function(require) {
 	 * Client Output class
 	 * @class
 	 */
-	var OutputElement = function() {
+	var Output = function() {
 		this.element = document.createElement('div');
 		this.element.className = 'terminusjs-output';
 	};
 
-	OutputElement.prototype = {
+	Output.prototype = {
 		_print: function(content, className) {
 			var outputLine = new OutputLine(className);
 			outputLine.appendTo(this.element);
@@ -65,5 +65,5 @@ define(function(require) {
 		}
 	};
 
-	return OutputElement;
+	return Output;
 });
