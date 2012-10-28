@@ -385,69 +385,6 @@ define("../vendor/almond", function(){});
 	
 });
 /**
- * Copyright © 2012 Ramón Lamana
- */
-define('ui/styles',['require'],function(require) {
-	
-	
-
-	/**
-	 * @singleton
-	 */
-	var Styles = {
-		_styleSheet: null,
-
-		addRule: function (selector, declaration) {  
-			var declarationStr = declaration;
-
-			// Create styleshee if it doesn't exist
-			if(!this._styleSheet) {
-				var style = document.createElement('style');
-
-				if(!document.head)
-					return;
-
-				//document.head.appendChild(style);
-				document.head.insertBefore(style, document.head.childNodes[0]); // Before all other defined styles
-				this._styleSheet = document.styleSheets[document.styleSheets.length - 1];
-			}
-
-			if (typeof declaration !== 'string') {
-				declarationStr = ''
-				
-
-				for(var style in declaration) {
-					if(!declaration.hasOwnProperty(style))
-						continue;
-
-					declarationStr += style + ': ' + declaration[style] + ';';
-				}
-	  		}
-
-			this._styleSheet.insertRule(selector + '{' + declarationStr + '}', 0);  
-		},  
-
-		hasClass: function (element, className) {
-			return element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
-		},
-
-		addClass: function(element, className) {
-			if (!this.hasClass(element, className)) 
-				element.className += " " + className;
-		},
-
-		removeClass: function(element, className) {
-			if (this.hasClass(element, className)) {
-				var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-				element.className = element.className.replace(reg,' ');
-			}
-		}
-	};
-
-	return Styles;
-});
-
-/**
  * Copyright © 2009-2012 A. Matías Quezada
  * https://github.com/amatiasq
  */
@@ -522,7 +459,7 @@ define('ui/styles',['require'],function(require) {
 		},
 
 		then: function(success, fail, progress) {
-			this.ondone(success);
+			this.onDone(success);
 			this.onFail(fail);
 			this.onProgress(progress);
 			return this;
@@ -657,6 +594,69 @@ define('ui/styles',['require'],function(require) {
 
 	return Promise;
 });
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+define('ui/styles',['require'],function(require) {
+	
+	
+
+	/**
+	 * @singleton
+	 */
+	var Styles = {
+		_styleSheet: null,
+
+		addRule: function (selector, declaration) {  
+			var declarationStr = declaration;
+
+			// Create styleshee if it doesn't exist
+			if(!this._styleSheet) {
+				var style = document.createElement('style');
+
+				if(!document.head)
+					return;
+
+				//document.head.appendChild(style);
+				document.head.insertBefore(style, document.head.childNodes[0]); // Before all other defined styles
+				this._styleSheet = document.styleSheets[document.styleSheets.length - 1];
+			}
+
+			if (typeof declaration !== 'string') {
+				declarationStr = ''
+				
+
+				for(var style in declaration) {
+					if(!declaration.hasOwnProperty(style))
+						continue;
+
+					declarationStr += style + ': ' + declaration[style] + ';';
+				}
+	  		}
+
+			this._styleSheet.insertRule(selector + '{' + declarationStr + '}', 0);  
+		},  
+
+		hasClass: function (element, className) {
+			return element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+		},
+
+		addClass: function(element, className) {
+			if (!this.hasClass(element, className)) 
+				element.className += " " + className;
+		},
+
+		removeClass: function(element, className) {
+			if (this.hasClass(element, className)) {
+				var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+				element.className = element.className.replace(reg,' ');
+			}
+		}
+	};
+
+	return Styles;
+});
+
 /**
  * Copyright © 2012 Ramón Lamana
  */
@@ -1032,14 +1032,16 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define('ui/display',['require','core/events','ui/styles','ui/input','ui/output'],function(require) {
+ define('ui/display',['require','core/events','core/promise','ui/styles','ui/input','ui/output'],function(require) {
 
 	
 
-	var Events 			= require('core/events');
-	var Styles 			= require('ui/styles');
-	var InputElement 	= require('ui/input');
-	var OutputElement 	= require('ui/output');
+	var Events 	= require('core/events');
+	var Promise = require('core/promise');
+
+	var Styles 	= require('ui/styles');
+	var Input 	= require('ui/input');
+	var Output 	= require('ui/output');
 
 	var transitionTime = .2;
 
@@ -1114,28 +1116,29 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	 * Widget 
 	 */
 	var Display = function(element, settings) {
-		var self = this;
+		var self = this,
+			setter;
 
 		// Events support
 		this.events = new Events();
 
-		// Create DOM elements structure
-		this.element = element;
-		this.element.className = 'terminusjs';
-
-		// Load settings
+				// Load settings
 		for(var key in settings) {
 			if (!settings.hasOwnProperty(key))
 				continue;
 			this.settings[key] = settings[key];
 		}
 
+		// Create DOM elements structure
+		this.element = element;
+		this.element.className = 'terminusjs';
+
 		// Create DOM output element
-		this.output = new OutputElement();
+		this.output = new Output();
 		this.output.appendTo(this.element);
 
 		// Create DOM input element
-		this.input = new InputElement({
+		this.input = new Input({
 			editable: true
 		});
 		this.input.appendTo(this.element).show();
@@ -1145,7 +1148,6 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		this.input.events.on('historyForward', this.historyForward, this);
 		this.input.events.on('autocomplete', this.autocomplete, this);
 		
-
 		// CTRL + Z support
 		element.addEventListener('keydown', function(e) {
 			if(e.ctrlKey && e.keyCode == 90) {
@@ -1153,18 +1155,24 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			}
 		});
 
-		// Init history
-		this.historyInit();
-
-		this.print(this.settings.welcome, 'WEB');
-		this.read();
+		this.output.print(this.settings.welcome, 'WEB');
+		this.prompt();
 		
 		element.addEventListener('click', function(e){
 			self.inputElement.focus();
 		});
+
+		if (!!this.settings.shell)
+			this.connectShell(this.settings.shell);
+
+		this._historyIndex = 0;
 	};
 
 	Display.prototype = {
+		shell: null,
+
+		_historyIndex: 0,
+
 		settings: {
 	 		welcome: "<p>Terminus.js 0.4<br/>Copyright 2011-2012 Ramón Lamana.</p>"
 		},
@@ -1173,40 +1181,31 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			this.input.focus();
 		},
 
-		historyInit: function() {
-			this._historyIndex = 0;
-			this._history = [];
-		},
-
 		historyReset: function() {
-			this._historyIndex = this._history.length;
+			this._historyIndex = this.shell.history.length;
 		},
 
 		historyBack: function() {
 			this._historyIndex--;
-			var command = this._history[this._historyIndex];
+			var command = this.shell.history[this._historyIndex];
 
 			if (command)
-				this.read(command);
+				this.input.setValue(command);
 			else
 				this._historyIndex = 0;
 		},
 
 		historyForward: function() {
 			this._historyIndex++;
-			var command = this._history[this._historyIndex];
+			var command = this.shell.history[this._historyIndex];
 
 			if (command) 
-				this.read(command);
+				this.input.setValue(command);
 			else 
 				this.historyReset();
 		},
 
-		history: function() {
-			return this._history;
-		},
-
-		read: function(withContent) {
+		prompt: function(withContent) {
 			this.input.clear()
 
 			if(typeof withContent !== 'undefined')
@@ -1220,66 +1219,70 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			this.element.focus();
 		},
 
-		/**
-		 * @param {String} target The output target: 'STDOUT', 'STDERR', 'WEB'.
-		 * @param {String} content Output content to be printed.
-		 * @return {OutputElement} Itself to call in cascade.
-		 */
-		print: function(content, target) {
-			target = target || 'STDOUT';
-			this.output.print(content, target);
-		},
-
-		clear: function() {
-			this.output.clear();
-		},
-
 		enter: function(inputElement) {
-			var command = inputElement.getValue();
+			var command = inputElement.getValue(),
+				promise = new Promise(),
+				self = this;
 
 			// Show command entered in output and hide 
 			// prompt waiting for next read operation
 			this._printInput();
-			this.idle();
+			if(command === '')
+				return;
 
-			if(command === '') {
-				this.read();
-				return
+			this.idle();
+			promise.then(function() {
+				self.prompt();
+			});
+
+			if(!!this.shell) {
+				// Execute Command
+				this.shell.exec(command).then(function(){
+					promise.done();
+				});
 			}
-			this._history.push(command);
+
 			this.historyReset();
-			
-			// Execute command
-			this.events.emit('read', command);
 		},
 
 		autocomplete: function() {
-			// Execute the internal _autocomplete method with 
-			// the input as parameter
-			this.events.emit('read', '_autocomplete ' + this.input.getValue());
-		},
+			var commands = this.shell.search(this.input.getValue());
 
-		autocompleteProposal: function(commands) {
 			if(commands.length > 1) {
 				this._printInput();
-				this.print(commands.join(' '), "STDOUT");
-				this.read(this.input.getValue());
+				this.output.print(commands.join(' '), "STDOUT");
+				this.prompt(this.input.getValue());
 			}
 			else if(commands.length === 1) {
-				this.read(commands[0]);
+				this.prompt(commands[0]);
 			}
 		},
-		
-		setPrompt: function(prompt) {
-			this.input.setPrompt(prompt);
-		},
 
-		setInfo: function(content) {
-			this.infoElement.setContent(info);
+		connectShell: function(shell) {
+			var streams = shell.streams;
+			this.shell = shell;
+
+			// Listen to its output streams
+			streams.stdout.events.on('data', function(data){
+				this.output.print(data, 'STDOUT');
+			}, this);
+
+			streams.err.events.on('data', function(data){
+				this.output.print(data, 'STDERR');
+			}, this);
+
+			streams.web.events.on('data', function(data){
+				this.output.print(data, 'WEB');
+			}, this);
+
+			// Listen to other events on shell
+			streams.stdin.events.on('clear', this.output.clear, this.output);
+
+			this.historyReset();
 		},
 
 		_printInput: function() {
-			var commandElement = new InputElement();
+			var commandElement = new Input();
 			commandElement
 				.setPrompt(this.input.getPrompt())
 				.setValue(this.input.text.innerHTML)
@@ -1339,13 +1342,13 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define('system/process',['require','core/events'],function(require) {
+ define('system/process',['require','core/events','core/promise'],function(require) {
 	
 	
 
 	var Process;
 	var Events = require('core/events');
-	//var Streams = require('terminus/streams');
+	var Promise = require('core/promise');
 
 	/**
 	 * @private
@@ -1365,25 +1368,18 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	/**
 	 * @class
 	 */
-	Process = function(input, outputStd, outputErr, outputWeb) {
+	Process = function(streams) {
 		this.pid = ProcessTable.register(this);
 		this.events = new Events;
+		this.streams = streams;
 
-		this.inputStream = input;
-		this.outputStream.std = outputStd;
-		this.outputStream.err = outputErr;
-		this.outputStream.web = outputWeb;
+		this._promise = new Promise();
 	};
 
 	Process.prototype = {
 		pid: null,
 
-		inputStream: null,
-		outputStream: {
-			std: null,
-			err: null,
-			web: null
-		},
+		_promise: null,
 
 		toString: function() {
 			return '[Process:' + this.pid + ']';
@@ -1396,14 +1392,16 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		write: function(output, target) {
 			var ostream;
 
+			target = target || 'STDOUT';
+
 			if (typeof target === 'OutputStream')
 				ostream = target;
 			else if(target === 'STDOUT') 
-				ostream = this.outputStream.std;
+				ostream = this.streams.stdout;
 			else if(target === 'STDERR') 
-				ostream = this.outputStream.err;
-			else if(target === 'STDWEB') 
-				ostream = this.outputStream.web;
+				ostream = this.streams.err;
+			else if(target === 'WEB') 
+				ostream = this.streams.web;
 			else {
 				console.error(this.toString + ' Method write(): The target is not a valid stream');
 				return;
@@ -1413,11 +1411,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		},
 
 		exit: function(value) {
-			this.events.emit('exit', value || '0');
-		},
-
-		info: function(content) {
-			this.events.emit('done', content);
+			this._promise.done();
 		},
 
 		/**
@@ -1426,12 +1420,15 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		 * as scope.
 		 */
 		exec: function(command, args) {
+			var promise = new Promise();
+
 			if(typeof command !== 'function') {
 				console.error(this.toString + ': Could not execute process because the given command is not a function');
 				this.exit(1);
 			}
 
 			command.apply(this, args);
+			return this._promise;
 		}
 	};
 
@@ -1442,41 +1439,141 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define('system/shell',['require','core/util','commander','system/process'],function(require) {
+ 
+define('io/outputstream',['require','core/promise','core/events'],function(require) {
 	
 	
 
-	var Util = require('core/util');
-	var Commander = require('commander');
-
-	var Process = require('system/process');
+	var Promise = require('core/promise');
+	var Events = require('core/events');
 
 	/**
 	 * @class
 	 */
-	var Shell = function(display, commander) {
+	var OutputStream = function() {
+		// Events support
+		this.events = new Events();
+		
+		this.stream = [];
+	};
+
+	OutputStream.prototype = {
+		write: function(output) {
+			this.stream.push(output);
+			this.events.emit('data', output);
+		}
+	};
+
+	return OutputStream;
+});
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+ define('system/shell',['require','core/util','core/promise','commander','system/process','io/inputstream','io/outputstream'],function(require) {
+	
+	
+
+	var Util = require('core/util');
+	var Promise = require('core/promise');
+
+	var Commander = require('commander');
+
+	var Process = require('system/process');
+	var InputStream = require('io/inputstream');
+	var OutputStream = require('io/outputstream');
+
+	/**
+	 * @class
+	 */
+	var Shell = function(commands) {
 		this._environment = {
 		};
 
-		if(commander)
-			this.addCommander(commander);
+		if(commands)
+			this.addCommands(commands);
 
-		if(display)
-			this.setDisplay(display);
+		// Create Standard Streams
+		this.streams = {
+			stdin: new InputStream(),
+			stdout: new OutputStream(),
+			err: new OutputStream(),
+			web: new OutputStream()
+		};
+
+		this.commands = [];
+		this.history = [];
 	};
 
 	Shell.prototype = {
-		commanders: [],
-		display: null,
+		commands: null,
+		streams: null,
+		history: null,
 
 		_environment: null,
 		
-
 		getEnv: function(key) {
 			return this._environment[key] ? this._environment[key] : null;
 		},
 
-		parse: function(input) {
+		exec: function(input) {
+			var commandsGroup, proc;
+
+			this.history.push(input);
+
+			input = this._parse(input);
+
+			// Execute first shell native commands
+			if (this.native[input.command]) {
+				this.native[input.command].apply(this, input.args);
+				return Promise.done();
+			} else {
+				// Search command in commander stack
+				for(var i = this.commands.length; i--;) {
+					commandsGroup = this.commands[i];
+					if (commandsGroup[input.command]) {
+						var proc = new Process(this.streams);
+						return proc.exec(commandsGroup[input.command], input.args); // Return promise
+					} 
+				}
+			}
+
+			this.streams.err.write("Command '"+input.command+"' not found.");
+
+			return Promise.done();
+		},
+
+		search: function(key) {
+			var found = [], commands = [];
+
+			for(var i = this.commands.length; i--;) 
+				commands = Util.Array.merge(commands, Object.keys(this.commands[i]));
+			
+			var regexp = new RegExp('^'+key, "i");
+
+			// Proposal only for commands not for arguments
+			//if(arguments.length <= 1) {
+				for (var i = commands.length; i--;) {
+					if (regexp.test(commands[i])) {
+						found.push(commands[i]);
+					}
+				}
+			//}
+			// @todo proposal for arguments asking the commander. Adding else here.
+
+			return found;
+		},
+
+		/**
+		 * Attaches a commander and start listening to its done event
+		 */
+		addCommands: function(commands) {
+			this.commands.push(commands); 
+		},
+
+		/**
+		 * Parse input string to get commands and args
+		 */
+		_parse: function(input) {
 			var command, args = input.split(' ');
 			command = args[0];
 			args.shift();
@@ -1486,103 +1583,20 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			};
 		},
 
-		exec: function(input) {
-			var commander;
-			input = this.parse(input);
-
-			if (this.native[input.command]) {
-				this.native[input.command].apply(this, input.args);
-				return;
-			}
-
-			// Search command in commander stack
-			for(var i = this.commanders.length; i--;) {
-				commander = this.commanders[i];
-				if (commander.commands && commander.commands[input.command]) {
-					var proc = new Process();
-					proc.events.on('exit', this.done);
-
-					// Call commander's command with the scope of the new created process
-					//commander.commands[input.command].apply(proc, input.args); 
-
-					// Call commander's command, always with the scope of the commander itself
-					commander.commands[input.command].apply(commander, input.args); 
-					return;
-				} 
-			}
-
-			this.display.print("Command '"+input.command+"' not found.", 'STDERR');
-			this.display.read();
-		},
-
-		output: function(content, target) {
-			target = target || 'STDOUT';
-			this.display.print(content, target);
-		},
-
-		done: function(content, target) {
-			//if(content)
-			//	this.output(content, target);
-
-			this.display.read();
-		},
-
-		info: function(content) {
-			this.display.setInfo(content);
-		},
-
 		/**
-		 * Attaches a display and start listening to its read events 
+		 * Shell native commands
 		 */
-		setDisplay: function(display) {
-			this.display = display; 
-			this.display.events.on('read', this.exec, this);
-		},
-
-		/**
-		 * Attaches a commander and start listening to its done event
-		 */
-		addCommander: function(commander) {
-			this.commanders.push(commander); 
-			commander.events.on('output', this.output, this);
-			commander.events.on('done', this.done, this);
-			commander.events.on('info', this.info, this);
-		},
-
 		native: {
 			history: function() {
-				var output = '', history = this.display.history();
-				for(var i=0, l=history.length; i<l; i++)
-					output += ' ' + i + ': ' + history[i] + '\n';
+				var output = ''
+				for(var i=0, l=this.history.length; i<l; i++)
+					output += ' ' + i + ': ' + this.history[i] + '\n';
 
-				this.output(output);
-				this.done();
+				this.streams.stdout.write(output);
 			},
 
 			clear: function() {
-				this.display.clear();
-				this.display.read();
-			},
-
-			_autocomplete: function(command) {
-				var found = [], commands = [];
-
-				for(var i = this.commanders.length; i--;) 
-					commands = Util.Array.merge(commands, this.commanders[i].getCommands());
-				
-				var regexp = new RegExp('^'+command, "i");
-
-				// Proposal only for commands not for arguments
-				if(arguments.length <= 1) {
-					for (var i = commands.length; i--;) {
-						if (regexp.test(commands[i])) {
-							found.push(commands[i]);
-						}
-					}
-				}
-				// @todo proposal for arguments asking the commander. Adding else here.
-
-				this.display.autocompleteProposal(found);
+				this.streams.stdin.events.emit('clear');
 			}
 		}
 	};

@@ -5,10 +5,12 @@
 
 	'use strict';
 
-	var Events 			= require('core/events');
-	var Styles 			= require('ui/styles');
-	var InputElement 	= require('ui/input');
-	var OutputElement 	= require('ui/output');
+	var Events 	= require('core/events');
+	var Promise = require('core/promise');
+
+	var Styles 	= require('ui/styles');
+	var Input 	= require('ui/input');
+	var Output 	= require('ui/output');
 
 	var transitionTime = .2;
 
@@ -83,28 +85,29 @@
 	 * Widget 
 	 */
 	var Display = function(element, settings) {
-		var self = this;
+		var self = this,
+			setter;
 
 		// Events support
 		this.events = new Events();
 
-		// Create DOM elements structure
-		this.element = element;
-		this.element.className = 'terminusjs';
-
-		// Load settings
+				// Load settings
 		for(var key in settings) {
 			if (!settings.hasOwnProperty(key))
 				continue;
 			this.settings[key] = settings[key];
 		}
 
+		// Create DOM elements structure
+		this.element = element;
+		this.element.className = 'terminusjs';
+
 		// Create DOM output element
-		this.output = new OutputElement();
+		this.output = new Output();
 		this.output.appendTo(this.element);
 
 		// Create DOM input element
-		this.input = new InputElement({
+		this.input = new Input({
 			editable: true
 		});
 		this.input.appendTo(this.element).show();
@@ -121,18 +124,24 @@
 			}
 		});
 
-		// Init history
-		this.historyInit();
-
-		this.print(this.settings.welcome, 'WEB');
-		this.read();
+		this.output.print(this.settings.welcome, 'WEB');
+		this.prompt();
 		
 		element.addEventListener('click', function(e){
 			self.inputElement.focus();
 		});
+
+		if (!!this.settings.shell)
+			this.connectShell(this.settings.shell);
+
+		this._historyIndex = 0;
 	};
 
 	Display.prototype = {
+		shell: null,
+
+		_historyIndex: 0,
+
 		settings: {
 	 		welcome: "<p>Terminus.js 0.4<br/>Copyright 2011-2012 Ramón Lamana.</p>"
 		},
@@ -141,40 +150,31 @@
 			this.input.focus();
 		},
 
-		historyInit: function() {
-			this._historyIndex = 0;
-			this._history = [];
-		},
-
 		historyReset: function() {
-			this._historyIndex = this._history.length;
+			this._historyIndex = this.shell.history.length;
 		},
 
 		historyBack: function() {
 			this._historyIndex--;
-			var command = this._history[this._historyIndex];
+			var command = this.shell.history[this._historyIndex];
 
 			if (command)
-				this.read(command);
+				this.input.setValue(command);
 			else
 				this._historyIndex = 0;
 		},
 
 		historyForward: function() {
 			this._historyIndex++;
-			var command = this._history[this._historyIndex];
+			var command = this.shell.history[this._historyIndex];
 
 			if (command) 
-				this.read(command);
+				this.input.setValue(command);
 			else 
 				this.historyReset();
 		},
 
-		history: function() {
-			return this._history;
-		},
-
-		read: function(withContent) {
+		prompt: function(withContent) {
 			this.input.clear()
 
 			if(typeof withContent !== 'undefined')
@@ -188,66 +188,70 @@
 			this.element.focus();
 		},
 
-		/**
-		 * @param {String} target The output target: 'STDOUT', 'STDERR', 'WEB'.
-		 * @param {String} content Output content to be printed.
-		 * @return {OutputElement} Itself to call in cascade.
-		 */
-		print: function(content, target) {
-			target = target || 'STDOUT';
-			this.output.print(content, target);
-		},
-
-		clear: function() {
-			this.output.clear();
-		},
-
 		enter: function(inputElement) {
-			var command = inputElement.getValue();
+			var command = inputElement.getValue(),
+				promise = new Promise(),
+				self = this;
 
 			// Show command entered in output and hide 
 			// prompt waiting for next read operation
 			this._printInput();
-			this.idle();
+			if(command === '')
+				return;
 
-			if(command === '') {
-				this.read();
-				return
+			this.idle();
+			promise.then(function() {
+				self.prompt();
+			});
+
+			if(!!this.shell) {
+				// Execute Command
+				this.shell.exec(command).then(function(){
+					promise.done();
+				});
 			}
-			this._history.push(command);
+
 			this.historyReset();
-			
-			// Execute command
-			this.events.emit('read', command);
 		},
 
 		autocomplete: function() {
-			// Execute the internal _autocomplete method with 
-			// the input as parameter
-			this.events.emit('read', '_autocomplete ' + this.input.getValue());
-		},
+			var commands = this.shell.search(this.input.getValue());
 
-		autocompleteProposal: function(commands) {
 			if(commands.length > 1) {
 				this._printInput();
-				this.print(commands.join(' '), "STDOUT");
-				this.read(this.input.getValue());
+				this.output.print(commands.join(' '), "STDOUT");
+				this.prompt(this.input.getValue());
 			}
 			else if(commands.length === 1) {
-				this.read(commands[0]);
+				this.prompt(commands[0]);
 			}
 		},
-		
-		setPrompt: function(prompt) {
-			this.input.setPrompt(prompt);
-		},
 
-		setInfo: function(content) {
-			this.infoElement.setContent(info);
+		connectShell: function(shell) {
+			var streams = shell.streams;
+			this.shell = shell;
+
+			// Listen to its output streams
+			streams.stdout.events.on('data', function(data){
+				this.output.print(data, 'STDOUT');
+			}, this);
+
+			streams.err.events.on('data', function(data){
+				this.output.print(data, 'STDERR');
+			}, this);
+
+			streams.web.events.on('data', function(data){
+				this.output.print(data, 'WEB');
+			}, this);
+
+			// Listen to other events on shell
+			streams.stdin.events.on('clear', this.output.clear, this.output);
+
+			this.historyReset();
 		},
 
 		_printInput: function() {
-			var commandElement = new InputElement();
+			var commandElement = new Input();
 			commandElement
 				.setPrompt(this.input.getPrompt())
 				.setValue(this.input.text.innerHTML)

@@ -7,7 +7,7 @@
 
 	var Process;
 	var Events = require('core/events');
-	//var Streams = require('terminus/streams');
+	var Promise = require('core/promise');
 
 	/**
 	 * @private
@@ -27,25 +27,18 @@
 	/**
 	 * @class
 	 */
-	Process = function(input, outputStd, outputErr, outputWeb) {
+	Process = function(streams) {
 		this.pid = ProcessTable.register(this);
 		this.events = new Events;
+		this.streams = streams;
 
-		this.inputStream = input;
-		this.outputStream.std = outputStd;
-		this.outputStream.err = outputErr;
-		this.outputStream.web = outputWeb;
+		this._promise = new Promise();
 	};
 
 	Process.prototype = {
 		pid: null,
 
-		inputStream: null,
-		outputStream: {
-			std: null,
-			err: null,
-			web: null
-		},
+		_promise: null,
 
 		toString: function() {
 			return '[Process:' + this.pid + ']';
@@ -58,14 +51,16 @@
 		write: function(output, target) {
 			var ostream;
 
+			target = target || 'STDOUT';
+
 			if (typeof target === 'OutputStream')
 				ostream = target;
 			else if(target === 'STDOUT') 
-				ostream = this.outputStream.std;
+				ostream = this.streams.stdout;
 			else if(target === 'STDERR') 
-				ostream = this.outputStream.err;
-			else if(target === 'STDWEB') 
-				ostream = this.outputStream.web;
+				ostream = this.streams.err;
+			else if(target === 'WEB') 
+				ostream = this.streams.web;
 			else {
 				console.error(this.toString + ' Method write(): The target is not a valid stream');
 				return;
@@ -75,11 +70,7 @@
 		},
 
 		exit: function(value) {
-			this.events.emit('exit', value || '0');
-		},
-
-		info: function(content) {
-			this.events.emit('done', content);
+			this._promise.done();
 		},
 
 		/**
@@ -88,12 +79,15 @@
 		 * as scope.
 		 */
 		exec: function(command, args) {
+			var promise = new Promise();
+
 			if(typeof command !== 'function') {
 				console.error(this.toString + ': Could not execute process because the given command is not a function');
 				this.exit(1);
 			}
 
 			command.apply(this, args);
+			return this._promise;
 		}
 	};
 

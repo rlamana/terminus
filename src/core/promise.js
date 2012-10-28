@@ -73,7 +73,7 @@
 		},
 
 		then: function(success, fail, progress) {
-			this.ondone(success);
+			this.onDone(success);
 			this.onFail(fail);
 			this.onProgress(progress);
 			return this;

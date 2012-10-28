@@ -6,13 +6,7 @@
 
 	'use strict';
 
-	var TestCommander = function(decorator) {
-		Terminus.Commander.apply(this);
-	}
-
-	TestCommander.prototype = new Terminus.Commander();
-
-	TestCommander.prototype.commands = {
+	var TestCommander = {
 		block: function() {
 			this.exit();
 		},
@@ -22,27 +16,16 @@
 		},
 
 		sum: function(op1, op2) {
-			this.output(parseInt(op1) + parseInt(op2));
-			this.done();
+			this.write(parseInt(op1) + parseInt(op2));
+			this.exit();
 		},
 
 		test: function() {
-			this.write("Hola mundo", 'STDOUT');
+			this.write("<div style='color:blue'>Hola mundo</div>", 'WEB');
+			this.exit(0);
 		}
 	};
 
 	global.TestCommander = TestCommander;
 
 })( window, window.Terminus );
-
-/*
-Terminus.addCommands({
-	exit: function() {
-		location.reload();
-	},
-
-	sum: function(op1, op2) {
-		this.output(parseInt(op1) + parseInt(op2));
-		this.done();
-	}
-});*/

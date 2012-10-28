@@ -13,6 +13,9 @@ define(function(require) {
 	 * @class
 	 */
 	var OutputStream = function() {
+		// Events support
+		this.events = new Events();
+		
 		this.stream = [];
 	};
 
