@@ -1159,7 +1159,11 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		this.prompt();
 		
 		element.addEventListener('click', function(e){
-			self.inputElement.focus();
+			self.input.focus();
+		});
+
+		document.addEventListener('click', function(e){
+			self.input.focus();
 		});
 
 		if (!!this.settings.shell)

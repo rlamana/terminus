@@ -128,7 +128,7 @@
 		this.prompt();
 		
 		element.addEventListener('click', function(e){
-			self.inputElement.focus();
+			self.input.focus();
 		});
 
 		if (!!this.settings.shell)
