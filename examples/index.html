@@ -31,7 +31,7 @@
 		<script type="text/javascript">
 			var shell = new Terminus.Shell();
 			shell.addCommands(TestCommander);
-			//shell.addCommands(new ShapeCommander());
+			shell.addCommands(ShapeCommander);
 			
 			var display = new Terminus.Display(document.getElementById('terminal'), {
 				welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminus.js 0.4<br/>Copyright 2011-2012 Ramón Lamana.</p>",

@@ -17,7 +17,6 @@ define(function(require) {
 	Terminus.Display = require('ui/display');
 	Terminus.Shell = require('system/shell');
 	Terminus.Process = require('system/process');
-	Terminus.Commander = require('commander');
 
 	return Terminus;
 

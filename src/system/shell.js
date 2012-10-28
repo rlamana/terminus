@@ -8,8 +8,6 @@
 	var Util = require('core/util');
 	var Promise = require('core/promise');
 
-	var Commander = require('commander');
-
 	var Process = require('system/process');
 	var InputStream = require('io/inputstream');
 	var OutputStream = require('io/outputstream');

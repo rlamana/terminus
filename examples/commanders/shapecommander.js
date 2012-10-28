@@ -6,16 +6,10 @@
 
 	'use strict';
 
-	var ShapeCommander = function(decorator) {
-		Terminus.Commander.apply(this);
-	}
-
-	ShapeCommander.prototype = new Terminus.Commander();
-
-	ShapeCommander.prototype.commands = {
+	var ShapeCommander = {
 		shape: function(n1, n2, n3, n4) {
 			var id = 'supertag_' + Math.floor(Math.random()*10e7);
-			this.output('<div id="'+id+'" />','WEB');
+			this.write('<div id="'+id+'" />','WEB');
 			
 			var image = new Supertags.Image(300, 300, {
 				n1: n1 ? n1 : 5,
@@ -26,7 +20,7 @@
 			image.appendTo(document.getElementById(id));
 			image.animate();
 			
-			this.done();
+			this.exit(0);
 		}
 	};
 

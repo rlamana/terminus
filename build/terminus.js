@@ -1162,10 +1162,6 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			self.input.focus();
 		});
 
-		document.addEventListener('click', function(e){
-			self.input.focus();
-		});
-
 		if (!!this.settings.shell)
 			this.connectShell(this.settings.shell);
 
@@ -1302,50 +1298,6 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define('commander',['require','core/events'],function(require) {
-
-	
-
-	var Events = require('core/events');
-	
-	/**
-	 * @class
-	 */
-	var Commander = function() {
-		this.events = new Events;
-	};
-
-	Commander.prototype = {		
-		output: function(output, target) {
-			this.events.emit('output', output || '', target || 'STDOUT');
-		},
-
-		done: function(output, target) {
-			this.events.emit('done', output || '', target || 'STDOUT');
-		},
-
-		info: function(content) {
-			this.events.emit('done', content);
-		},
-
-		getCommands: function() {
-			var commands = [], command;
-			for (var commandName in this.commands) {
-				if (this.commands.hasOwnProperty(commandName)) 
-					commands.push(commandName);
-			}
-			return commands;
-		},
-
-		commands: {
-		}
-	};
-
-	return Commander;
-});
-/**
- * Copyright © 2012 Ramón Lamana
- */
  define('system/process',['require','core/events','core/promise'],function(require) {
 	
 	
@@ -1473,14 +1425,12 @@ define('io/outputstream',['require','core/promise','core/events'],function(requi
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define('system/shell',['require','core/util','core/promise','commander','system/process','io/inputstream','io/outputstream'],function(require) {
+ define('system/shell',['require','core/util','core/promise','system/process','io/inputstream','io/outputstream'],function(require) {
 	
 	
 
 	var Util = require('core/util');
 	var Promise = require('core/promise');
-
-	var Commander = require('commander');
 
 	var Process = require('system/process');
 	var InputStream = require('io/inputstream');
@@ -1615,7 +1565,7 @@ define('io/outputstream',['require','core/promise','core/events'],function(requi
 /**
  * Copyright © 2012 Ramón Lamana
  */
-define('terminus',['require','ui/display','system/shell','system/process','commander'],function(require) {
+define('terminus',['require','ui/display','system/shell','system/process'],function(require) {
 	
 	
 
@@ -1631,7 +1581,6 @@ define('terminus',['require','ui/display','system/shell','system/process','comma
 	Terminus.Display = require('ui/display');
 	Terminus.Shell = require('system/shell');
 	Terminus.Process = require('system/process');
-	Terminus.Commander = require('commander');
 
 	return Terminus;
 
