@@ -23,6 +23,11 @@
 		test: function() {
 			this.write("<div style='color:blue'>Hola mundo</div>", 'WEB');
 			this.exit(0);
+		},
+
+		test2: function() {
+			this.write("It works");
+			this.exit(0);
 		}
 	};
 
