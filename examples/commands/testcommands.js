@@ -6,7 +6,7 @@
 
 	'use strict';
 
-	var TestCommander = {
+	var TestCommands = {
 		block: function() {
 			this.exit();
 		},
@@ -31,6 +31,6 @@
 		}
 	};
 
-	global.TestCommander = TestCommander;
+	global.TestCommands = TestCommands;
 
 })( window, window.Terminus );

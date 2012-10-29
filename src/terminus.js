@@ -14,10 +14,11 @@ define(function(require) {
 	Terminus.prototype = {
 	};
 	
+	Terminus.version = '0.4';
+
 	Terminus.Display = require('ui/display');
-	Terminus.Shell = require('system/shell');
+	Terminus.Shell 	 = require('system/shell');
 	Terminus.Process = require('system/process');
 
 	return Terminus;
-
 });

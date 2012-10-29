@@ -1169,8 +1169,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	};
 
 	Display.prototype = {
-		shell: null,
-
+		_shell: null,
 		_historyIndex: 0,
 
 		settings: {
@@ -1182,12 +1181,12 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		},
 
 		historyReset: function() {
-			this._historyIndex = this.shell.history.length;
+			this._historyIndex = this._shell.history.length;
 		},
 
 		historyBack: function() {
 			this._historyIndex--;
-			var command = this.shell.history[this._historyIndex];
+			var command = this._shell.history[this._historyIndex];
 
 			if (command)
 				this.input.setValue(command);
@@ -1197,7 +1196,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 
 		historyForward: function() {
 			this._historyIndex++;
-			var command = this.shell.history[this._historyIndex];
+			var command = this._shell.history[this._historyIndex];
 
 			if (command) 
 				this.input.setValue(command);
@@ -1235,9 +1234,9 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 				self.prompt();
 			});
 
-			if(!!this.shell) {
+			if(!!this._shell) {
 				// Execute Command
-				this.shell.exec(command).then(function(){
+				this._shell.exec(command).then(function(){
 					promise.done();
 				});
 			}
@@ -1246,7 +1245,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		},
 
 		autocomplete: function() {
-			var commands = this.shell.search(this.input.getValue());
+			var commands = this._shell.search(this.input.getValue());
 
 			if(commands.length > 1) {
 				this._printInput();
@@ -1258,9 +1257,9 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			}
 		},
 
-		connectShell: function(shell) {
+		connectShell: function (shell) {
 			var streams = shell.streams;
-			this.shell = shell;
+			this._shell = shell;
 
 			// Listen to its output streams
 			streams.stdout.events.on('data', function(data){
@@ -1440,8 +1439,7 @@ define('io/outputstream',['require','core/promise','core/events'],function(requi
 	 * @class
 	 */
 	var Shell = function(commands) {
-		this._environment = {
-		};
+		this._environment = {};
 
 		if(commands)
 			this.addCommands(commands);
@@ -1578,12 +1576,13 @@ define('terminus',['require','ui/display','system/shell','system/process'],funct
 	Terminus.prototype = {
 	};
 	
+	Terminus.version = '0.4';
+
 	Terminus.Display = require('ui/display');
-	Terminus.Shell = require('system/shell');
+	Terminus.Shell 	 = require('system/shell');
 	Terminus.Process = require('system/process');
 
 	return Terminus;
-
 });
 exports.Terminus = require('terminus');
 })(window);

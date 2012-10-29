@@ -16,8 +16,7 @@
 	 * @class
 	 */
 	var Shell = function(commands) {
-		this._environment = {
-		};
+		this._environment = {};
 
 		if(commands)
 			this.addCommands(commands);

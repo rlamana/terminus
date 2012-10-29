@@ -138,8 +138,7 @@
 	};
 
 	Display.prototype = {
-		shell: null,
-
+		_shell: null,
 		_historyIndex: 0,
 
 		settings: {
@@ -151,12 +150,12 @@
 		},
 
 		historyReset: function() {
-			this._historyIndex = this.shell.history.length;
+			this._historyIndex = this._shell.history.length;
 		},
 
 		historyBack: function() {
 			this._historyIndex--;
-			var command = this.shell.history[this._historyIndex];
+			var command = this._shell.history[this._historyIndex];
 
 			if (command)
 				this.input.setValue(command);
@@ -166,7 +165,7 @@
 
 		historyForward: function() {
 			this._historyIndex++;
-			var command = this.shell.history[this._historyIndex];
+			var command = this._shell.history[this._historyIndex];
 
 			if (command) 
 				this.input.setValue(command);
@@ -204,9 +203,9 @@
 				self.prompt();
 			});
 
-			if(!!this.shell) {
+			if(!!this._shell) {
 				// Execute Command
-				this.shell.exec(command).then(function(){
+				this._shell.exec(command).then(function(){
 					promise.done();
 				});
 			}
@@ -215,7 +214,7 @@
 		},
 
 		autocomplete: function() {
-			var commands = this.shell.search(this.input.getValue());
+			var commands = this._shell.search(this.input.getValue());
 
 			if(commands.length > 1) {
 				this._printInput();
@@ -227,9 +226,9 @@
 			}
 		},
 
-		connectShell: function(shell) {
+		connectShell: function (shell) {
 			var streams = shell.streams;
-			this.shell = shell;
+			this._shell = shell;
 
 			// Listen to its output streams
 			streams.stdout.events.on('data', function(data){

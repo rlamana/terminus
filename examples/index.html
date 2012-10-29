@@ -20,22 +20,28 @@
 	<body>
 		<div id="terminal"></div>	
 
+		<script type="text/javascript" src="vendor/ready.js"></script>
 		<script type="text/javascript" src="../build/terminus.js"></script>
 		<!--<script type="text/javascript" src="/terminus.min.js"></script>-->
 
-		<script type="text/javascript" src="commanders/testcommander.js"></script>
+		<!-- Example commands -->
+		<script type="text/javascript" src="commands/testcommands.js"></script>
 
-		<script type="text/javascript" src="commanders/lib/three.js"></script>
-		<script type="text/javascript" src="commanders/lib/supertags.js"></script>
-		<script type="text/javascript" src="commanders/shapecommander.js"></script>
+		<!-- Super Shape commands example -->
+		<script type="text/javascript" src="vendor/three.js"></script>
+		<script type="text/javascript" src="vendor/supertags.js"></script>
+		<script type="text/javascript" src="commands/shapecommands.js"></script>
+
 		<script type="text/javascript">
-			var shell = new Terminus.Shell();
-			shell.addCommands(TestCommander);
-			shell.addCommands(ShapeCommander);
-			
-			var display = new Terminus.Display(document.getElementById('terminal'), {
-				welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminus.js 0.4<br/>Copyright 2011-2012 Ramón Lamana.</p>",
-				shell: shell
+			domready(function(){
+				var shell = new Terminus.Shell();
+				shell.addCommands(TestCommands);
+				shell.addCommands(ShapeCommands);
+							
+				var display = new Terminus.Display(document.getElementById('terminal'), {
+					welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminus.js 0.4<br/>Copyright 2011-2012 Ramón Lamana.</p>",
+					shell: shell
+				});
 			});
 		</script>
 	</body>
