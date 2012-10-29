@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Terminal.js</title>
+		<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+		<style type="text/css">
+			body {
+				margin: 0;
+				padding: 5px;
+				background-color: #111;
+				height: auto;
+			}
+
+			.terminusjs {
+				font-family: 'Ubuntu Mono', monospace;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="terminal"></div>	
+
+		<script type="text/javascript" src="vendor/ready.js"></script>
+		<script type="text/javascript" src="../build/terminus.js"></script>
+		<!--<script type="text/javascript" src="/terminus.min.js"></script>-->
+
+		<!-- Example commands -->
+		<script type="text/javascript" src="commands/testcommands.js"></script>
+
+		<!-- Super Shape commands example -->
+		<script type="text/javascript" src="vendor/three.js"></script>
+		<script type="text/javascript" src="vendor/supertags.js"></script>
+		<script type="text/javascript" src="commands/shapecommands.js"></script>
+
+		<script type="text/javascript">
+			domready(function(){
+				var shell = new Terminus.Shell();
+				shell.addCommands(TestCommands);
+				shell.addCommands(ShapeCommands);
+							
+				var display = new Terminus.Display(document.getElementById('terminal'), {
+					welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminus.js "+Terminus.version+"<br/>Copyright 2011-2012 Ramón Lamana.</p>",
+					shell: shell
+				});
+			});
+		</script>
+	</body>
+</html>

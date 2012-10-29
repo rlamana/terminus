@@ -1,14 +1,16 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
-(function(global) {
-	
-	'use strict';
+ define(function(require) {
 
+ 	'use strict';
+
+	/**
+	 * @class
+	 */
 	var Events = function() {
 		this.__listeners = {};
-	}
+	};
 
 	Events.prototype = {
 		on: function(eventName, listener, scope) {
@@ -37,6 +39,6 @@
 		}
 	};
 
-	global.Events = Events;
+	return Events;
 	
-})( window );
+});

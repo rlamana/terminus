@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Terminal.js</title>
+		<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+		<style type="text/css">
+			body {
+				margin: 0;
+				padding: 5px;
+				background-color: #111;
+				height: auto;
+			}
+
+			.terminusjs {
+				font-family: 'Ubuntu Mono', monospace;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="terminal"></div>	
+
+		<script type="text/javascript" src="vendor/ready.js"></script>
+		<script type="text/javascript" src="../vendor/require.js"></script>
+
+		<script type="text/javascript" src="commands/testcommands.js"></script>
+
+		<script type="text/javascript">
+			domready(function(){
+				requirejs.config({
+				    baseUrl: '../src/',
+				});
+
+				require(['terminus'], function(Terminus) {
+					var shell = new Terminus.Shell();
+					shell.addCommands(TestCommands);
+								
+					var display = new Terminus.Display(document.getElementById('terminal'), {
+						welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminus.js "+Terminus.version+"<br/>Copyright 2011-2012 Ramón Lamana.</p>",
+						shell: shell
+					});
+				});
+			});
+		</script>
+	</body>
+</html>

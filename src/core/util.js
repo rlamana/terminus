@@ -1,11 +1,13 @@
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
-(function(global) {
+define(function(require) {
 	
 	'use strict';
 
+	/**
+	 * @singleton
+	 */
 	var Util = {
 		String: {
 			htmlEntities: function (str) {
@@ -33,6 +35,5 @@
 		}
 	};
 
-	global.Util = Util;
-})
-( window );
+	return Util;
+});
