@@ -20,15 +20,21 @@
 			this.exit();
 		},
 
-		test: function() {
+		hello: function() {
 			this.write("<div style='color:blue'>Hola mundo</div>", 'WEB');
 			this.exit(0);
 		},
 
-		test2: function() {
-			this.write("It works");
-			this.exit(0);
+		read: function() {
+			var self = this;
+
+			this.write('¿Cómo te llamas?');
+			this.read().then(function(data){
+				self.write("Hola " + data + "!!!!!");
+				self.exit(0);
+			});
 		}
+
 	};
 
 	global.TestCommands = TestCommands;

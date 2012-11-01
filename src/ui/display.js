@@ -116,6 +116,8 @@
 		this.input.events.on('historyBack', this.historyBack, this);
 		this.input.events.on('historyForward', this.historyForward, this);
 		this.input.events.on('autocomplete', this.autocomplete, this);
+
+		this._currentInput = this.input;
 		
 		// CTRL + Z support
 		element.addEventListener('keydown', function(e) {
@@ -128,7 +130,7 @@
 		this.prompt();
 		
 		element.addEventListener('click', function(e){
-			self.input.focus();
+			self.focus();
 		});
 
 		if (!!this.settings.shell)
@@ -140,13 +142,14 @@
 	Display.prototype = {
 		_shell: null,
 		_historyIndex: 0,
+		_currentInput: null,
 
 		settings: {
-	 		welcome: "<p>Terminus.js 0.4<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+	 		welcome: "<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>"
 		},
 
 		focus: function(){
-			this.input.focus();
+			this._currentInput.focus();
 		},
 
 		historyReset: function() {
@@ -246,7 +249,33 @@
 			// Listen to other events on shell
 			streams.stdin.events.on('clear', this.output.clear, this.output);
 
+			// Listen to input read events
+			streams.stdin.events.on('read', this._read, this);
+
 			this.historyReset();
+		},
+
+		_read: function() {
+			var input = new Input({
+				prompt: '',
+				editable: true
+			});			
+
+			this._currentInput = input;
+
+			input.appendTo(this.element)
+				.show()
+				.focus();
+
+			input.events.on('enter', function(input) {
+				var stream = this._shell.streams.stdin.pipe();
+				stream.write(input.getValue());
+				this._shell.streams.stdin.end();
+
+				input.setEditable(false);
+				this.element.removeChild(input.element);
+				this._currentInput = this.input; // restore to prompt
+			}, this);
 		},
 
 		_printInput: function() {

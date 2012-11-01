@@ -96,6 +96,10 @@ define(function(require) {
 			return this;
 		},
 
+		setEditable: function(value) {
+			this.text.contentEditable = value;
+		},
+
 		appendTo: function(element) {
 			element.appendChild(this.element);
 			return this;

@@ -19,7 +19,7 @@
 		this._environment = {};
 
 		if(commands)
-			this.addCommands(commands);
+			this.include(commands);
 
 		// Create Standard Streams
 		this.streams = {
@@ -93,10 +93,18 @@
 		},
 
 		/**
-		 * Attaches a commander and start listening to its done event
+		 * Attaches a group of commands and start listening to its done event
 		 */
-		addCommands: function(commands) {
-			this.commands.push(commands); 
+		include: function(groupORname, func) {
+			var group;
+			if (arguments.length > 1 && typeof groupORname === 'string') {
+				group = {};
+				group[groupORname] = func;
+			} 
+			else
+				group = groupORname;
+
+			this.commands.push(group); 
 		},
 
 		/**

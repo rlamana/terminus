@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Terminal.js</title>
+		<title>Terminus.js</title>
 		<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
 		<style type="text/css">
 			body {
@@ -35,8 +35,12 @@
 		<script type="text/javascript">
 			domready(function(){
 				var shell = new Terminus.Shell();
-				shell.addCommands(TestCommands);
-				shell.addCommands(ShapeCommands);
+				shell.include(TestCommands);
+				shell.include(ShapeCommands);
+				shell.include('test3', function() {
+					this.write('Hello World!');
+					this.exit(0);
+				});
 							
 				var display = new Terminus.Display(document.getElementById('terminal'), {
 					welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminus.js "+Terminus.version+"<br/>Copyright 2011-2012 Ramón Lamana.</p>",

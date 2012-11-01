@@ -661,7 +661,37 @@ define('ui/styles',['require'],function(require) {
  * Copyright © 2012 Ramón Lamana
  */
  
-define('io/inputstream',['require','core/promise','core/events'],function(require) {
+define('io/outputstream',['require','core/promise','core/events'],function(require) {
+	
+	
+
+	var Promise = require('core/promise');
+	var Events = require('core/events');
+
+	/**
+	 * @class
+	 */
+	var OutputStream = function() {
+		// Events support
+		this.events = new Events();
+		
+		this.stream = [];
+	};
+
+	OutputStream.prototype = {
+		write: function(output) {
+			this.stream.push(output);
+			this.events.emit('data', output);
+		}
+	};
+
+	return OutputStream;
+});
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+ 
+define('io/inputstream',['require','core/promise','core/events','io/outputstream'],function(require) {
 	
 	
 
@@ -671,32 +701,49 @@ define('io/inputstream',['require','core/promise','core/events'],function(requir
 	var Promise = require('core/promise');
 	var Events = require('core/events');
 
+	var OutputStream = require('io/outputstream');
+
 	/**
 	 * @class
 	 *
-	 * methods: read, readLine
-	 * events: data
+	 * events: read, data, end
 	 */
 	var InputStream = function() {
 		// Events support
 		this.events = new Events();
-
 		this.stream = [];
+
+		this._promise = null;
 	};
 
 	InputStream.prototype = {
 		read: function() {
-			var ret = this.stream;
-			this.stream = [];
-			return ret;
+			this.events.emit('read');
+			this._promise = new Promise();
+
+			return this._promise;
 		}, 
 
-		readLine: function() {
+		end: function() {
+			if(this._promise)
+				this._promise.done(this.stream);
 		},
 
-		_put: function(data) {
-			this.stream.push(data);
-			this.events.emit('data');
+		/**
+		 * Connects an output stream with an input stream
+		 */ 
+		pipe: function(outputstream) {
+			var self = this;
+
+			if(!outputstream)
+				outputstream = new OutputStream();
+			
+			outputstream.events.on('data', function(input) {
+				this.stream.push(input);
+				this.events.emit('data', input);
+			}, this);
+
+			return outputstream;
 		}
 	};
 
@@ -799,6 +846,10 @@ define('ui/input',['require','core/events','ui/styles','io/inputstream'],functio
 		setValue: function (value) {
 			this.text.innerHTML = value;
 			return this;
+		},
+
+		setEditable: function(value) {
+			this.text.contentEditable = value;
 		},
 
 		appendTo: function(element) {
@@ -1147,6 +1198,8 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		this.input.events.on('historyBack', this.historyBack, this);
 		this.input.events.on('historyForward', this.historyForward, this);
 		this.input.events.on('autocomplete', this.autocomplete, this);
+
+		this._currentInput = this.input;
 		
 		// CTRL + Z support
 		element.addEventListener('keydown', function(e) {
@@ -1159,7 +1212,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		this.prompt();
 		
 		element.addEventListener('click', function(e){
-			self.input.focus();
+			self.focus();
 		});
 
 		if (!!this.settings.shell)
@@ -1171,13 +1224,14 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	Display.prototype = {
 		_shell: null,
 		_historyIndex: 0,
+		_currentInput: null,
 
 		settings: {
-	 		welcome: "<p>Terminus.js 0.4<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+	 		welcome: "<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>"
 		},
 
 		focus: function(){
-			this.input.focus();
+			this._currentInput.focus();
 		},
 
 		historyReset: function() {
@@ -1277,7 +1331,33 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			// Listen to other events on shell
 			streams.stdin.events.on('clear', this.output.clear, this.output);
 
+			// Listen to input read events
+			streams.stdin.events.on('read', this._read, this);
+
 			this.historyReset();
+		},
+
+		_read: function() {
+			var input = new Input({
+				prompt: '',
+				editable: true
+			});			
+
+			this._currentInput = input;
+
+			input.appendTo(this.element)
+				.show()
+				.focus();
+
+			input.events.on('enter', function(input) {
+				var stream = this._shell.streams.stdin.pipe();
+				stream.write(input.getValue());
+				this._shell.streams.stdin.end();
+
+				input.setEditable(false);
+				this.element.removeChild(input.element);
+				this._currentInput = this.input; // restore to prompt
+			}, this);
 		},
 
 		_printInput: function() {
@@ -1341,7 +1421,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		},
 
 		read: function() {
-			return this.inputStream.read();
+			return this.streams.stdin.read();
 		},
 
 		write: function(output, target) {
@@ -1394,36 +1474,6 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
-define('io/outputstream',['require','core/promise','core/events'],function(require) {
-	
-	
-
-	var Promise = require('core/promise');
-	var Events = require('core/events');
-
-	/**
-	 * @class
-	 */
-	var OutputStream = function() {
-		// Events support
-		this.events = new Events();
-		
-		this.stream = [];
-	};
-
-	OutputStream.prototype = {
-		write: function(output) {
-			this.stream.push(output);
-			this.events.emit('data', output);
-		}
-	};
-
-	return OutputStream;
-});
-/**
- * Copyright © 2012 Ramón Lamana
- */
  define('system/shell',['require','core/util','core/promise','system/process','io/inputstream','io/outputstream'],function(require) {
 	
 	
@@ -1442,7 +1492,7 @@ define('io/outputstream',['require','core/promise','core/events'],function(requi
 		this._environment = {};
 
 		if(commands)
-			this.addCommands(commands);
+			this.include(commands);
 
 		// Create Standard Streams
 		this.streams = {
@@ -1516,10 +1566,18 @@ define('io/outputstream',['require','core/promise','core/events'],function(requi
 		},
 
 		/**
-		 * Attaches a commander and start listening to its done event
+		 * Attaches a group of commands and start listening to its done event
 		 */
-		addCommands: function(commands) {
-			this.commands.push(commands); 
+		include: function(groupORname, func) {
+			var group;
+			if (arguments.length > 1 && typeof groupORname === 'string') {
+				group = {};
+				group[groupORname] = func;
+			} 
+			else
+				group = groupORname;
+
+			this.commands.push(group); 
 		},
 
 		/**
@@ -1576,7 +1634,7 @@ define('terminus',['require','ui/display','system/shell','system/process'],funct
 	Terminus.prototype = {
 	};
 	
-	Terminus.version = '0.4';
+	Terminus.version = '0.5';
 
 	Terminus.Display = require('ui/display');
 	Terminus.Shell 	 = require('system/shell');

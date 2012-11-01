@@ -14,7 +14,7 @@ define(function(require) {
 	Terminus.prototype = {
 	};
 	
-	Terminus.version = '0.4';
+	Terminus.version = '0.5';
 
 	Terminus.Display = require('ui/display');
 	Terminus.Shell 	 = require('system/shell');

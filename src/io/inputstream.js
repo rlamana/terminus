@@ -12,32 +12,49 @@ define(function(require) {
 	var Promise = require('core/promise');
 	var Events = require('core/events');
 
+	var OutputStream = require('io/outputstream');
+
 	/**
 	 * @class
 	 *
-	 * methods: read, readLine
-	 * events: data
+	 * events: read, data, end
 	 */
 	var InputStream = function() {
 		// Events support
 		this.events = new Events();
-
 		this.stream = [];
+
+		this._promise = null;
 	};
 
 	InputStream.prototype = {
 		read: function() {
-			var ret = this.stream;
-			this.stream = [];
-			return ret;
+			this.events.emit('read');
+			this._promise = new Promise();
+
+			return this._promise;
 		}, 
 
-		readLine: function() {
+		end: function() {
+			if(this._promise)
+				this._promise.done(this.stream);
 		},
 
-		_put: function(data) {
-			this.stream.push(data);
-			this.events.emit('data');
+		/**
+		 * Connects an output stream with an input stream
+		 */ 
+		pipe: function(outputstream) {
+			var self = this;
+
+			if(!outputstream)
+				outputstream = new OutputStream();
+			
+			outputstream.events.on('data', function(input) {
+				this.stream.push(input);
+				this.events.emit('data', input);
+			}, this);
+
+			return outputstream;
 		}
 	};
 

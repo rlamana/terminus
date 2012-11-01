@@ -45,7 +45,7 @@
 		},
 
 		read: function() {
-			return this.inputStream.read();
+			return this.streams.stdin.read();
 		},
 
 		write: function(output, target) {
