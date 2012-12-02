@@ -1097,7 +1097,6 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	var transitionTime = .2;
 
 	Styles.addRule('.terminusjs', {
-		'height': '100%',
 		'padding': '10px',
 		'color': '#fff',
 		'background-color': '#111',
