@@ -3,7 +3,8 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>Terminus.js</title>
-		<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css' />
+		<link href='http://fonts.googleapis.com/css?family=Arvo:400,700,400italic,700italic' rel='stylesheet' type='text/css' />
 		<style type="text/css">
 			body {
 				margin: 0;
@@ -13,7 +14,33 @@
 			}
 
 			.terminusjs {
+				padding: 20px;
 				font-family: 'Ubuntu Mono', monospace;
+				font-weight: 400;
+				color: #ddd;
+			}
+
+			.identity {
+				padding: 0 0 10px 0; 
+				margin: 0;
+			}
+
+			.identity img {
+				display: inline-block;
+			}
+
+			.identity p {
+				display: inline-block;
+
+				font-family: 'Arvo', serif;
+				font-style: italic;
+
+				padding-left: 12px;
+			}
+
+			.identity p strong {
+				font-weight: 400;
+				font-size: 40px;
 			}
 		</style>
 	</head>
@@ -43,7 +70,7 @@
 				});
 							
 				var display = new Terminus.Display(document.getElementById('terminal'), {
-					welcome: "<img src='images/logo.png'/><p style='margin-top: 0; padding-top: 0'>Terminus.js "+Terminus.version+"<br/>Copyright 2011-2012 Ramón Lamana.</p>",
+					welcome: "<div class='identity'><img src='images/logo.png' /><p><strong>Terminus.js</strong> "+Terminus.version+"</p></div>Copyright 2011-2012 Ramón Lamana",
 					shell: shell
 				});
 			});
