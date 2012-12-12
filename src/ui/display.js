@@ -15,19 +15,22 @@
 	var transitionTime = .2;
 
 	Styles.addRule('.terminusjs', {
-		'padding': '10px',
 		'color': '#fff',
 		'background-color': '#111',
 		'font-family': 'monospace'
 	});
 
-	// Class to support cross box model
+	// Class to support cross-browser flexible box (specs 2009 and 2012)
 	Styles.addRule('.terminusjs-box', "\
 		display: -webkit-box; \
 		display: -moz-box; \
 		display: -o-box; \
 		display: -ms-box; \
-		display: box; \
+		display: -webkit-flex; \
+		display: -moz-flex; \
+		display: -o-flex; \
+		display: -ms-flex; \
+		display: flex; \
 	");
 
 	// Default stylesheet rules for input and output elements
@@ -38,7 +41,12 @@
 		'-moz-box-orient': 'horizontal',
 		'-ms-box-orient': 'horizontal',
 		'-o-box-orient': 'horizontal',
-		'box-orient': 'horizontal'
+
+		'-webkit-flex-flow': 'row',
+		'-moz-flex-flow': 'row',
+		'-ms-flex-flow': 'row',
+		'-o-flex-flow': 'row',
+		'flex-flow': 'row'
 	});
 
 	Styles.addRule('.terminusjs-input', {
@@ -48,7 +56,12 @@
 		'-moz-box-flex': '1',
 		'-ms-box-flex': '1',
 		'-o-box-flex': '1',
-		'box-flex': '1'
+
+		'-webkit-flex': '1',
+		'-moz-flex': '1',
+		'-ms-flex': '1',
+		'-o-flex': '1',
+		'flex': '1'
 	});
 
 	Styles.addRule('.terminusjs .terminusjs-prompt', {
@@ -125,7 +138,7 @@
 			}
 		});
 
-		this.output.print(this.settings.welcome, 'WEB');
+		this.output.print(this.settings.welcome, 'web');
 		this.prompt();
 		
 		element.addEventListener('click', function(e){
@@ -144,7 +157,7 @@
 		_currentInput: null,
 
 		settings: {
-	 		welcome: "<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+	 		welcome: '<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>'
 		},
 
 		focus: function(){
@@ -197,13 +210,16 @@
 			// Show command entered in output and hide 
 			// prompt waiting for next read operation
 			this._printInput();
-			if(command === '')
-				return;
-
 			this.idle();
+
 			promise.then(function() {
 				self.prompt();
 			});
+
+			if(command === '') {
+				promise.done();
+				return;
+			}
 
 			if(!!this._shell) {
 				// Execute Command
@@ -220,7 +236,7 @@
 
 			if(commands.length > 1) {
 				this._printInput();
-				this.output.print(commands.join(' '), "STDOUT");
+				this.output.print(commands.join(' '), 'stdout');
 				this.prompt(this.input.getValue());
 			}
 			else if(commands.length === 1) {
@@ -234,15 +250,15 @@
 
 			// Listen to its output streams
 			streams.stdout.events.on('data', function(data){
-				this.output.print(data, 'STDOUT');
+				this.output.print(data, 'stdout');
 			}, this);
 
-			streams.err.events.on('data', function(data){
-				this.output.print(data, 'STDERR');
+			streams.stderr.events.on('data', function(data){
+				this.output.print(data, 'stderr');
 			}, this);
 
 			streams.web.events.on('data', function(data){
-				this.output.print(data, 'WEB');
+				this.output.print(data, 'web');
 			}, this);
 
 			// Listen to other events on shell

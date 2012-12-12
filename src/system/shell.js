@@ -25,7 +25,7 @@
 		this.streams = {
 			stdin: new InputStream(),
 			stdout: new OutputStream(),
-			err: new OutputStream(),
+			stderr: new OutputStream(),
 			web: new OutputStream()
 		};
 
@@ -66,7 +66,7 @@
 				}
 			}
 
-			this.streams.err.write("Command '"+input.command+"' not found.");
+			this.streams.stderr.write("Command '"+input.command+"' not found.");
 
 			return Promise.done();
 		},

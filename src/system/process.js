@@ -9,6 +9,8 @@
 	var Events = require('core/events');
 	var Promise = require('core/promise');
 
+	var OutputStream = require('io/outputstream');
+
 	/**
 	 * @private
 	 */
@@ -48,21 +50,26 @@
 			return this.streams.stdin.read();
 		},
 
+		/**
+		 *
+		 * @param {String} output
+		 * @param {String|OutputStream} target Output stream or the standard output values: 'stdout', 'stderr' or 'web'.
+		 */
 		write: function(output, target) {
 			var ostream;
 
-			target = target || 'STDOUT';
+			target = target || 'stdout';
 
-			if (typeof target === 'OutputStream')
+			if (typeof target === 'string')
+				target = target.toLowerCase();
+
+			if(target instanceof OutputStream)
 				ostream = target;
-			else if(target === 'STDOUT') 
-				ostream = this.streams.stdout;
-			else if(target === 'STDERR') 
-				ostream = this.streams.err;
-			else if(target === 'WEB') 
-				ostream = this.streams.web;
-			else {
-				console.error(this.toString + ' Method write(): The target is not a valid stream');
+			else if(target !== 'stdin')
+				ostream = this.streams[target];
+
+			if(!ostream) {
+				console.error(this.toString() + ' Method write(): The target \''+ target +'\' is not a valid stream');
 				return;
 			}
 

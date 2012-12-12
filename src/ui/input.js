@@ -7,6 +7,7 @@ define(function(require) {
 
 	var Events = require('core/events');
 	var Styles = require('ui/styles');
+	
 	var InputStream = require('io/inputstream');
 
 	/**
@@ -93,6 +94,7 @@ define(function(require) {
 
 		setValue: function (value) {
 			this.text.innerHTML = value;
+			this.placeCursorToEnd();
 			return this;
 		},
 

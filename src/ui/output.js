@@ -33,21 +33,21 @@ define(function(require) {
 		},
 
 		/**
-		 * @param {String} target The output target: 'STDOUT', 'STDERR', 'WEB'.
+		 * @param {String} target The output target: 'stdout', 'stderr', 'web'.
 		 * @param {String} content Output content to be printed.
 		 * @return {ClientOutput} Itself to call in cascade.
 		 */
 		print: function(content, target) {
 			var output;
-			target = target || 'STDOUT';
+			target = target || 'stdout';
 			switch(target) {
-				case 'STDOUT': 
+				case 'stdout': 
 					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stdout');
 				break;
-				case 'STDERR':
+				case 'stderr':
 					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stderr');
 				break;
-				case 'WEB':
+				case 'web':
 					output = this._print(content, 'terminusjs-web');
 				break;
 			}

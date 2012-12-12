@@ -2,7 +2,7 @@
  * Copyright © 2012 Ramón Lamana
  */
  
-(function(global, Terminus) {
+(function(global) {
 
 	'use strict';
 
@@ -16,13 +16,12 @@
 		},
 
 		sum: function(op1, op2) {
-			this.write(parseInt(op1) + parseInt(op2));
-			this.exit();
-		},
+			if(arguments.length < 2)
+				this.write('Please insert two numeric values (ex. > sum 5 6)', 'stderr');
+			else
+				this.write(parseInt(op1) + parseInt(op2));
 
-		hello: function() {
-			this.write("<div style='color:blue'>Hola mundo</div>", 'WEB');
-			this.exit(0);
+			this.exit();
 		},
 
 		read: function() {
@@ -39,4 +38,4 @@
 
 	global.TestCommands = TestCommands;
 
-})( window, window.Terminus );
+})( this );

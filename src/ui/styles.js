@@ -14,14 +14,13 @@ define(function(require) {
 		addRule: function (selector, declaration) {  
 			var declarationStr = declaration;
 
-			// Create styleshee if it doesn't exist
+			// Create stylesheet if it doesn't exist
 			if(!this._styleSheet) {
 				var style = document.createElement('style');
 
 				if(!document.head)
 					return;
 
-				//document.head.appendChild(style);
 				document.head.insertBefore(style, document.head.childNodes[0]); // Before all other defined styles
 				this._styleSheet = document.styleSheets[document.styleSheets.length - 1];
 			}
@@ -29,7 +28,6 @@ define(function(require) {
 			if (typeof declaration !== 'string') {
 				declarationStr = ''
 				
-
 				for(var style in declaration) {
 					if(!declaration.hasOwnProperty(style))
 						continue;

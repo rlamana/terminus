@@ -610,14 +610,13 @@ define('ui/styles',['require'],function(require) {
 		addRule: function (selector, declaration) {  
 			var declarationStr = declaration;
 
-			// Create styleshee if it doesn't exist
+			// Create stylesheet if it doesn't exist
 			if(!this._styleSheet) {
 				var style = document.createElement('style');
 
 				if(!document.head)
 					return;
 
-				//document.head.appendChild(style);
 				document.head.insertBefore(style, document.head.childNodes[0]); // Before all other defined styles
 				this._styleSheet = document.styleSheets[document.styleSheets.length - 1];
 			}
@@ -625,7 +624,6 @@ define('ui/styles',['require'],function(require) {
 			if (typeof declaration !== 'string') {
 				declarationStr = ''
 				
-
 				for(var style in declaration) {
 					if(!declaration.hasOwnProperty(style))
 						continue;
@@ -759,6 +757,7 @@ define('ui/input',['require','core/events','ui/styles','io/inputstream'],functio
 
 	var Events = require('core/events');
 	var Styles = require('ui/styles');
+	
 	var InputStream = require('io/inputstream');
 
 	/**
@@ -845,6 +844,7 @@ define('ui/input',['require','core/events','ui/styles','io/inputstream'],functio
 
 		setValue: function (value) {
 			this.text.innerHTML = value;
+			this.placeCursorToEnd();
 			return this;
 		},
 
@@ -955,7 +955,6 @@ define('ui/outputline',['require','ui/styles'],function(require) {
 	
 	
 
-	//var Client = {};//require('cliente');
 	var Styles = require('ui/styles');
 
 	/**
@@ -1046,21 +1045,21 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		},
 
 		/**
-		 * @param {String} target The output target: 'STDOUT', 'STDERR', 'WEB'.
+		 * @param {String} target The output target: 'stdout', 'stderr', 'web'.
 		 * @param {String} content Output content to be printed.
 		 * @return {ClientOutput} Itself to call in cascade.
 		 */
 		print: function(content, target) {
 			var output;
-			target = target || 'STDOUT';
+			target = target || 'stdout';
 			switch(target) {
-				case 'STDOUT': 
+				case 'stdout': 
 					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stdout');
 				break;
-				case 'STDERR':
+				case 'stderr':
 					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stderr');
 				break;
-				case 'WEB':
+				case 'web':
 					output = this._print(content, 'terminusjs-web');
 				break;
 			}
@@ -1097,19 +1096,22 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	var transitionTime = .2;
 
 	Styles.addRule('.terminusjs', {
-		'padding': '10px',
 		'color': '#fff',
 		'background-color': '#111',
 		'font-family': 'monospace'
 	});
 
-	// Class to support cross box model
+	// Class to support cross-browser flexible box (specs 2009 and 2012)
 	Styles.addRule('.terminusjs-box', "\
 		display: -webkit-box; \
 		display: -moz-box; \
 		display: -o-box; \
 		display: -ms-box; \
-		display: box; \
+		display: -webkit-flex; \
+		display: -moz-flex; \
+		display: -o-flex; \
+		display: -ms-flex; \
+		display: flex; \
 	");
 
 	// Default stylesheet rules for input and output elements
@@ -1120,7 +1122,12 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		'-moz-box-orient': 'horizontal',
 		'-ms-box-orient': 'horizontal',
 		'-o-box-orient': 'horizontal',
-		'box-orient': 'horizontal'
+
+		'-webkit-flex-flow': 'row',
+		'-moz-flex-flow': 'row',
+		'-ms-flex-flow': 'row',
+		'-o-flex-flow': 'row',
+		'flex-flow': 'row'
 	});
 
 	Styles.addRule('.terminusjs-input', {
@@ -1130,7 +1137,12 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		'-moz-box-flex': '1',
 		'-ms-box-flex': '1',
 		'-o-box-flex': '1',
-		'box-flex': '1'
+
+		'-webkit-flex': '1',
+		'-moz-flex': '1',
+		'-ms-flex': '1',
+		'-o-flex': '1',
+		'flex': '1'
 	});
 
 	Styles.addRule('.terminusjs .terminusjs-prompt', {
@@ -1207,7 +1219,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			}
 		});
 
-		this.output.print(this.settings.welcome, 'WEB');
+		this.output.print(this.settings.welcome, 'web');
 		this.prompt();
 		
 		element.addEventListener('click', function(e){
@@ -1226,7 +1238,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		_currentInput: null,
 
 		settings: {
-	 		welcome: "<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>"
+	 		welcome: '<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>'
 		},
 
 		focus: function(){
@@ -1279,13 +1291,16 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			// Show command entered in output and hide 
 			// prompt waiting for next read operation
 			this._printInput();
-			if(command === '')
-				return;
-
 			this.idle();
+
 			promise.then(function() {
 				self.prompt();
 			});
+
+			if(command === '') {
+				promise.done();
+				return;
+			}
 
 			if(!!this._shell) {
 				// Execute Command
@@ -1302,7 +1317,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 
 			if(commands.length > 1) {
 				this._printInput();
-				this.output.print(commands.join(' '), "STDOUT");
+				this.output.print(commands.join(' '), 'stdout');
 				this.prompt(this.input.getValue());
 			}
 			else if(commands.length === 1) {
@@ -1316,15 +1331,15 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 
 			// Listen to its output streams
 			streams.stdout.events.on('data', function(data){
-				this.output.print(data, 'STDOUT');
+				this.output.print(data, 'stdout');
 			}, this);
 
-			streams.err.events.on('data', function(data){
-				this.output.print(data, 'STDERR');
+			streams.stderr.events.on('data', function(data){
+				this.output.print(data, 'stderr');
 			}, this);
 
 			streams.web.events.on('data', function(data){
-				this.output.print(data, 'WEB');
+				this.output.print(data, 'web');
 			}, this);
 
 			// Listen to other events on shell
@@ -1376,13 +1391,15 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define('system/process',['require','core/events','core/promise'],function(require) {
+ define('system/process',['require','core/events','core/promise','io/outputstream'],function(require) {
 	
 	
 
 	var Process;
 	var Events = require('core/events');
 	var Promise = require('core/promise');
+
+	var OutputStream = require('io/outputstream');
 
 	/**
 	 * @private
@@ -1423,21 +1440,26 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			return this.streams.stdin.read();
 		},
 
+		/**
+		 *
+		 * @param {String} output
+		 * @param {String|OutputStream} target Output stream or the standard output values: 'stdout', 'stderr' or 'web'.
+		 */
 		write: function(output, target) {
 			var ostream;
 
-			target = target || 'STDOUT';
+			target = target || 'stdout';
 
-			if (typeof target === 'OutputStream')
+			if (typeof target === 'string')
+				target = target.toLowerCase();
+
+			if(target instanceof OutputStream)
 				ostream = target;
-			else if(target === 'STDOUT') 
-				ostream = this.streams.stdout;
-			else if(target === 'STDERR') 
-				ostream = this.streams.err;
-			else if(target === 'WEB') 
-				ostream = this.streams.web;
-			else {
-				console.error(this.toString + ' Method write(): The target is not a valid stream');
+			else if(target !== 'stdin')
+				ostream = this.streams[target];
+
+			if(!ostream) {
+				console.error(this.toString() + ' Method write(): The target \''+ target +'\' is not a valid stream');
 				return;
 			}
 
@@ -1497,7 +1519,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		this.streams = {
 			stdin: new InputStream(),
 			stdout: new OutputStream(),
-			err: new OutputStream(),
+			stderr: new OutputStream(),
 			web: new OutputStream()
 		};
 
@@ -1538,7 +1560,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 				}
 			}
 
-			this.streams.err.write("Command '"+input.command+"' not found.");
+			this.streams.stderr.write("Command '"+input.command+"' not found.");
 
 			return Promise.done();
 		},

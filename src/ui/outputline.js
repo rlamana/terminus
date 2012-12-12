@@ -5,7 +5,6 @@ define(function(require) {
 	
 	'use strict';
 
-	//var Client = {};//require('cliente');
 	var Styles = require('ui/styles');
 
 	/**

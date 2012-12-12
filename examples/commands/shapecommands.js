@@ -2,14 +2,14 @@
  * Copyright © 2012 Ramón Lamana
  */
  
-(function(global, Terminus) {
+(function(global) {
 
 	'use strict';
 
 	var ShapeCommands = {
 		shape: function(n1, n2, n3, n4) {
 			var id = 'supertag_' + Math.floor(Math.random()*10e7);
-			this.write('<div id="'+id+'" />','WEB');
+			this.write('<div id="'+id+'" />', 'web');
 			
 			var image = new Supertags.Image(300, 300, {
 				n1: n1 ? n1 : 5,
@@ -26,4 +26,4 @@
 
 	global.ShapeCommands = ShapeCommands;
 
-})( window, window.Terminus);
+})( this );
