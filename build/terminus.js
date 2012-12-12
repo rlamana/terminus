@@ -1655,7 +1655,7 @@ define('terminus',['require','ui/display','system/shell','system/process'],funct
 	Terminus.prototype = {
 	};
 	
-	Terminus.version = '0.5';
+	Terminus.version = '0.5.1';
 
 	Terminus.Display = require('ui/display');
 	Terminus.Shell 	 = require('system/shell');
