@@ -21,7 +21,7 @@ define(function(require) {
 	 */
 	var InputStream = function() {
 		this.events = new Events();
-		
+
 		this._buffer = [];
 		this._promise = null;
 	};
@@ -35,8 +35,13 @@ define(function(require) {
 		}, 
 
 		end: function() {
-			if(this._promise)
-				this._promise.done(this._buffer.join(''));
+			var data;
+			if(!this._promise)
+				return;
+
+			var data = this._buffer.join('');
+			this._buffer = []; // Empty buffer
+			this._promise.done(data);
 		},
 
 		/**

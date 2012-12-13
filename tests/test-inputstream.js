@@ -78,6 +78,33 @@ define(['io/inputstream', 'io/outputstream'], function(InputStream, OutputStream
 					stdin.end();
 				}, 300);
 			});
+
+			it('should wait until end() and empty buffer for multiple reads', function(done) {
+				// First read
+				stdin.read().then(function(data){
+					expect(data).to.be.equal('Hello World!');
+					
+					// Second read
+					stdin.read().then(function(data){
+						expect(data).to.be.equal('Hello again!');
+						done();
+					});
+
+					stdout.write('Hello');
+					stdout.write(' again!');
+
+					setTimeout(function(){
+						stdin.end();
+					}, 300);
+				});
+
+				stdout.write('Hello');
+				stdout.write(' World!');
+
+				setTimeout(function(){
+					stdin.end();
+				}, 300);
+			});
 		})
 	});
 });
