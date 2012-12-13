@@ -659,26 +659,53 @@ define('ui/styles',['require'],function(require) {
  * Copyright © 2012 Ramón Lamana
  */
  
-define('io/outputstream',['require','core/promise','core/events'],function(require) {
+define('io/outputstream',['require','core/events'],function(require) {
 	
 	
 
-	var Promise = require('core/promise');
 	var Events = require('core/events');
 
 	/**
 	 * @class
 	 */
 	var OutputStream = function() {
-		// Events support
 		this.events = new Events();
-		
-		this.stream = [];
+		this.close = false;
+
+		this._buffer = [];
 	};
 
 	OutputStream.prototype = {
+		events: null,
+
+		/** 
+		 * @property {bool} close 
+		 */
+		set close(value) {
+			// Cannot be reopened
+			if(this._close) return; 
+
+			if(value === true)
+				this.events.emit('close');
+
+			this._close = !!value;
+		},
+
+		get close() {
+			return this._close;
+		},
+
+		/**
+		 * Writes the content of output to the stream.
+		 * @param {String} output
+		 */
 		write: function(output) {
-			this.stream.push(output);
+			if(this.close) 
+				return;
+
+			output += ''; // Stringify output
+
+			this._buffer.push(output);
 			this.events.emit('data', output);
 		}
 	};
@@ -707,10 +734,9 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 	 * events: read, data, end
 	 */
 	var InputStream = function() {
-		// Events support
 		this.events = new Events();
-		this.stream = [];
-
+		
+		this._buffer = [];
 		this._promise = null;
 	};
 
@@ -724,7 +750,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 
 		end: function() {
 			if(this._promise)
-				this._promise.done(this.stream);
+				this._promise.done(this._buffer.join(''));
 		},
 
 		/**
@@ -737,7 +763,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 				outputstream = new OutputStream();
 			
 			outputstream.events.on('data', function(input) {
-				this.stream.push(input);
+				this._buffer.push(input);
 				this.events.emit('data', input);
 			}, this);
 
@@ -844,7 +870,7 @@ define('ui/input',['require','core/events','ui/styles','io/inputstream'],functio
 
 		setValue: function (value) {
 			this.text.innerHTML = value;
-			this.placeCursorToEnd();
+			this.focus();
 			return this;
 		},
 
@@ -902,6 +928,7 @@ define('ui/input',['require','core/events','ui/styles','io/inputstream'],functio
 		        selection.removeAllRanges();
 		        selection.addRange(range);
 		    } 
+
 		    return this;
 		}
 	};
@@ -1275,7 +1302,8 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			if(typeof withContent !== 'undefined')
 				this.input.setValue(withContent);
 
-			this.input.show().focus();
+			this.input.show();
+			this.focus();
 		},
 
 		idle: function() {

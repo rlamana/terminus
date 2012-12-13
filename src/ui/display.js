@@ -194,7 +194,8 @@
 			if(typeof withContent !== 'undefined')
 				this.input.setValue(withContent);
 
-			this.input.show().focus();
+			this.input.show();
+			this.focus();
 		},
 
 		idle: function() {

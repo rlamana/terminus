@@ -25,4 +25,7 @@ clean:
 	rm ${builddir}terminus.js
 	rm ${builddir}terminus.min.js
 
+install:
+	npm install requirejs
+
 

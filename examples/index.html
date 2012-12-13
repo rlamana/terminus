@@ -1,13 +1,20 @@
-<!doctype html>
-<html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Terminus.js</title>
-		<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css' />
-		<link href='http://fonts.googleapis.com/css?family=Arvo:400,700,400italic,700italic' rel='stylesheet' type='text/css' />
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Terminus.js</title>
+        <meta name="viewport" content="width=device-width">
+
+		<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Arvo:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
 		<style type="text/css">
 			html {
 				height: 100%;
+				background: url(images/logo.png) no-repeat -100 -100; /* Preload logo image*/
 			}
 
 			body {
@@ -17,7 +24,7 @@
 				height: 100%;
 			}
 
-			.terminusjs {
+			#terminal {
 				font-family: 'Ubuntu Mono', monospace;
 				font-weight: 400;
 				color: #ddd;
@@ -25,27 +32,22 @@
 				height: 100%;
 			}
 
-			.identity {
+			#terminal .identity {
+				font-family: 'Arvo', serif;
+				font-style: italic;
 				padding: 0 0 10px 0; 
 				margin: 0;
 			}
 
-			.identity img {
+			#terminal .identity img {
 				display: inline-block;
 			}
 
-			.identity p {
+			#terminal .identity h1 {
 				display: inline-block;
 
-				font-family: 'Arvo', serif;
-				font-style: italic;
-
-				padding-left: 12px;
-			}
-
-			.identity p strong {
-				font-weight: 400;
 				font-size: 40px;
+				padding-left: 12px;
 			}
 		</style>
 	</head>
@@ -54,7 +56,7 @@
 
 		<script type="text/javascript" src="vendor/ready.js"></script>
 		<script type="text/javascript" src="../build/terminus.js"></script>
-		<!--<script type="text/javascript" src="/terminus.min.js"></script>-->
+		<!--<script type="text/javascript" src="../build/terminus.min.js"></script>-->
 
 		<!-- Example commands -->
 		<script type="text/javascript" src="commands/testcommands.js"></script>
@@ -75,7 +77,7 @@
 				});
 							
 				var display = new Terminus.Display(document.getElementById('terminal'), {
-					welcome: "<div class='identity'><img src='images/logo.png' /><p><strong>Terminus.js</strong> "+Terminus.version+"</p></div>Copyright 2011-2012 Ramón Lamana.<br/>Press <span style='color:green'>&lt; tab &gt;</span> to see a list of available commands.",
+					welcome: "<div class='identity'><img src='images/logo.png' /><h1>Terminus.js</h1> "+Terminus.version+"</div>Copyright 2011-2012 Ramón Lamana.<br/>Press <span style='color:green'>&lt; tab &gt;</span> to see a list of available commands.",
 					shell: shell
 				});
 			});

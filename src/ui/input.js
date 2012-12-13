@@ -94,7 +94,7 @@ define(function(require) {
 
 		setValue: function (value) {
 			this.text.innerHTML = value;
-			this.placeCursorToEnd();
+			this.focus();
 			return this;
 		},
 
@@ -152,6 +152,7 @@ define(function(require) {
 		        selection.removeAllRanges();
 		        selection.addRange(range);
 		    } 
+
 		    return this;
 		}
 	};

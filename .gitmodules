@@ -1,3 +1,0 @@
-[submodule "deps/specrunner"]
-	path = deps/specrunner
-	url = git://github.com/senchalabs/examples.git
