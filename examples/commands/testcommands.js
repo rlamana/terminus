@@ -27,9 +27,9 @@
 		read: function() {
 			var self = this;
 
-			this.write('¿Cómo te llamas?');
+			this.write('What\'s your name?');
 			this.read().then(function(data){
-				self.write("Hola " + data + "!!!!!");
+				self.write("Hello " + data + "!!!");
 				self.exit(0);
 			});
 		}

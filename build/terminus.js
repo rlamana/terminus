@@ -459,7 +459,7 @@ define('ui/styles',['require','core/util'],function(require) {
 	");
 
 	// Default stylesheet rules for input and output elements
-	Styles.addRule('.terminusjs-input-line', {
+	Styles.addRule('.terminusjs-prompt', {
 		'display': 'none',
 		'clear': 'both',
 		'-webkit-box-orient': 'horizontal',
@@ -474,7 +474,7 @@ define('ui/styles',['require','core/util'],function(require) {
 		'flex-flow': 'row'
 	});
 
-	Styles.addRule('.terminusjs-input', {
+	Styles.addRule('.terminusjs .terminusjs-input', {
 		'display': 'block',
 		'outline': 'none',
 		'-webkit-box-flex': '1',
@@ -489,7 +489,7 @@ define('ui/styles',['require','core/util'],function(require) {
 		'flex': '1'
 	});
 
-	Styles.addRule('.terminusjs .terminusjs-prompt', {
+	Styles.addRule('.terminusjs .terminusjs-ps', {
 		'margin-right': '5px'
 	});
 
@@ -777,140 +777,12 @@ define('ui/styles',['require','core/util'],function(require) {
 /**
  * Copyright © 2012 Ramón Lamana
  */
- 
-define('io/outputstream',['require','core/events'],function(require) {
-	
-	
-
-	var Events = require('core/events');
-
-	/**
-	 * @class
-	 */
-	var OutputStream = function() {
-		this.events = new Events();
-		this.close = false;
-
-		this._buffer = [];
-	};
-
-	OutputStream.prototype = {
-		events: null,
-
-		/** 
-		 * @property {bool} close 
-		 */
-		set close(value) {
-			// Cannot be reopened
-			if(this._close) return; 
-
-			if(value === true)
-				this.events.emit('close');
-
-			this._close = !!value;
-		},
-
-		get close() {
-			return this._close;
-		},
-
-		/**
-		 * Writes the content of output to the stream.
-		 * @param {String} output
-		 */
-		write: function(output) {
-			if(this.close) 
-				return;
-
-			output += ''; // Stringify output
-
-			this._buffer.push(output);
-			this.events.emit('data', output);
-		}
-	};
-
-	return OutputStream;
-});
-/**
- * Copyright © 2012 Ramón Lamana
- */
- 
-define('io/inputstream',['require','core/promise','core/events','io/outputstream'],function(require) {
-	
-	
-
-	/**
-	 * @dependecies
-	 */
-	var Promise = require('core/promise');
-	var Events = require('core/events');
-
-	var OutputStream = require('io/outputstream');
-
-	/**
-	 * @class
-	 *
-	 * events: read, data, end
-	 */
-	var InputStream = function() {
-		this.events = new Events();
-
-		this._buffer = [];
-		this._promise = null;
-	};
-
-	InputStream.prototype = {
-		read: function() {
-			this.events.emit('read');
-			this._promise = this._promise || (new Promise());
-
-			return this._promise;
-		}, 
-
-		end: function() {
-			var data;
-			if(!this._promise)
-				return;
-
-			var data = this._buffer.join('');
-			this._buffer = []; // Empty buffer
-
-			this.events.emit('end', data);
-			this._promise.done(data);
-		},
-
-		/**
-		 * Connects an output stream with this input stream
-		 */ 
-		pipe: function(outputstream) {
-			var self = this;
-
-			if(!outputstream)
-				outputstream = new OutputStream();
-			
-			outputstream.events.on('data', function(input) {
-				this._buffer.push(input);
-				this.events.emit('data', input);
-			}, this);
-
-			return outputstream;
-		}
-	};
-
-	return InputStream;
-	
-});
-/**
- * Copyright © 2012 Ramón Lamana
- */
-define('ui/input',['require','core/events','core/util','io/inputstream'],function(require) {
+define('ui/input',['require','core/events','core/util'],function(require) {
 	
 	
 
 	var Events = require('core/events');
 	var Util = require('core/util');
-	
-	var InputStream = require('io/inputstream');
 
 	/**
 	 * Client Input class
@@ -920,8 +792,7 @@ define('ui/input',['require','core/events','core/util','io/inputstream'],functio
 		var self = this;
 
 		this.settings = {
-			editable: false,
-			prompt: '>'
+			editable: false
 		};
 
 		for(var key in settings) {
@@ -934,121 +805,76 @@ define('ui/input',['require','core/events','core/util','io/inputstream'],functio
 		this.events = new Events();
 
 		// DOM elements structure
-		this.element = document.createElement('div');
-		
-		this.element.className = 'terminusjs-input-line';
-
-		this.prompt = document.createElement('div');
-		this.prompt.className = 'terminusjs-prompt';
-		this.element.appendChild(this.prompt);
-
-		this.text = document.createElement('div');
-		this.text.className = 'terminusjs-input';
-		this.text.innerHTML = '';
-		this.element.appendChild(this.text);
+		this.$el = document.createElement('div');	
+		this.$el.className = 'terminusjs-input';
+		this.$el.innerHTML = '';
 
 		if(!!this.settings.editable) {
-			this.text.contentEditable = true;
-			this.text.addEventListener('keydown', function(e) {
+			this.$el.contentEditable = true;
+			this.$el.addEventListener('keydown', function(e) {
 				// When a key event, alway scroll to bottom
 				window.scrollTo(0,document.body.scrollHeight);
+
 				switch(e.keyCode) {
 					case 13: // Enter key
 						e.preventDefault();
 						e.stopPropagation();
 						self.events.emit('enter', self);
 						break;
-
-					case 38: // Up key
-						self.events.emit('historyBack', self);
-
-						e.preventDefault();
-						e.stopPropagation();
-						break;
-
-					case 40: // Down key
-						self.events.emit('historyForward', self);
-
-						e.preventDefault();
-						e.stopPropagation();
-						break;
-
-					case 9: // Tab key
-						self.events.emit('autocomplete', self);
-
-						e.preventDefault();
-						e.stopPropagation();
-						break;
 				}
 			});
 		}
-
-		this.setPrompt(this.settings.prompt);
 	};
 
 	Input.prototype = {
-		getValue: function () {
-			var input = this.text.innerText || this.text.textContent;
+		get value() {
+			var input = this.$el.innerText || this.$el.textContent;
 			var value = input ? input.replace(/\n/g, '') : '';
 			value = value.replace(/^\s+|\s+$/g,"");
 			return value;
 		},
 
-		setValue: function (value) {
-			this.text.innerHTML = value;
+		set value(value) {
+			this.$el.innerHTML = value;
 			this.focus();
 			return this;
 		},
 
-		setEditable: function(value) {
-			this.text.contentEditable = value;
+		set editable(value) {
+			value = !!value;
+			this.settings.editable = value;
+			this.$el.contentEditable = value;
+		},
+
+		get editable() {
+			return this.settings.editable;
 		},
 
 		appendTo: function(element) {
-			element.appendChild(this.element);
+			element.appendChild(this.$el);
 			return this;
-		},
-
-		setPrompt: function(prompt) {
-			this.settings.prompt = prompt;
-			this.prompt.innerHTML = prompt;
-			return this;
-		},
-
-		getPrompt: function() {
-			return this.settings.prompt;
 		},
 
 		focus: function () {
-			this.text.focus();
+			this.$el.focus();
 			this.placeCursorToEnd();
 			return this;
 		},
 
 		clear: function() {
-			this.setValue('');
-			return this;
-		},
-
-		show: function () {
-			Util.Styles.addClass(this.element,'terminusjs-box');
-			return this;
-		},
-
-		hide: function () {
-			Util.Styles.removeClass(this.element,'terminusjs-box');
+			this.value = '';
 			return this;
 		},
 
 		isVisible: function() {
-			return (this.element.style.display !== 'none') && Util.Styles.hasClass(this.element, 'terminusjs-box');
+			return (this.$el.style.display !== 'none') && Util.Styles.hasClass(this.$el, 'terminusjs-box');
 		},
 
 		placeCursorToEnd: function() {
 			var range, selection;
 		    if(document.createRange) { // Firefox, Chrome, Opera, Safari, IE 9+
 		        range = document.createRange();
-		        range.selectNodeContents(this.text);
+		        range.selectNodeContents(this.$el);
 		        range.collapse(false);
 		        selection = window.getSelection();
 		        selection.removeAllRanges();
@@ -1060,6 +886,121 @@ define('ui/input',['require','core/events','core/util','io/inputstream'],functio
 	};
 
 	return Input;
+});
+
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+define('ui/prompt',['require','core/events','core/util','ui/input'],function(require) {
+	
+	
+
+	var Events = require('core/events');
+	var Util = require('core/util');
+	
+	var Input = require('ui/input');
+
+	/**
+	 * Prompt input class
+	 * @class
+	 */
+	var Prompt = function(settings) {
+		var self = this;
+
+		this.settings = {
+			editable: false,
+			ps: '>'
+		};
+
+		for(var key in settings) {
+			if (!settings.hasOwnProperty(key))
+				continue;
+			this.settings[key] = settings[key];
+		}
+
+		// Events support
+		this.events = new Events();
+
+		// DOM elements structure
+		this.$el = document.createElement('div');
+		this.$el.className = 'terminusjs-prompt';
+
+		this.$ps = document.createElement('div');
+		this.$ps.className = 'terminusjs-ps';
+		this.$el.appendChild(this.$ps);
+
+		// Input element
+		this.input = new Input(settings);
+		this.input.appendTo(this.$el);
+
+		if(!!this.settings.editable) {
+			this.input.$el.addEventListener('keydown', function(e) {
+				switch(e.keyCode) {
+					case 13: // Enter key
+						e.preventDefault();
+						e.stopPropagation();
+						self.events.emit('enter', self.input);
+						break;
+
+					case 38: // Up key
+						self.events.emit('historyBack', self.input);
+
+						e.preventDefault();
+						e.stopPropagation();
+						break;
+
+					case 40: // Down key
+						self.events.emit('historyForward', self.input);
+
+						e.preventDefault();
+						e.stopPropagation();
+						break;
+
+					case 9: // Tab key
+						self.events.emit('autocomplete', self.input);
+
+						e.preventDefault();
+						e.stopPropagation();
+						break;
+				}
+			});
+		}
+
+		this.ps = this.settings.ps;
+	};
+
+	Prompt.prototype = {
+		set ps(value) {
+			this.settings.prompt = value;
+			this.$ps.innerHTML = value;
+			return this;
+		},
+
+		get ps() {
+			return this.settings.prompt;
+		},
+
+		appendTo: function(element) {
+			element.appendChild(this.$el);
+			return this;
+		},
+
+		show: function () {
+			Util.Styles.addClass(this.$el, 'terminusjs-box');
+			return this;
+		},
+
+		hide: function () {
+			Util.Styles.removeClass(this.$el, 'terminusjs-box');
+			return this;
+		},
+
+		isVisible: function() {
+			return (this.$el.style.display !== 'none') && Util.Styles.hasClass(this.$el, 'terminusjs-box');
+		}
+	};
+
+	return Prompt;
 });
 
 /**
@@ -1145,19 +1086,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		this.element.className = 'terminusjs-output';
 	};
 
-	Output.prototype = {
-		_print: function(content, className) {
-			var outputLine = new OutputLine(className);
-			outputLine.appendTo(this.element);
-			outputLine.setContent(content);
-			return outputLine;
-		},
-
-		appendTo: function(element) {
-			element.appendChild(this.element);
-			return this;
-		},
-
+	Output.prototype = {	
 		/**
 		 * @param {String} target The output target: 'stdout', 'stderr', 'web'.
 		 * @param {String} content Output content to be printed.
@@ -1182,12 +1111,20 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			return this;
 		},
 
-		printUserInput: function(content) {
-			this._print(content, 'terminusjs-userinput').show();
-		},
-
 		clear: function() {
 			this.element.innerHTML = '';
+		},
+
+		appendTo: function(element) {
+			element.appendChild(this.element);
+			return this;
+		},
+
+		_print: function(content, className) {
+			var outputLine = new OutputLine(className);
+			outputLine.appendTo(this.element);
+			outputLine.setContent(content);
+			return outputLine;
 		}
 	};
 
@@ -1196,7 +1133,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define('ui/display',['require','ui/styles','core/events','core/promise','ui/input','ui/output'],function(require) {
+ define('ui/display',['require','ui/styles','core/events','core/promise','ui/prompt','ui/input','ui/output'],function(require) {
 
 	
 
@@ -1205,8 +1142,9 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	var Events 	= require('core/events');
 	var Promise = require('core/promise');
 
-	var Input 	= require('ui/input');
-	var Output 	= require('ui/output');
+	var Prompt = require('ui/prompt');
+	var Input = require('ui/input');
+	var Output = require('ui/output');
 
 	/**
 	 * Widget 
@@ -1226,35 +1164,35 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		}
 
 		// Create DOM elements structure
-		this.element = element;
-		this.element.className = 'terminusjs';
+		this.$el = element;
+		this.$el.className = 'terminusjs';
 
 		// Create DOM output element
 		this.output = new Output();
-		this.output.appendTo(this.element);
+		this.output.appendTo(this.$el);
 
-		// Create DOM input element
-		this.input = new Input({
+		// Create DOM prompt element
+		this.prompt = new Prompt({
 			editable: true
 		});
-		this.input.appendTo(this.element).show();
+		this.prompt.appendTo(this.$el).show();
 
-		this.input.events.on('enter', this.enter, this);
-		this.input.events.on('historyBack', this.historyBack, this);
-		this.input.events.on('historyForward', this.historyForward, this);
-		this.input.events.on('autocomplete', this.autocomplete, this);
+		this.prompt.events.on('enter', this.enter, this);
+		this.prompt.events.on('historyBack', this.historyBack, this);
+		this.prompt.events.on('historyForward', this.historyForward, this);
+		this.prompt.events.on('autocomplete', this.autocomplete, this);
 
-		this._currentInput = this.input;
+		this._currentInput = this.prompt.input;
 		
 		// CTRL + Z support
-		element.addEventListener('keydown', function(e) {
+		this.$el.addEventListener('keydown', function(e) {
 			if(e.ctrlKey && e.keyCode == 90) {
 				self.read();
 			}
 		});
 
 		this.output.print(this.settings.welcome, 'web');
-		this.prompt();
+		this.showPrompt();
 		
 		element.addEventListener('click', function(e){
 			self.focus();
@@ -1288,7 +1226,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			var command = this._shell.history[this._historyIndex];
 
 			if (command)
-				this.input.setValue(command);
+				this.prompt.input.value = command;
 			else
 				this._historyIndex = 0;
 		},
@@ -1298,38 +1236,38 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			var command = this._shell.history[this._historyIndex];
 
 			if (command) 
-				this.input.setValue(command);
+				this.prompt.input.value = command;
 			else 
 				this.historyReset();
 		},
 
-		prompt: function(withContent) {
-			this.input.clear()
+		showPrompt: function(withContent) {
+			this.prompt.input.clear();
 
 			if(typeof withContent !== 'undefined')
-				this.input.setValue(withContent);
+				this.prompt.value = withContent;
 
-			this.input.show();
+			this.prompt.show();
 			this.focus();
 		},
 
 		idle: function() {
-			this.input.hide();
-			this.element.focus();
+			this.prompt.hide();
+			this.$el.focus();
 		},
 
-		enter: function(inputElement) {
-			var command = inputElement.getValue(),
+		enter: function(input) {
+			var command = input.value,
 				promise = new Promise(),
 				self = this;
 
 			// Show command entered in output and hide 
 			// prompt waiting for next read operation
-			this._printInput();
+			this._printPrompt();
 			this.idle();
 
 			promise.then(function() {
-				self.prompt();
+				self.showPrompt();
 			});
 
 			if(command === '') {
@@ -1347,16 +1285,16 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			this.historyReset();
 		},
 
-		autocomplete: function() {
-			var commands = this._shell.search(this.input.getValue());
+		autocomplete: function(input) {
+			var commands = this._shell.search(input.value);
 
 			if(commands.length > 1) {
-				this._printInput();
+				this._printPrompt();
 				this.output.print(commands.join(' '), 'stdout');
-				this.prompt(this.input.getValue());
+				this.showPrompt(input.value);
 			}
 			else if(commands.length === 1) {
-				this.prompt(commands[0]);
+				this.showPrompt(commands[0]);
 			}
 		},
 
@@ -1382,49 +1320,107 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 
 			// Listen to input events
 			streams.stdin.events.on('read', this._read, this);
-			streams.stdin.events.on('end', this._end, this);
 
 			this.historyReset();
 		},
 
 		_read: function() {
-			var stdin = this._shell.streams.stdin,
+			var stdin =  this._shell.streams.stdin,
 				input = new Input({
-					prompt: '',
 					editable: true
 				});			
 
 			this._currentInput = input;
 
-			input.appendTo(this.element)
-				.show()
-				.focus();
+			input.appendTo(this.$el).focus();
 
 			input.events.on('enter', function(input) {
 				var stream = stdin.pipe();
-				stream.write(input.getValue());
+				var data = input.value;
+
+				stream.write(data);
 				stdin.end();
 
-				input.setEditable(false);
-				this.element.removeChild(input.element);
-				this._currentInput = this.input; // restore to prompt
+				// Print out the input data
+				this.output.print(data);
+
+				// Restore input to the old prompt
+				input.editable = false;
+				this.$el.removeChild(input.$el);
+				this._currentInput = this.prompt.input;
 			}, this);
 		},
 
-		_printInput: function() {
-			var commandElement = new Input();
-			commandElement
-				.setPrompt(this.input.getPrompt())
-				.setValue(this.input.text.innerHTML)
-				.show();
+		_printPrompt: function() {
+			var copy = new Prompt();
+			copy.ps = this.prompt.ps;
+			copy.input.value = this.prompt.input.value;
+			copy.show();
 
-			this.output.printUserInput(commandElement.element.outerHTML);
+			this.output.print(copy.$el.outerHTML, 'web');
 		}
 	};
 
 	return Display;
 });
 
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+ 
+define('io/outputstream',['require','core/events'],function(require) {
+	
+	
+
+	var Events = require('core/events');
+
+	/**
+	 * @class
+	 */
+	var OutputStream = function() {
+		this.events = new Events();
+		this.close = false;
+
+		this._buffer = [];
+	};
+
+	OutputStream.prototype = {
+		events: null,
+
+		/** 
+		 * @property {bool} close 
+		 */
+		set close(value) {
+			// Cannot be reopened
+			if(this._close) return; 
+
+			if(value === true)
+				this.events.emit('close');
+
+			this._close = !!value;
+		},
+
+		get close() {
+			return this._close;
+		},
+
+		/**
+		 * Writes the content of output to the stream.
+		 * @param {String} output
+		 */
+		write: function(output) {
+			if(this.close) 
+				return;
+
+			output += ''; // Stringify output
+
+			this._buffer.push(output);
+			this.events.emit('data', output);
+		}
+	};
+
+	return OutputStream;
+});
 /**
  * Copyright © 2012 Ramón Lamana
  */
@@ -1528,6 +1524,74 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	
 });
 
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+ 
+define('io/inputstream',['require','core/promise','core/events','io/outputstream'],function(require) {
+	
+	
+
+	/**
+	 * @dependecies
+	 */
+	var Promise = require('core/promise');
+	var Events = require('core/events');
+
+	var OutputStream = require('io/outputstream');
+
+	/**
+	 * @class
+	 *
+	 * events: read, data, end
+	 */
+	var InputStream = function() {
+		this.events = new Events();
+
+		this._buffer = [];
+		this._promise = null;
+	};
+
+	InputStream.prototype = {
+		read: function() {
+			this.events.emit('read');
+			this._promise = this._promise || (new Promise());
+
+			return this._promise;
+		}, 
+
+		end: function() {
+			var data;
+			if(!this._promise)
+				return;
+
+			var data = this._buffer.join('');
+			this._buffer = []; // Empty buffer
+			this._promise.done(data);
+			this._promise = null;
+		},
+
+		/**
+		 * Connects an output stream with this input stream
+		 */ 
+		pipe: function(outputstream) {
+			var self = this;
+
+			if(!outputstream)
+				outputstream = new OutputStream();
+			
+			outputstream.events.on('data', function(input) {
+				this._buffer.push(input);
+				this.events.emit('data', input);
+			}, this);
+
+			return outputstream;
+		}
+	};
+
+	return InputStream;
+	
+});
 /**
  * Copyright © 2012 Ramón Lamana
  */
