@@ -21,6 +21,12 @@
 		var self = this,
 			setter;
 
+		// Create the DOM element and append to body
+		if(!element) {
+			this.$el = document.createElement('div');
+			document.body.appendChild(this.$el);
+		}
+
 		// Events support
 		this.events = new Events();
 

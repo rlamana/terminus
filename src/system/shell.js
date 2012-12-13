@@ -93,18 +93,11 @@
 		},
 
 		/**
-		 * Attaches a group of commands and start listening to its done event
+		 * Attaches a group of commands
+		 * @param {Array} List of commands
 		 */
-		include: function(groupORname, func) {
-			var group;
-			if (arguments.length > 1 && typeof groupORname === 'string') {
-				group = {};
-				group[groupORname] = func;
-			} 
-			else
-				group = groupORname;
-
-			this.commands.push(group); 
+		include: function(commands) {
+			this.commands = this.commands.concat(commands); 
 		},
 
 		/**

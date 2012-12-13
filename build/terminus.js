@@ -340,6 +340,60 @@ var requirejs, require, define;
 
 define("../vendor/almond", function(){});
 
+/*!
+  * domready (c) Dustin Diaz 2012 - License MIT
+  */
+!function (name, definition) {
+  if (typeof module != 'undefined') module.exports = definition()
+  else if (typeof define == 'function' && typeof define.amd == 'object') define('vendor/domready',[],definition)
+  else this[name] = definition()
+}('domready', function (ready) {
+
+  var fns = [], fn, f = false
+    , doc = document
+    , testEl = doc.documentElement
+    , hack = testEl.doScroll
+    , domContentLoaded = 'DOMContentLoaded'
+    , addEventListener = 'addEventListener'
+    , onreadystatechange = 'onreadystatechange'
+    , readyState = 'readyState'
+    , loaded = /^loade|c/.test(doc[readyState])
+
+  function flush(f) {
+    loaded = 1
+    while (f = fns.shift()) f()
+  }
+
+  doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
+    doc.removeEventListener(domContentLoaded, fn, f)
+    flush()
+  }, f)
+
+
+  hack && doc.attachEvent(onreadystatechange, fn = function () {
+    if (/^c/.test(doc[readyState])) {
+      doc.detachEvent(onreadystatechange, fn)
+      flush()
+    }
+  })
+
+  return (ready = hack ?
+    function (fn) {
+      self != top ?
+        loaded ? fn() : fns.push(fn) :
+        function () {
+          try {
+            testEl.doScroll('left')
+          } catch (e) {
+            return setTimeout(function() { ready(fn) }, 50)
+          }
+          fn()
+        }()
+    } :
+    function (fn) {
+      loaded ? fn() : fns.push(fn)
+    })
+});
 /**
  * Copyright © 2012 Ramón Lamana
  */
@@ -1153,6 +1207,12 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		var self = this,
 			setter;
 
+		// Create the DOM element and append to body
+		if(!element) {
+			this.$el = document.createElement('div');
+			document.body.appendChild(this.$el);
+		}
+
 		// Events support
 		this.events = new Events();
 
@@ -1687,18 +1747,11 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 		},
 
 		/**
-		 * Attaches a group of commands and start listening to its done event
+		 * Attaches a group of commands
+		 * @param {Array} List of commands
 		 */
-		include: function(groupORname, func) {
-			var group;
-			if (arguments.length > 1 && typeof groupORname === 'string') {
-				group = {};
-				group[groupORname] = func;
-			} 
-			else
-				group = groupORname;
-
-			this.commands.push(group); 
+		include: function(commands) {
+			this.commands = this.commands.concat(commands); 
 		},
 
 		/**
@@ -1742,20 +1795,66 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 /**
  * Copyright © 2012 Ramón Lamana
  */
-define('terminus',['require','ui/display','system/shell','system/process'],function(require) {
+define('terminus',['require','vendor/domready','ui/display','system/shell','system/process'],function(require) {
 	
 	
 
+	var domready = require('vendor/domready');
+
 	/**
-	 * @class
+	 * Helper that creates a terminal with a default display and shell.
+	 * 
+	 * @param {String} DOM element selector where display will be rendered
+	 * @param {Object} displaySettings Optional display parameters 
+	 * @constructor
 	 */
-	var Terminus = function() {
+	var Terminus = function(selector, displaySettings) {
+		var self = this;
+
+		// Setup shell
+		this.shell = displaySettings.shell || (new Terminus.Shell());
+		if(!this.shell || !(this.shell instanceof Terminus.Shell)) {
+			console.error('Terminus.constructor: Provided shell not valid');
+			return;
+		}
+		displaySettings.shell = this.shell;
+
+		// Setup display
+		domready(function(){
+			var element = document.querySelector(selector);
+			self.display = new Terminus.Display(element, displaySettings);
+		});
 	};
 
 	Terminus.prototype = {
+		/**
+		 * @property {Terminus.Shell} shell 
+		 * @readonly
+		 */
+		set shell(value) {
+			if(!this._shell)
+				this._shell = value;
+		},
+
+		get shell() {
+			return this._shell;
+		},
+
+		/**
+		 * @property {Terminus.Display} display 
+		 * @readonly
+		 */
+		set display(value) {
+			if(!this._display)
+				this._display = value;
+		},
+
+		get display() {
+			return this._display;
+		}
 	};
 	
-	Terminus.version = '0.5.1';
+	Terminus.version = '0.5.2';
 
 	Terminus.Display = require('ui/display');
 	Terminus.Shell 	 = require('system/shell');

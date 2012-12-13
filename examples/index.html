@@ -53,8 +53,6 @@
 	</head>
 	<body>
 		<div id="terminal"></div>	
-
-		<script type="text/javascript" src="vendor/ready.js"></script>
 		<script type="text/javascript" src="../build/terminus.js"></script>
 		<!--<script type="text/javascript" src="../build/terminus.min.js"></script>-->
 
@@ -67,20 +65,16 @@
 		<script type="text/javascript" src="commands/shapecommands.js"></script>
 
 		<script type="text/javascript">
-			domready(function(){
-				var shell = new Terminus.Shell();
-				shell.include(TestCommands);
-				shell.include(ShapeCommands);
-				shell.include('hello', function() {
+			var terminus = new Terminus('#terminal', {
+				welcome: "<div class='identity'><img src='images/logo.png' /><h1>Terminus.js</h1> "+Terminus.version+"</div>Copyright 2011-2012 Ramón Lamana.<br/>Press <span style='color:green'>&lt; tab &gt;</span> to see a list of available commands."
+			});
+
+			terminus.shell.include([TestCommands, ShapeCommands, {
+				hello: function() {
 					this.write('<span style="color:blue">Hello World!</span>', 'web');
 					this.exit(0);
-				});
-							
-				var display = new Terminus.Display(document.getElementById('terminal'), {
-					welcome: "<div class='identity'><img src='images/logo.png' /><h1>Terminus.js</h1> "+Terminus.version+"</div>Copyright 2011-2012 Ramón Lamana.<br/>Press <span style='color:green'>&lt; tab &gt;</span> to see a list of available commands.",
-					shell: shell
-				});
-			});
+				}
+			}]);
 		</script>
 	</body>
 </html>
