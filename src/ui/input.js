@@ -6,7 +6,7 @@ define(function(require) {
 	'use strict';
 
 	var Events = require('core/events');
-	var Styles = require('ui/styles');
+	var Util = require('core/util');
 	
 	var InputStream = require('io/inputstream');
 
@@ -129,17 +129,17 @@ define(function(require) {
 		},
 
 		show: function () {
-			Styles.addClass(this.element,'terminusjs-box');
+			Util.Styles.addClass(this.element,'terminusjs-box');
 			return this;
 		},
 
 		hide: function () {
-			Styles.removeClass(this.element,'terminusjs-box');
+			Util.Styles.removeClass(this.element,'terminusjs-box');
 			return this;
 		},
 
 		isVisible: function() {
-			return (this.element.style.display !== 'none') && Styles.hasClass(this.element, 'terminusjs-box');
+			return (this.element.style.display !== 'none') && Util.Styles.hasClass(this.element, 'terminusjs-box');
 		},
 
 		placeCursorToEnd: function() {

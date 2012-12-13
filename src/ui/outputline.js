@@ -5,7 +5,7 @@ define(function(require) {
 	
 	'use strict';
 
-	var Styles = require('ui/styles');
+	var Util = require('core/util');
 
 	/**
 	 * Client OutputLine class.
@@ -45,7 +45,7 @@ define(function(require) {
 			var animations = false; //Client.animations;
 
 			var func = function() {
-				Styles.addClass(self.element, 'visible');
+				Util.Styles.addClass(self.element, 'visible');
 				self.element.style.height = animations ? self.outputContent.clientHeight + 'px' : 'auto';
 			};
 
@@ -53,7 +53,7 @@ define(function(require) {
 		},
 
 		hide: function() {
-			Styles.removeClass(this.element, 'visible');
+			Util.Styles.removeClass(this.element, 'visible');
 			this.element.style.height = '0';
 		}
 	};

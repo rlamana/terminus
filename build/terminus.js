@@ -343,6 +343,185 @@ define("../vendor/almond", function(){});
 /**
  * Copyright © 2012 Ramón Lamana
  */
+define('core/util',['require'],function(require) {
+	
+	
+
+	/**
+	 * @singleton
+	 */
+	var Util = {
+		String: {
+			htmlEntities: function (str) {
+				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+			},
+
+			htmlStrip: function (str) {
+				return String(str).replace(/&/g, '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+			},
+		},
+		
+		Array: {
+			merge: function(/* variable number of arrays */){
+				var result = [];
+			    for(var i = 0; i < arguments.length; i++){
+			        var array = arguments[i];
+			        for(var j = 0; j < array.length; j++){
+			            if(result.indexOf(array[j]) === -1) {
+			                result.push(array[j]);
+			            }
+			        }
+			    }
+			    return result;
+			}
+		},
+
+		Styles: {
+			_styleSheet: null,
+
+			addRule: function (selector, declaration) {  
+				var declarationStr = declaration;
+
+				// Create stylesheet if it doesn't exist
+				if(!this._styleSheet) {
+					var style = document.createElement('style');
+
+					if(!document.head)
+						return;
+
+					document.head.insertBefore(style, document.head.childNodes[0]); // Before all other defined styles
+					this._styleSheet = document.styleSheets[document.styleSheets.length - 1];
+				}
+
+				if (typeof declaration !== 'string') {
+					declarationStr = ''
+					
+					for(var style in declaration) {
+						if(!declaration.hasOwnProperty(style))
+							continue;
+
+						declarationStr += style + ': ' + declaration[style] + ';';
+					}
+		  		}
+
+				this._styleSheet.insertRule(selector + '{' + declarationStr + '}', 0);  
+			},  
+
+			hasClass: function (element, className) {
+				return element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+			},
+
+			addClass: function(element, className) {
+				if (!this.hasClass(element, className)) 
+					element.className += " " + className;
+			},
+
+			removeClass: function(element, className) {
+				if (this.hasClass(element, className)) {
+					var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+					element.className = element.className.replace(reg,' ');
+				}
+			}
+		}
+	};
+
+	return Util;
+});
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+
+define('ui/styles',['require','core/util'],function(require) {
+	
+	
+
+	var Util = require('core/util');
+	var Styles = Util.Styles;
+
+	Styles.addRule('.terminusjs', {
+		'color': '#fff',
+		'background-color': '#111',
+		'font-family': 'monospace'
+	});
+
+	// Class to support cross-browser flexible box (specs 2009 and 2012)
+	Styles.addRule('.terminusjs-box', "\
+		display: -webkit-box; \
+		display: -moz-box; \
+		display: -o-box; \
+		display: -ms-box; \
+		display: -webkit-flex; \
+		display: -moz-flex; \
+		display: -o-flex; \
+		display: -ms-flex; \
+		display: flex; \
+	");
+
+	// Default stylesheet rules for input and output elements
+	Styles.addRule('.terminusjs-input-line', {
+		'display': 'none',
+		'clear': 'both',
+		'-webkit-box-orient': 'horizontal',
+		'-moz-box-orient': 'horizontal',
+		'-ms-box-orient': 'horizontal',
+		'-o-box-orient': 'horizontal',
+
+		'-webkit-flex-flow': 'row',
+		'-moz-flex-flow': 'row',
+		'-ms-flex-flow': 'row',
+		'-o-flex-flow': 'row',
+		'flex-flow': 'row'
+	});
+
+	Styles.addRule('.terminusjs-input', {
+		'display': 'block',
+		'outline': 'none',
+		'-webkit-box-flex': '1',
+		'-moz-box-flex': '1',
+		'-ms-box-flex': '1',
+		'-o-box-flex': '1',
+
+		'-webkit-flex': '1',
+		'-moz-flex': '1',
+		'-ms-flex': '1',
+		'-o-flex': '1',
+		'flex': '1'
+	});
+
+	Styles.addRule('.terminusjs .terminusjs-prompt', {
+		'margin-right': '5px'
+	});
+
+	Styles.addRule('.terminusjs-output', {
+		'clear': 'both'
+	});
+
+	Styles.addRule('.terminusjs-output .terminusjs-output-line', {
+		'height': '0',
+		'overflow': 'hidden'
+	});
+
+	Styles.addRule('.terminusjs-output .terminusjs-output-line.animate', {
+		'-webkit-transition': 'height '+transitionTime+'s ease-in-out',
+		'-moz-transition': 'height '+transitionTime+'s ease-in-out',
+		'-ms-transition': 'height '+transitionTime+'s ease-in-out',
+		'-o-transition': 'height '+transitionTime+'s ease-in-out',
+		'transition': 'height '+transitionTime+'s ease-in-out'
+	});
+
+	Styles.addRule('.terminusjs-output .terminusjs-output-line.terminusjs-userinput', {
+		'-webkit-transition': 'none !important',
+		'-moz-transition': 'none !important',
+		'-ms-transition': 'none !important',
+		'-o-transition': 'none !important',
+		'transition': 'none !important'
+	});
+
+});
+
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
  define('core/events',['require'],function(require) {
 
  	
@@ -597,67 +776,6 @@ define("../vendor/almond", function(){});
 /**
  * Copyright © 2012 Ramón Lamana
  */
-define('ui/styles',['require'],function(require) {
-	
-	
-
-	/**
-	 * @singleton
-	 */
-	var Styles = {
-		_styleSheet: null,
-
-		addRule: function (selector, declaration) {  
-			var declarationStr = declaration;
-
-			// Create stylesheet if it doesn't exist
-			if(!this._styleSheet) {
-				var style = document.createElement('style');
-
-				if(!document.head)
-					return;
-
-				document.head.insertBefore(style, document.head.childNodes[0]); // Before all other defined styles
-				this._styleSheet = document.styleSheets[document.styleSheets.length - 1];
-			}
-
-			if (typeof declaration !== 'string') {
-				declarationStr = ''
-				
-				for(var style in declaration) {
-					if(!declaration.hasOwnProperty(style))
-						continue;
-
-					declarationStr += style + ': ' + declaration[style] + ';';
-				}
-	  		}
-
-			this._styleSheet.insertRule(selector + '{' + declarationStr + '}', 0);  
-		},  
-
-		hasClass: function (element, className) {
-			return element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
-		},
-
-		addClass: function(element, className) {
-			if (!this.hasClass(element, className)) 
-				element.className += " " + className;
-		},
-
-		removeClass: function(element, className) {
-			if (this.hasClass(element, className)) {
-				var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-				element.className = element.className.replace(reg,' ');
-			}
-		}
-	};
-
-	return Styles;
-});
-
-/**
- * Copyright © 2012 Ramón Lamana
- */
  
 define('io/outputstream',['require','core/events'],function(require) {
 	
@@ -735,7 +853,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 	 */
 	var InputStream = function() {
 		this.events = new Events();
-		
+
 		this._buffer = [];
 		this._promise = null;
 	};
@@ -749,12 +867,17 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 		}, 
 
 		end: function() {
-			if(this._promise)
-				this._promise.done(this._buffer.join(''));
+			var data;
+			if(!this._promise)
+				return;
+
+			var data = this._buffer.join('');
+			this._buffer = []; // Empty buffer
+			this._promise.done(data);
 		},
 
 		/**
-		 * Connects an output stream with an input stream
+		 * Connects an output stream with this input stream
 		 */ 
 		pipe: function(outputstream) {
 			var self = this;
@@ -777,12 +900,12 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 /**
  * Copyright © 2012 Ramón Lamana
  */
-define('ui/input',['require','core/events','ui/styles','io/inputstream'],function(require) {
+define('ui/input',['require','core/events','core/util','io/inputstream'],function(require) {
 	
 	
 
 	var Events = require('core/events');
-	var Styles = require('ui/styles');
+	var Util = require('core/util');
 	
 	var InputStream = require('io/inputstream');
 
@@ -905,17 +1028,17 @@ define('ui/input',['require','core/events','ui/styles','io/inputstream'],functio
 		},
 
 		show: function () {
-			Styles.addClass(this.element,'terminusjs-box');
+			Util.Styles.addClass(this.element,'terminusjs-box');
 			return this;
 		},
 
 		hide: function () {
-			Styles.removeClass(this.element,'terminusjs-box');
+			Util.Styles.removeClass(this.element,'terminusjs-box');
 			return this;
 		},
 
 		isVisible: function() {
-			return (this.element.style.display !== 'none') && Styles.hasClass(this.element, 'terminusjs-box');
+			return (this.element.style.display !== 'none') && Util.Styles.hasClass(this.element, 'terminusjs-box');
 		},
 
 		placeCursorToEnd: function() {
@@ -939,50 +1062,11 @@ define('ui/input',['require','core/events','ui/styles','io/inputstream'],functio
 /**
  * Copyright © 2012 Ramón Lamana
  */
-define('core/util',['require'],function(require) {
+define('ui/outputline',['require','core/util'],function(require) {
 	
 	
 
-	/**
-	 * @singleton
-	 */
-	var Util = {
-		String: {
-			htmlEntities: function (str) {
-				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-			},
-
-			htmlStrip: function (str) {
-				return String(str).replace(/&/g, '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-			},
-		},
-		
-		Array: {
-			merge: function(/* variable number of arrays */){
-				var result = [];
-			    for(var i = 0; i < arguments.length; i++){
-			        var array = arguments[i];
-			        for(var j = 0; j < array.length; j++){
-			            if(result.indexOf(array[j]) === -1) {
-			                result.push(array[j]);
-			            }
-			        }
-			    }
-			    return result;
-			}
-		}
-	};
-
-	return Util;
-});
-/**
- * Copyright © 2012 Ramón Lamana
- */
-define('ui/outputline',['require','ui/styles'],function(require) {
-	
-	
-
-	var Styles = require('ui/styles');
+	var Util = require('core/util');
 
 	/**
 	 * Client OutputLine class.
@@ -1022,7 +1106,7 @@ define('ui/outputline',['require','ui/styles'],function(require) {
 			var animations = false; //Client.animations;
 
 			var func = function() {
-				Styles.addClass(self.element, 'visible');
+				Util.Styles.addClass(self.element, 'visible');
 				self.element.style.height = animations ? self.outputContent.clientHeight + 'px' : 'auto';
 			};
 
@@ -1030,7 +1114,7 @@ define('ui/outputline',['require','ui/styles'],function(require) {
 		},
 
 		hide: function() {
-			Styles.removeClass(this.element, 'visible');
+			Util.Styles.removeClass(this.element, 'visible');
 			this.element.style.height = '0';
 		}
 	};
@@ -1109,97 +1193,19 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 /**
  * Copyright © 2012 Ramón Lamana
  */
- define('ui/display',['require','core/events','core/promise','ui/styles','ui/input','ui/output'],function(require) {
+ define('ui/display',['require','ui/styles','core/events','core/promise','ui/input','ui/output'],function(require) {
 
 	
 
+	require('ui/styles');
+
 	var Events 	= require('core/events');
 	var Promise = require('core/promise');
-
-	var Styles 	= require('ui/styles');
+	
 	var Input 	= require('ui/input');
 	var Output 	= require('ui/output');
 
 	var transitionTime = .2;
-
-	Styles.addRule('.terminusjs', {
-		'color': '#fff',
-		'background-color': '#111',
-		'font-family': 'monospace'
-	});
-
-	// Class to support cross-browser flexible box (specs 2009 and 2012)
-	Styles.addRule('.terminusjs-box', "\
-		display: -webkit-box; \
-		display: -moz-box; \
-		display: -o-box; \
-		display: -ms-box; \
-		display: -webkit-flex; \
-		display: -moz-flex; \
-		display: -o-flex; \
-		display: -ms-flex; \
-		display: flex; \
-	");
-
-	// Default stylesheet rules for input and output elements
-	Styles.addRule('.terminusjs-input-line', {
-		'display': 'none',
-		'clear': 'both',
-		'-webkit-box-orient': 'horizontal',
-		'-moz-box-orient': 'horizontal',
-		'-ms-box-orient': 'horizontal',
-		'-o-box-orient': 'horizontal',
-
-		'-webkit-flex-flow': 'row',
-		'-moz-flex-flow': 'row',
-		'-ms-flex-flow': 'row',
-		'-o-flex-flow': 'row',
-		'flex-flow': 'row'
-	});
-
-	Styles.addRule('.terminusjs-input', {
-		'display': 'block',
-		'outline': 'none',
-		'-webkit-box-flex': '1',
-		'-moz-box-flex': '1',
-		'-ms-box-flex': '1',
-		'-o-box-flex': '1',
-
-		'-webkit-flex': '1',
-		'-moz-flex': '1',
-		'-ms-flex': '1',
-		'-o-flex': '1',
-		'flex': '1'
-	});
-
-	Styles.addRule('.terminusjs .terminusjs-prompt', {
-		'margin-right': '5px'
-	});
-
-	Styles.addRule('.terminusjs-output', {
-		'clear': 'both'
-	});
-
-	Styles.addRule('.terminusjs-output .terminusjs-output-line', {
-		'height': '0',
-		'overflow': 'hidden'
-	});
-
-	Styles.addRule('.terminusjs-output .terminusjs-output-line.animate', {
-		'-webkit-transition': 'height '+transitionTime+'s ease-in-out',
-		'-moz-transition': 'height '+transitionTime+'s ease-in-out',
-		'-ms-transition': 'height '+transitionTime+'s ease-in-out',
-		'-o-transition': 'height '+transitionTime+'s ease-in-out',
-		'transition': 'height '+transitionTime+'s ease-in-out'
-	});
-
-	Styles.addRule('.terminusjs-output .terminusjs-output-line.terminusjs-userinput', {
-		'-webkit-transition': 'none !important',
-		'-moz-transition': 'none !important',
-		'-ms-transition': 'none !important',
-		'-o-transition': 'none !important',
-		'transition': 'none !important'
-	});
 
 	/**
 	 * Widget 

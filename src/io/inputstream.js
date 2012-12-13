@@ -45,7 +45,7 @@ define(function(require) {
 		},
 
 		/**
-		 * Connects an output stream with an input stream
+		 * Connects an output stream with this input stream
 		 */ 
 		pipe: function(outputstream) {
 			var self = this;
