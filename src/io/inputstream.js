@@ -20,10 +20,9 @@ define(function(require) {
 	 * events: read, data, end
 	 */
 	var InputStream = function() {
-		// Events support
 		this.events = new Events();
-		this.stream = [];
-
+		
+		this._buffer = [];
 		this._promise = null;
 	};
 
@@ -37,7 +36,7 @@ define(function(require) {
 
 		end: function() {
 			if(this._promise)
-				this._promise.done(this.stream);
+				this._promise.done(this._buffer.join(''));
 		},
 
 		/**
@@ -50,7 +49,7 @@ define(function(require) {
 				outputstream = new OutputStream();
 			
 			outputstream.events.on('data', function(input) {
-				this.stream.push(input);
+				this._buffer.push(input);
 				this.events.emit('data', input);
 			}, this);
 

@@ -1,10 +1,10 @@
-
-define(['terminus/process'],function(Process) {
+/**
+ * Copyright © 2012 Ramón Lamana
+ */
+ 
+define(['system/process'],function(Process) {
 	describe('Process', function(){
 	    describe('Process()', function(){
-			it('debuti', function(){
-			   
-			})
 	    })
 	});
 });
