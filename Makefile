@@ -13,14 +13,6 @@ terminus.js: ${targets}
 terminus.min.js: ${targets}
 	r.js -o config.js out=${builddir}terminus.min.js
 
-build-runner: 
-	cd deps/examples/specrunner
-	qmake && make
-
-build-runner-mac: 
-	cd deps/examples/specrunner
-	qmake -spec macx-g++ && make
-
 clean:
 	rm ${builddir}terminus.js
 	rm ${builddir}terminus.min.js
