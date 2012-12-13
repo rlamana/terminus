@@ -1804,11 +1804,11 @@ define('terminus',['require','vendor/domready','ui/display','system/shell','syst
 	/**
 	 * Helper that creates a terminal with a default display and shell.
 	 * 
-	 * @param {String} DOM element selector where display will be rendered
+	 * @param {String|Element} DOM element or selector where display will be rendered
 	 * @param {Object} displaySettings Optional display parameters 
 	 * @constructor
 	 */
-	var Terminus = function(selector, displaySettings) {
+	var Terminus = function(element, displaySettings) {
 		var self = this;
 
 		// Setup shell
@@ -1821,7 +1821,10 @@ define('terminus',['require','vendor/domready','ui/display','system/shell','syst
 
 		// Setup display
 		domready(function(){
-			var element = document.querySelector(selector);
+			element = (typeof element === 'string') ? 
+				document.querySelector(element) :
+				element;
+
 			self.display = new Terminus.Display(element, displaySettings);
 		});
 	};
