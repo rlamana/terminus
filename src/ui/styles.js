@@ -30,7 +30,7 @@ define(function(require) {
 	");
 
 	// Default stylesheet rules for input and output elements
-	Styles.addRule('.terminusjs-input-line', {
+	Styles.addRule('.terminusjs-prompt', {
 		'display': 'none',
 		'clear': 'both',
 		'-webkit-box-orient': 'horizontal',
@@ -45,7 +45,7 @@ define(function(require) {
 		'flex-flow': 'row'
 	});
 
-	Styles.addRule('.terminusjs-input', {
+	Styles.addRule('.terminusjs .terminusjs-input', {
 		'display': 'block',
 		'outline': 'none',
 		'-webkit-box-flex': '1',
@@ -60,7 +60,7 @@ define(function(require) {
 		'flex': '1'
 	});
 
-	Styles.addRule('.terminusjs .terminusjs-prompt', {
+	Styles.addRule('.terminusjs .terminusjs-ps', {
 		'margin-right': '5px'
 	});
 

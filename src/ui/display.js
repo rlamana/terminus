@@ -10,8 +10,9 @@
 	var Events 	= require('core/events');
 	var Promise = require('core/promise');
 
-	var Input 	= require('ui/input');
-	var Output 	= require('ui/output');
+	var Prompt = require('ui/prompt');
+	var Input = require('ui/input');
+	var Output = require('ui/output');
 
 	/**
 	 * Widget 
@@ -23,7 +24,7 @@
 		// Events support
 		this.events = new Events();
 
-				// Load settings
+		// Load settings
 		for(var key in settings) {
 			if (!settings.hasOwnProperty(key))
 				continue;
@@ -31,35 +32,35 @@
 		}
 
 		// Create DOM elements structure
-		this.element = element;
-		this.element.className = 'terminusjs';
+		this.$el = element;
+		this.$el.className = 'terminusjs';
 
 		// Create DOM output element
 		this.output = new Output();
-		this.output.appendTo(this.element);
+		this.output.appendTo(this.$el);
 
-		// Create DOM input element
-		this.input = new Input({
+		// Create DOM prompt element
+		this.prompt = new Prompt({
 			editable: true
 		});
-		this.input.appendTo(this.element).show();
+		this.prompt.appendTo(this.$el).show();
 
-		this.input.events.on('enter', this.enter, this);
-		this.input.events.on('historyBack', this.historyBack, this);
-		this.input.events.on('historyForward', this.historyForward, this);
-		this.input.events.on('autocomplete', this.autocomplete, this);
+		this.prompt.events.on('enter', this.enter, this);
+		this.prompt.events.on('historyBack', this.historyBack, this);
+		this.prompt.events.on('historyForward', this.historyForward, this);
+		this.prompt.events.on('autocomplete', this.autocomplete, this);
 
-		this._currentInput = this.input;
+		this._currentInput = this.prompt.input;
 		
 		// CTRL + Z support
-		element.addEventListener('keydown', function(e) {
+		this.$el.addEventListener('keydown', function(e) {
 			if(e.ctrlKey && e.keyCode == 90) {
 				self.read();
 			}
 		});
 
 		this.output.print(this.settings.welcome, 'web');
-		this.prompt();
+		this.showPrompt();
 		
 		element.addEventListener('click', function(e){
 			self.focus();
@@ -93,7 +94,7 @@
 			var command = this._shell.history[this._historyIndex];
 
 			if (command)
-				this.input.setValue(command);
+				this.prompt.input.value = command;
 			else
 				this._historyIndex = 0;
 		},
@@ -103,38 +104,38 @@
 			var command = this._shell.history[this._historyIndex];
 
 			if (command) 
-				this.input.setValue(command);
+				this.prompt.input.value = command;
 			else 
 				this.historyReset();
 		},
 
-		prompt: function(withContent) {
-			this.input.clear()
+		showPrompt: function(withContent) {
+			this.prompt.input.clear();
 
 			if(typeof withContent !== 'undefined')
-				this.input.setValue(withContent);
+				this.prompt.value = withContent;
 
-			this.input.show();
+			this.prompt.show();
 			this.focus();
 		},
 
 		idle: function() {
-			this.input.hide();
-			this.element.focus();
+			this.prompt.hide();
+			this.$el.focus();
 		},
 
-		enter: function(inputElement) {
-			var command = inputElement.getValue(),
+		enter: function(input) {
+			var command = input.value,
 				promise = new Promise(),
 				self = this;
 
 			// Show command entered in output and hide 
 			// prompt waiting for next read operation
-			this._printInput();
+			this._printPrompt();
 			this.idle();
 
 			promise.then(function() {
-				self.prompt();
+				self.showPrompt();
 			});
 
 			if(command === '') {
@@ -152,16 +153,16 @@
 			this.historyReset();
 		},
 
-		autocomplete: function() {
-			var commands = this._shell.search(this.input.getValue());
+		autocomplete: function(input) {
+			var commands = this._shell.search(input.value);
 
 			if(commands.length > 1) {
-				this._printInput();
+				this._printPrompt();
 				this.output.print(commands.join(' '), 'stdout');
-				this.prompt(this.input.getValue());
+				this.showPrompt(input.value);
 			}
 			else if(commands.length === 1) {
-				this.prompt(commands[0]);
+				this.showPrompt(commands[0]);
 			}
 		},
 
@@ -185,43 +186,46 @@
 			// Listen to other events on shell
 			streams.stdin.events.on('clear', this.output.clear, this.output);
 
-			// Listen to input read events
+			// Listen to input events
 			streams.stdin.events.on('read', this._read, this);
 
 			this.historyReset();
 		},
 
 		_read: function() {
-			var input = new Input({
-				prompt: '',
-				editable: true
-			});			
+			var stdin =  this._shell.streams.stdin,
+				input = new Input({
+					editable: true
+				});			
 
 			this._currentInput = input;
 
-			input.appendTo(this.element)
-				.show()
-				.focus();
+			input.appendTo(this.$el).focus();
 
 			input.events.on('enter', function(input) {
-				var stream = this._shell.streams.stdin.pipe();
-				stream.write(input.getValue());
-				this._shell.streams.stdin.end();
+				var stream = stdin.pipe();
+				var data = input.value;
 
-				input.setEditable(false);
-				this.element.removeChild(input.element);
-				this._currentInput = this.input; // restore to prompt
+				stream.write(data);
+				stdin.end();
+
+				// Print out the input data
+				this.output.print(data);
+
+				// Restore input to the old prompt
+				input.editable = false;
+				this.$el.removeChild(input.$el);
+				this._currentInput = this.prompt.input;
 			}, this);
 		},
 
-		_printInput: function() {
-			var commandElement = new Input();
-			commandElement
-				.setPrompt(this.input.getPrompt())
-				.setValue(this.input.text.innerHTML)
-				.show();
+		_printPrompt: function() {
+			var copy = new Prompt();
+			copy.ps = this.prompt.ps;
+			copy.input.value = this.prompt.input.value;
+			copy.show();
 
-			this.output.printUserInput(commandElement.element.outerHTML);
+			this.output.print(copy.$el.outerHTML, 'web');
 		}
 	};
 

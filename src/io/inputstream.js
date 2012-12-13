@@ -29,7 +29,7 @@ define(function(require) {
 	InputStream.prototype = {
 		read: function() {
 			this.events.emit('read');
-			this._promise = new Promise();
+			this._promise = this._promise || (new Promise());
 
 			return this._promise;
 		}, 
@@ -42,6 +42,7 @@ define(function(require) {
 			var data = this._buffer.join('');
 			this._buffer = []; // Empty buffer
 			this._promise.done(data);
+			this._promise = null;
 		},
 
 		/**

@@ -430,13 +430,14 @@ define('core/util',['require'],function(require) {
 /**
  * Copyright © 2012 Ramón Lamana
  */
-
 define('ui/styles',['require','core/util'],function(require) {
 	
 	
 
 	var Util = require('core/util');
 	var Styles = Util.Styles;
+
+	var transitionTime = .2;
 
 	Styles.addRule('.terminusjs', {
 		'color': '#fff',
@@ -861,7 +862,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 	InputStream.prototype = {
 		read: function() {
 			this.events.emit('read');
-			this._promise = new Promise();
+			this._promise = this._promise || (new Promise());
 
 			return this._promise;
 		}, 
@@ -873,6 +874,8 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 
 			var data = this._buffer.join('');
 			this._buffer = []; // Empty buffer
+
+			this.events.emit('end', data);
 			this._promise.done(data);
 		},
 
@@ -1201,11 +1204,9 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 
 	var Events 	= require('core/events');
 	var Promise = require('core/promise');
-	
+
 	var Input 	= require('ui/input');
 	var Output 	= require('ui/output');
-
-	var transitionTime = .2;
 
 	/**
 	 * Widget 
@@ -1217,7 +1218,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		// Events support
 		this.events = new Events();
 
-				// Load settings
+		// Load settings
 		for(var key in settings) {
 			if (!settings.hasOwnProperty(key))
 				continue;
@@ -1379,17 +1380,19 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			// Listen to other events on shell
 			streams.stdin.events.on('clear', this.output.clear, this.output);
 
-			// Listen to input read events
+			// Listen to input events
 			streams.stdin.events.on('read', this._read, this);
+			streams.stdin.events.on('end', this._end, this);
 
 			this.historyReset();
 		},
 
 		_read: function() {
-			var input = new Input({
-				prompt: '',
-				editable: true
-			});			
+			var stdin = this._shell.streams.stdin,
+				input = new Input({
+					prompt: '',
+					editable: true
+				});			
 
 			this._currentInput = input;
 
@@ -1398,9 +1401,9 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 				.focus();
 
 			input.events.on('enter', function(input) {
-				var stream = this._shell.streams.stdin.pipe();
+				var stream = stdin.pipe();
 				stream.write(input.getValue());
-				this._shell.streams.stdin.end();
+				stdin.end();
 
 				input.setEditable(false);
 				this.element.removeChild(input.element);
@@ -1475,7 +1478,6 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		},
 
 		/**
-		 *
 		 * @param {String} output
 		 * @param {String|OutputStream} target Output stream or the standard output values: 'stdout', 'stderr' or 'web'.
 		 */

@@ -83,7 +83,7 @@ define(['io/inputstream', 'io/outputstream'], function(InputStream, OutputStream
 				// First read
 				stdin.read().then(function(data){
 					expect(data).to.be.equal('Hello World!');
-					
+
 					// Second read
 					stdin.read().then(function(data){
 						expect(data).to.be.equal('Hello again!');

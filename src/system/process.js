@@ -51,7 +51,6 @@
 		},
 
 		/**
-		 *
 		 * @param {String} output
 		 * @param {String|OutputStream} target Output stream or the standard output values: 'stdout', 'stderr' or 'web'.
 		 */

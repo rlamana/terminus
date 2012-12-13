@@ -19,19 +19,7 @@ define(function(require) {
 		this.element.className = 'terminusjs-output';
 	};
 
-	Output.prototype = {
-		_print: function(content, className) {
-			var outputLine = new OutputLine(className);
-			outputLine.appendTo(this.element);
-			outputLine.setContent(content);
-			return outputLine;
-		},
-
-		appendTo: function(element) {
-			element.appendChild(this.element);
-			return this;
-		},
-
+	Output.prototype = {	
 		/**
 		 * @param {String} target The output target: 'stdout', 'stderr', 'web'.
 		 * @param {String} content Output content to be printed.
@@ -56,12 +44,20 @@ define(function(require) {
 			return this;
 		},
 
-		printUserInput: function(content) {
-			this._print(content, 'terminusjs-userinput').show();
-		},
-
 		clear: function() {
 			this.element.innerHTML = '';
+		},
+
+		appendTo: function(element) {
+			element.appendChild(this.element);
+			return this;
+		},
+
+		_print: function(content, className) {
+			var outputLine = new OutputLine(className);
+			outputLine.appendTo(this.element);
+			outputLine.setContent(content);
+			return outputLine;
 		}
 	};
 
