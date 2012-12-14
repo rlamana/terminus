@@ -55,6 +55,10 @@
 		this.prompt.events.on('historyBack', this.historyBack, this);
 		this.prompt.events.on('historyForward', this.historyForward, this);
 		this.prompt.events.on('autocomplete', this.autocomplete, this);
+		this.prompt.events.on('focus', function(){
+			// When a key event, always scroll to bottom
+			//window.scrollTo(0, document.body.scrollHeight);
+		}, this)
 
 		this._currentInput = this.prompt.input;
 		
@@ -122,7 +126,7 @@
 				this.prompt.input.value = withContent;
 
 			this.prompt.show();
-			this.focus();
+			this.prompt.input.focus();
 		},
 
 		idle: function() {

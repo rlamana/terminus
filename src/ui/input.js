@@ -37,8 +37,7 @@ define(function(require) {
 		if(!!this.settings.editable) {
 			this.$el.contentEditable = true;
 			this.$el.addEventListener('keydown', function(e) {
-				// When a key event, always scroll to bottom
-				window.scrollTo(0, document.body.scrollHeight);
+				self.focus();
 
 				switch(e.keyCode) {
 					case 13: // Enter key
@@ -83,6 +82,9 @@ define(function(require) {
 		focus: function () {
 			this.$el.focus();
 			this.placeCursorToEnd();
+			
+			this.events.emit('focus', this);
+
 			return this;
 		},
 

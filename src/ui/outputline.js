@@ -26,7 +26,6 @@ define(function(require) {
 
 		// When new output is generated, always scroll to bottom
 		window.scrollTo(0,document.body.scrollHeight);
-		
 	};
 
 	OutputLine.prototype = {
