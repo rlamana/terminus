@@ -146,6 +146,7 @@
 			this._printPrompt();
 			this.idle();
 
+			// When promise is done, put back prompt
 			promise.then(function() {
 				self.showPrompt();
 			});

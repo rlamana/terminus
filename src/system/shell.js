@@ -46,28 +46,31 @@
 		},
 
 		exec: function(input) {
-			var commandsGroup, proc;
+			var group, commands, proc;
 
 			this.history.push(input);
 
-			input = this._parse(input);
-
-			// Execute first shell native commands
-			if (this.native[input.command]) {
-				this.native[input.command].apply(this, input.args);
-				return Promise.done();
-			} else {
-				// Search command in commander stack
-				for(var i = this.commands.length; i--;) {
-					commandsGroup = this.commands[i];
-					if (commandsGroup[input.command]) {
-						var proc = new Process(this.streams);
-						return proc.exec(commandsGroup[input.command], input.args); // Return promise
-					} 
+			commands = this._parse(input);
+			console.log(commands);
+			commands.forEach(function(command, index) {
+				// Execute first shell native commands
+				if (this.native[command.name]) {
+					this.native[command.name].apply(this, command.args);
+					return Promise.done();
+				} else {
+					// Search command in commander stack
+					for(var i = this.commands.length; i--;) {
+						group = this.commands[i];
+						if (group[command.name]) {
+							var proc = new Process(this.streams);
+							return proc.exec(group[command.name], command.args); // Return promise
+						} 
+					}
 				}
-			}
 
-			this.streams.stderr.write("Command '"+input.command+"' not found.");
+				this.streams.stderr.write("Command '"+command.name+"' not found.");
+			}, 
+			this);
 
 			return Promise.done();
 		},
@@ -103,15 +106,20 @@
 
 		/**
 		 * Parse input string to get commands and args
+		 * @return An array of {command, args} objects
 		 */
 		_parse: function(input) {
-			var command, args = input.split(' ');
-			command = args[0];
-			args.shift();
-			return {
-				command: command,
-				args: args
-			};
+			var commands = input.split('|');
+
+			return commands.map(function(command) {
+				var args = command.trim().split(' ');
+				command = args[0];
+				args.shift();
+				return {
+					name: command,
+					args: args
+				}
+			});
 		},
 
 		/**
