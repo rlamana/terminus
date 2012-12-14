@@ -37,8 +37,6 @@ define(function(require) {
 		if(!!this.settings.editable) {
 			this.$el.contentEditable = true;
 			this.$el.addEventListener('keydown', function(e) {
-				self.focus();
-
 				switch(e.keyCode) {
 					case 13: // Enter key
 						e.preventDefault();

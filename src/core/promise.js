@@ -153,7 +153,7 @@
 			return Promise.done();
 
 		for (var i = 0; i < len; i++)
-			queueParallel(promise, promises[i], i, done, results);
+			queueParallel(promise, promises[i], i, done, result);
 
 		return promise;
 	};

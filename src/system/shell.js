@@ -46,33 +46,40 @@
 		},
 
 		exec: function(input) {
-			var group, commands, proc;
+			var group, commands, proc, 
+				finishQueue = [];
 
 			this.history.push(input);
 
 			commands = this._parse(input);
-			console.log(commands);
-			commands.forEach(function(command, index) {
-				// Execute first shell native commands
-				if (this.native[command.name]) {
-					this.native[command.name].apply(this, command.args);
-					return Promise.done();
-				} else {
-					// Search command in commander stack
-					for(var i = this.commands.length; i--;) {
-						group = this.commands[i];
-						if (group[command.name]) {
-							var proc = new Process(this.streams);
-							return proc.exec(group[command.name], command.args); // Return promise
-						} 
-					}
-				}
 
-				this.streams.stderr.write("Command '"+command.name+"' not found.");
+			commands.forEach(function(command, index) {
+				var promise = (function() {
+					// Execute first shell native commands
+					if (this.native[command.name]) {
+						this.native[command.name].apply(this, command.args);
+						return Promise.done();
+					} else {
+						// Search command in commander stack
+						for(var i = this.commands.length; i--;) {
+							group = this.commands[i];
+							if (group[command.name]) {
+								var proc = new Process(this.streams);
+								return proc.exec(group[command.name], command.args); // Return promise
+							} 
+						}
+					}
+
+					this.streams.stderr.write("Command '"+command.name+"' not found.");
+					return Promise.done();
+				})
+				.call(this);
+
+				finishQueue.push(promise);
 			}, 
 			this);
 
-			return Promise.done();
+			return Promise.parallel(finishQueue);
 		},
 
 		search: function(key) {
