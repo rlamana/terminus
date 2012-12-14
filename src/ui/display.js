@@ -1,4 +1,5 @@
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
  define(function(require) {
@@ -18,8 +19,7 @@
 	 * Widget 
 	 */
 	var Display = function(element, settings) {
-		var self = this,
-			setter;
+		var self = this;
 
 		// Create the DOM element and append to body
 		if(!element) {
@@ -61,7 +61,7 @@
 		// CTRL + Z support
 		this.$el.addEventListener('keydown', function(e) {
 			if(e.ctrlKey && e.keyCode == 90) {
-				self.read();
+				self.cancel();
 			}
 		});
 
@@ -119,7 +119,7 @@
 			this.prompt.input.clear();
 
 			if(typeof withContent !== 'undefined')
-				this.prompt.value = withContent;
+				this.prompt.input.value = withContent;
 
 			this.prompt.show();
 			this.focus();
@@ -128,6 +128,12 @@
 		idle: function() {
 			this.prompt.hide();
 			this.$el.focus();
+		},
+
+		cancel: function() {
+			this.prompt.show();
+			this._currentInput = this.prompt.input;
+			this.focus();
 		},
 
 		enter: function(input) {

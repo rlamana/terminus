@@ -1,4 +1,5 @@
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
  define(function(require) {

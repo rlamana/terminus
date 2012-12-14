@@ -1,4 +1,5 @@
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
 define(function(require) {
@@ -7,6 +8,8 @@ define(function(require) {
 
 	var Util = require('core/util');
 
+	var animations = true;
+
 	/**
 	 * Client OutputLine class.
 	 * Represents a line output element in the whole output stream.
@@ -14,9 +17,8 @@ define(function(require) {
 	 */
 	var OutputLine = function(className) {
 		var outputContent, outputLine = this.element = document.createElement('div');
-		outputLine.className = 'terminusjs-output-line ' + 
-			(className || '');/* + 
-			(Client.animations ? ' animate' : '');*/
+		outputLine.className = 'terminusjs-output-line';
+		Util.Styles.addClass(outputLine, 'animate')
 
 		outputContent = this.outputContent = document.createElement('div');
 		outputContent.className = 'terminusjs-output-content';

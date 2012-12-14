@@ -1,14 +1,19 @@
 /**
+ * Terminus.js example commands
  * Copyright © 2012 Ramón Lamana
  */
- 
 (function(global) {
 
 	'use strict';
 
 	var TestCommands = {
 		block: function() {
-			this.exit();
+
+			setTimeout.call(this, function(){
+				this.write('Process has finished');
+				this.exit();
+			}, 3000);
+			
 		},
 
 		exit: function() {

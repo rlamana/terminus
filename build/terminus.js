@@ -395,6 +395,7 @@ define("../vendor/almond", function(){});
     })
 });
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
 define('core/util',['require'],function(require) {
@@ -482,6 +483,7 @@ define('core/util',['require'],function(require) {
 	return Util;
 });
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
 define('ui/styles',['require','core/util'],function(require) {
@@ -575,6 +577,7 @@ define('ui/styles',['require','core/util'],function(require) {
 });
 
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
  define('core/events',['require'],function(require) {
@@ -619,6 +622,7 @@ define('ui/styles',['require','core/util'],function(require) {
 	
 });
 /**
+ * jsBase
  * Copyright © 2009-2012 A. Matías Quezada
  * https://github.com/amatiasq
  */
@@ -829,6 +833,7 @@ define('ui/styles',['require','core/util'],function(require) {
 	return Promise;
 });
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
 define('ui/input',['require','core/events','core/util'],function(require) {
@@ -866,8 +871,8 @@ define('ui/input',['require','core/events','core/util'],function(require) {
 		if(!!this.settings.editable) {
 			this.$el.contentEditable = true;
 			this.$el.addEventListener('keydown', function(e) {
-				// When a key event, alway scroll to bottom
-				window.scrollTo(0,document.body.scrollHeight);
+				// When a key event, always scroll to bottom
+				window.scrollTo(0, document.body.scrollHeight);
 
 				switch(e.keyCode) {
 					case 13: // Enter key
@@ -943,6 +948,7 @@ define('ui/input',['require','core/events','core/util'],function(require) {
 });
 
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
 define('ui/prompt',['require','core/events','core/util','ui/input'],function(require) {
@@ -1058,6 +1064,7 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
 });
 
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
 define('ui/outputline',['require','core/util'],function(require) {
@@ -1066,6 +1073,8 @@ define('ui/outputline',['require','core/util'],function(require) {
 
 	var Util = require('core/util');
 
+	var animations = true;
+
 	/**
 	 * Client OutputLine class.
 	 * Represents a line output element in the whole output stream.
@@ -1073,9 +1082,8 @@ define('ui/outputline',['require','core/util'],function(require) {
 	 */
 	var OutputLine = function(className) {
 		var outputContent, outputLine = this.element = document.createElement('div');
-		outputLine.className = 'terminusjs-output-line ' + 
-			(className || '');/* + 
-			(Client.animations ? ' animate' : '');*/
+		outputLine.className = 'terminusjs-output-line';
+		Util.Styles.addClass(outputLine, 'animate')
 
 		outputContent = this.outputContent = document.createElement('div');
 		outputContent.className = 'terminusjs-output-content';
@@ -1120,6 +1128,7 @@ define('ui/outputline',['require','core/util'],function(require) {
 	return OutputLine;
 });
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
 define('ui/output',['require','core/events','core/util','ui/outputline'],function(require) {
@@ -1185,6 +1194,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	return Output;
 });
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
  define('ui/display',['require','ui/styles','core/events','core/promise','ui/prompt','ui/input','ui/output'],function(require) {
@@ -1204,8 +1214,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	 * Widget 
 	 */
 	var Display = function(element, settings) {
-		var self = this,
-			setter;
+		var self = this;
 
 		// Create the DOM element and append to body
 		if(!element) {
@@ -1247,7 +1256,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		// CTRL + Z support
 		this.$el.addEventListener('keydown', function(e) {
 			if(e.ctrlKey && e.keyCode == 90) {
-				self.read();
+				self.cancel();
 			}
 		});
 
@@ -1305,7 +1314,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			this.prompt.input.clear();
 
 			if(typeof withContent !== 'undefined')
-				this.prompt.value = withContent;
+				this.prompt.input.value = withContent;
 
 			this.prompt.show();
 			this.focus();
@@ -1314,6 +1323,12 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		idle: function() {
 			this.prompt.hide();
 			this.$el.focus();
+		},
+
+		cancel: function() {
+			this.prompt.show();
+			this._currentInput = this.prompt.input;
+			this.focus();
 		},
 
 		enter: function(input) {
@@ -1425,9 +1440,9 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 });
 
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
- 
 define('io/outputstream',['require','core/events'],function(require) {
 	
 	
@@ -1482,6 +1497,7 @@ define('io/outputstream',['require','core/events'],function(require) {
 	return OutputStream;
 });
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
  define('system/process',['require','core/events','core/promise','io/outputstream'],function(require) {
@@ -1585,9 +1601,9 @@ define('io/outputstream',['require','core/events'],function(require) {
 });
 
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
- 
 define('io/inputstream',['require','core/promise','core/events','io/outputstream'],function(require) {
 	
 	
@@ -1653,6 +1669,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 	
 });
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
  define('system/shell',['require','core/util','core/promise','system/process','io/inputstream','io/outputstream'],function(require) {
@@ -1793,6 +1810,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 
 
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
 define('terminus',['require','vendor/domready','ui/display','system/shell','system/process'],function(require) {

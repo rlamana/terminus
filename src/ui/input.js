@@ -1,4 +1,5 @@
 /**
+ * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
 define(function(require) {
@@ -36,8 +37,8 @@ define(function(require) {
 		if(!!this.settings.editable) {
 			this.$el.contentEditable = true;
 			this.$el.addEventListener('keydown', function(e) {
-				// When a key event, alway scroll to bottom
-				window.scrollTo(0,document.body.scrollHeight);
+				// When a key event, always scroll to bottom
+				window.scrollTo(0, document.body.scrollHeight);
 
 				switch(e.keyCode) {
 					case 13: // Enter key
