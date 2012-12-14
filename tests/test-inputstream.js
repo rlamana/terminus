@@ -7,20 +7,28 @@ define(['io/inputstream', 'io/outputstream'], function(InputStream, OutputStream
 	var scope = {};
 
 	describe('InputStream', function() {
-		var stdin, stdout, spydata, spyread;
+		var stdin, stdout;
 		beforeEach(function() {
 			stdin = new InputStream();
-		
-			spydata = sinon.spy();
-			stdin.events.on('data', spydata, scope);
-
-			spyread = sinon.spy();
-			stdin.events.on('read', spyread, scope);
 		});
 
 		describe('When creating an input stream', function() {
 			it('should have an event system', function() {
 				expect(stdin.events).to.exist;
+			});
+		});
+
+		describe('When calling read()', function() {
+			var readerspy;
+			beforeEach(function() {			
+				readerspy = sinon.spy();
+				stdin.reader = readerspy;
+			});
+
+			it('should call the reader() function with a promise', function() {
+				var promise = stdin.read();
+				expect(readerspy.calledOnce).to.be.true;
+				expect(readerspy.calledWith(promise)).to.be.true;
 			});
 		});
 
@@ -30,80 +38,38 @@ define(['io/inputstream', 'io/outputstream'], function(InputStream, OutputStream
 				stdin.pipe(stdout);
 			});
 
-			it('should emit "data" event when new string of data is written to the output stream', function() {
+			it('should get the data written in the output stream', function(done) {
 				stdout.write('newvalue');
-				expect(spydata.calledOnce).to.be.true;
-				expect(spydata.calledWith('newvalue')).to.be.true;
+				stdin.read().then(function(data){
+					expect('newvalue').to.be.equal(data);
+					done();
+				});
 			});
 
-			it('should emit "data" event and stringify a written numeric value like 3  to the output stream', function() {
+			it('should get stringified value when writting numeric value like 3', function(done) {
 				stdout.write(3);
-				expect(spydata.calledOnce).to.be.true;
-				expect(spydata.calledWith('3')).to.be.true;
+				stdin.read().then(function(data){
+					expect('3').to.be.equal(data);
+					done();
+				});
 			});
 
-			it('should emit "data" event and stringify a written object value like {} to the output stream', function() {
+			it('should get stringified value when writting object value like {}', function(done) {
 				var strObject = ({}+'');
-
 				stdout.write({});
-				expect(spydata.calledOnce).to.be.true;
-				expect(spydata.calledWith(strObject)).to.be.true;
-			});
-
-			it('should emit "read" event when read event is called', function() {
-				stdin.read();
-				expect(spyread.calledOnce).to.be.true;
-			});
-
-			it('should wait until end() is called while reading', function(done) {
-				stdin.read().then(function(){
+				stdin.read().then(function(data){
+					expect(strObject).to.be.equal(data);
 					done();
 				});
-
-				setTimeout(function(){
-					stdin.end();
-				}, 300);
 			});
 
-			it('should wait until end() and receive buffer data string', function(done) {
+			it('should get the whole buffer data when writting several values', function(done) {
+				stdout.write('Hello');
+				stdout.write(' World!');
 				stdin.read().then(function(data){
-					expect(data).to.be.equal('Hello World!');
+					expect('Hello World!').to.be.equal(data);
 					done();
 				});
-
-				stdout.write('Hello');
-				stdout.write(' World!');
-
-				setTimeout(function(){
-					stdin.end();
-				}, 300);
-			});
-
-			it('should wait until end() and empty buffer for multiple reads', function(done) {
-				// First read
-				stdin.read().then(function(data){
-					expect(data).to.be.equal('Hello World!');
-
-					// Second read
-					stdin.read().then(function(data){
-						expect(data).to.be.equal('Hello again!');
-						done();
-					});
-
-					stdout.write('Hello');
-					stdout.write(' again!');
-
-					setTimeout(function(){
-						stdin.end();
-					}, 300);
-				});
-
-				stdout.write('Hello');
-				stdout.write(' World!');
-
-				setTimeout(function(){
-					stdin.end();
-				}, 300);
 			});
 		})
 	});

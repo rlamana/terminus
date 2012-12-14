@@ -34,13 +34,20 @@
 		this.pid = ProcessTable.register(this);
 		this.events = new Events;
 		this.streams = streams;
+		this.bus = Process.bus;
 
 		this._promise = new Promise();
 	};
 
+	/**
+	 * Global process bus
+	 */
+	Process.bus = new Events;
+
 	Process.prototype = {
 		pid: null,
-
+		bus: null,
+		
 		_promise: null,
 
 		toString: function() {

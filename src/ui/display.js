@@ -15,6 +15,8 @@
 	var Input = require('ui/input');
 	var Output = require('ui/output');
 
+	var OutputStream = require('io/outputstream');
+
 	/**
 	 * Widget 
 	 */
@@ -188,43 +190,41 @@
 			this._shell = shell;
 
 			// Listen to its output streams
-			streams.stdout.events.on('data', function(data){
+			streams.stdout.events.on('write', function(data){
 				this.output.print(data, 'stdout');
 			}, this);
 
-			streams.stderr.events.on('data', function(data){
+			streams.stderr.events.on('write', function(data){
 				this.output.print(data, 'stderr');
 			}, this);
 
-			streams.web.events.on('data', function(data){
+			streams.web.events.on('write', function(data){
 				this.output.print(data, 'web');
 			}, this);
 
 			// Listen to other events on shell
-			streams.stdin.events.on('clear', this.output.clear, this.output);
+			this._shell.bus.on('clear', this.output.clear, this.output);
 
 			// Listen to input events
-			streams.stdin.events.on('read', this._read, this);
+			streams.stdin.reader = this.reader.bind(this);
 
 			this.historyReset();
 		},
 
-		_read: function() {
+		reader: function(promise) {
 			var stdin =  this._shell.streams.stdin,
 				input = new Input({
 					editable: true
 				});			
 
 			this._currentInput = input;
-
 			input.appendTo(this.$el).focus();
 
 			input.events.on('enter', function(input) {
-				var stream = stdin.pipe();
-				var data = input.value;
+				var stream = new OutputStream(),
+					data = input.value;
 
-				stream.write(data);
-				stdin.end();
+				promise.done(data);
 
 				// Print out the input data
 				this.output.print(data);

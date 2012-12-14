@@ -29,12 +29,25 @@
 			this.exit();
 		},
 
-		read: function() {
+		hi: function() {
 			var self = this;
 
 			this.write('What\'s your name?');
 			this.read().then(function(data){
 				self.write("Hello " + data + "!!!");
+				self.exit(0);
+			});
+		},
+
+		echo: function(str) {
+			this.write(str);
+			this.exit(0);
+		},
+
+		read: function() {
+			var self = this;
+			this.read().then(function(data){
+				self.write(data);
 				self.exit(0);
 			});
 		}

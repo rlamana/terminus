@@ -16,6 +16,11 @@ define(function(require) {
 		this.close = false;
 
 		this._buffer = [];
+
+		// Default writer
+		this.writer = function(data) {
+			this._buffer.push(data);
+		};
 	};
 
 	OutputStream.prototype = {
@@ -39,17 +44,25 @@ define(function(require) {
 		},
 
 		/**
+		 * Set writer function. 
+		 * The function will receive data to write.
+		 *    function(data){}
+		 * @writeonly
+		 */
+		set writer(func) {
+			this._writer = func;
+		},
+
+		/**
 		 * Writes the content of output to the stream.
 		 * @param {String} output
 		 */
-		write: function(output) {
-			if(this.close) 
-				return;
+		write: function(data) {
+			if(this.close) return;
 
-			output += ''; // Stringify output
-
-			this._buffer.push(output);
-			this.events.emit('data', output);
+			data += ''; // Stringify output
+			this.events.emit('write', data);
+			this._writer.call(this, data);
 		}
 	};
 

@@ -30,6 +30,13 @@
 			web: new OutputStream()
 		};
 
+		// Global process bus
+		this.bus = Process.bus;
+
+		// Debug purposes
+		this.streams.stdin.id = "STDIN";
+		this.streams.stdout.id = "STDOUT";
+
 		this.commands = [];
 		this.history = [];
 	};
@@ -37,6 +44,7 @@
 	Shell.prototype = {
 		commands: null,
 		streams: null,
+		bus: null,
 		history: null,
 
 		_environment: null,
@@ -49,12 +57,30 @@
 			var group, commands, proc, 
 				finishQueue = [];
 
+			var streams = {
+				stdin: this.streams.stdin,
+				stdout: this.streams.stdout,
+				stderr: this.streams.stderr,
+				web: this.streams.web
+			};
+
 			this.history.push(input);
 
 			commands = this._parse(input);
-
 			commands.forEach(function(command, index) {
-				var promise = (function() {
+				var promise, futureinput;
+
+				// Setup processes streams
+				if(index < commands.length-1) {
+					streams.stdout = new OutputStream();
+					futureinput = (new InputStream()).pipe(streams.stdout);
+				}
+				else {
+					streams.stdout = this.streams.stdout;
+					futureinput = null;
+				}
+					
+				promise = (function(streams) {
 					// Execute first shell native commands
 					if (this.native[command.name]) {
 						this.native[command.name].apply(this, command.args);
@@ -64,8 +90,8 @@
 						for(var i = this.commands.length; i--;) {
 							group = this.commands[i];
 							if (group[command.name]) {
-								var proc = new Process(this.streams);
-								return proc.exec(group[command.name], command.args); // Return promise
+								var proc = new Process(streams);
+								return proc.exec(group[command.name], command.args);
 							} 
 						}
 					}
@@ -73,7 +99,11 @@
 					this.streams.stderr.write("Command '"+command.name+"' not found.");
 					return Promise.done();
 				})
-				.call(this);
+				.call(this, streams);
+
+				// Setup input stream for next process
+				if(futureinput)
+					streams.stdin = futureinput;
 
 				finishQueue.push(promise);
 			}, 
@@ -142,7 +172,7 @@
 			},
 
 			clear: function() {
-				this.streams.stdin.events.emit('clear');
+				this.bus.emit('clear');
 			}
 		}
 	};

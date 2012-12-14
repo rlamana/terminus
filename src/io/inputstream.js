@@ -6,9 +6,6 @@ define(function(require) {
 	
 	'use strict';
 
-	/**
-	 * @dependecies
-	 */
 	var Promise = require('core/promise');
 	var Events = require('core/events');
 
@@ -16,33 +13,43 @@ define(function(require) {
 
 	/**
 	 * @class
-	 *
-	 * events: read, data, end
 	 */
 	var InputStream = function() {
 		this.events = new Events();
-
 		this._buffer = [];
-		this._promise = null;
+
+		// Default reader function
+		this.reader = function(promise) {
+			var data = this._buffer.join('');
+			this._buffer = [];
+			promise.done(data);
+		};
 	};
 
 	InputStream.prototype = {
-		read: function() {
-			this.events.emit('read');
-			this._promise = this._promise || (new Promise());
+		events: null,
 
-			return this._promise;
+		/**
+		 * @return {Promise}
+		 */
+		read: function() {
+			var promise = new Promise();
+
+			// Call reader function
+			this._reader.call(this, promise);
+			this.events.emit('read');
+		
+			return promise;
 		}, 
 
-		end: function() {
-			var data;
-			if(!this._promise)
-				return;
-
-			var data = this._buffer.join('');
-			this._buffer = []; // Empty buffer
-			this._promise.done(data);
-			this._promise = null;
+		/**
+		 * Set reader function. 
+		 * This function receives promise.
+		 *    function(promise){}
+		 * @writeonly
+		 */
+		set reader(func) {
+			this._reader = func;
 		},
 
 		/**
@@ -50,16 +57,11 @@ define(function(require) {
 		 */ 
 		pipe: function(outputstream) {
 			var self = this;
+			outputstream.writer = function(data) {
+				self._buffer.push(data);	
+			};
 
-			if(!outputstream)
-				outputstream = new OutputStream();
-			
-			outputstream.events.on('data', function(input) {
-				this._buffer.push(input);
-				this.events.emit('data', input);
-			}, this);
-
-			return outputstream;
+			return this;
 		}
 	};
 
