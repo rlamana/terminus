@@ -6,8 +6,6 @@
 
 	'use strict';
 
-	require('ui/styles');
-
 	var Events 	= require('core/events');
 	var Promise = require('core/promise');
 	var Util = require('core/util');

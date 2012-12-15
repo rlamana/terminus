@@ -1,23 +1,36 @@
 # Set the source directory
 srcdir = src/
 builddir = build/
+buildname = terminus
+
+lessfiles = $(wildcard src/ui/css/*.less)
+cssfile = ${builddir}/${buildname}.css
 
 # Dependencies
 targets = config.js
 
-all: terminus.js terminus.min.js
+all: debug release
 
-terminus.js: ${targets}
-	r.js -o config.js optimize=none out=${builddir}terminus.js
+debug: ${targets} less
+	r.js -o config.js optimize=none out=${builddir}/${buildname}.js
 
-terminus.min.js: ${targets}
-	r.js -o config.js out=${builddir}terminus.min.js
+release: ${targets} less
+	r.js -o config.js out=${builddir}/${buildname}.min.js
+
+less: $(lessfiles:.less=.css)
+	@echo "LESS compiler finished."
+
+%.css: %.less
+	@echo Compiling $<
+	@lessc --yui-compress $< >> ${cssfile}
 
 clean:
-	rm ${builddir}terminus.js
-	rm ${builddir}terminus.min.js
+	rm -f ${builddir}/${buildname}.js
+	rm -f ${builddir}/${buildname}.min.js
+	rm -f ${cssfile}
 
 install:
 	npm install requirejs
+	npm install less
 
 
