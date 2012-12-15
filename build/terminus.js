@@ -776,7 +776,7 @@ define('ui/styles',['require','core/util'],function(require) {
 			return Promise.done();
 
 		for (var i = 0; i < len; i++)
-			queueParallel(promise, promises[i], i, done, results);
+			queueParallel(promise, promises[i], i, done, result);
 
 		return promise;
 	};
@@ -871,9 +871,6 @@ define('ui/input',['require','core/events','core/util'],function(require) {
 		if(!!this.settings.editable) {
 			this.$el.contentEditable = true;
 			this.$el.addEventListener('keydown', function(e) {
-				// When a key event, always scroll to bottom
-				window.scrollTo(0, document.body.scrollHeight);
-
 				switch(e.keyCode) {
 					case 13: // Enter key
 						e.preventDefault();
@@ -917,6 +914,9 @@ define('ui/input',['require','core/events','core/util'],function(require) {
 		focus: function () {
 			this.$el.focus();
 			this.placeCursorToEnd();
+			
+			this.events.emit('focus', this);
+
 			return this;
 		},
 
@@ -1091,7 +1091,6 @@ define('ui/outputline',['require','core/util'],function(require) {
 
 		// When new output is generated, always scroll to bottom
 		window.scrollTo(0,document.body.scrollHeight);
-		
 	};
 
 	OutputLine.prototype = {
@@ -1197,7 +1196,77 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
- define('ui/display',['require','ui/styles','core/events','core/promise','ui/prompt','ui/input','ui/output'],function(require) {
+define('io/outputstream',['require','core/events'],function(require) {
+	
+	
+
+	var Events = require('core/events');
+
+	/**
+	 * @class
+	 */
+	var OutputStream = function() {
+		this.events = new Events();
+		this.close = false;
+
+		this._buffer = [];
+
+		// Default writer
+		this.writer = function(data) {
+			this._buffer.push(data);
+		};
+	};
+
+	OutputStream.prototype = {
+		events: null,
+
+		/** 
+		 * @property {bool} close 
+		 */
+		set close(value) {
+			// Cannot be reopened
+			if(this._close) return; 
+
+			if(value === true)
+				this.events.emit('close');
+
+			this._close = !!value;
+		},
+
+		get close() {
+			return this._close;
+		},
+
+		/**
+		 * Set writer function. 
+		 * The function will receive data to write.
+		 *    function(data){}
+		 * @writeonly
+		 */
+		set writer(func) {
+			this._writer = func;
+		},
+
+		/**
+		 * Writes the content of output to the stream.
+		 * @param {String} output
+		 */
+		write: function(data) {
+			if(this.close) return;
+
+			data += ''; // Stringify output
+			this.events.emit('write', data);
+			this._writer.call(this, data);
+		}
+	};
+
+	return OutputStream;
+});
+/**
+ * Terminus.js
+ * Copyright © 2012 Ramón Lamana
+ */
+ define('ui/display',['require','ui/styles','core/events','core/promise','core/util','ui/prompt','ui/input','ui/output','io/outputstream'],function(require) {
 
 	
 
@@ -1205,10 +1274,13 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 
 	var Events 	= require('core/events');
 	var Promise = require('core/promise');
+	var Util = require('core/util');
 
 	var Prompt = require('ui/prompt');
 	var Input = require('ui/input');
 	var Output = require('ui/output');
+
+	var OutputStream = require('io/outputstream');
 
 	/**
 	 * Widget 
@@ -1234,7 +1306,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 
 		// Create DOM elements structure
 		this.$el = element;
-		this.$el.className = 'terminusjs';
+		Util.Styles.addClass(this.$el, 'terminusjs');
 
 		// Create DOM output element
 		this.output = new Output();
@@ -1250,6 +1322,10 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		this.prompt.events.on('historyBack', this.historyBack, this);
 		this.prompt.events.on('historyForward', this.historyForward, this);
 		this.prompt.events.on('autocomplete', this.autocomplete, this);
+		this.prompt.events.on('focus', function(){
+			// When a key event, always scroll to bottom
+			//window.scrollTo(0, document.body.scrollHeight);
+		}, this)
 
 		this._currentInput = this.prompt.input;
 		
@@ -1317,7 +1393,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 				this.prompt.input.value = withContent;
 
 			this.prompt.show();
-			this.focus();
+			this.prompt.input.focus();
 		},
 
 		idle: function() {
@@ -1379,43 +1455,41 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			this._shell = shell;
 
 			// Listen to its output streams
-			streams.stdout.events.on('data', function(data){
+			streams.stdout.events.on('write', function(data){
 				this.output.print(data, 'stdout');
 			}, this);
 
-			streams.stderr.events.on('data', function(data){
+			streams.stderr.events.on('write', function(data){
 				this.output.print(data, 'stderr');
 			}, this);
 
-			streams.web.events.on('data', function(data){
+			streams.web.events.on('write', function(data){
 				this.output.print(data, 'web');
 			}, this);
 
 			// Listen to other events on shell
-			streams.stdin.events.on('clear', this.output.clear, this.output);
+			this._shell.bus.on('clear', this.output.clear, this.output);
 
 			// Listen to input events
-			streams.stdin.events.on('read', this._read, this);
+			streams.stdin.reader = this.reader.bind(this);
 
 			this.historyReset();
 		},
 
-		_read: function() {
+		reader: function(promise) {
 			var stdin =  this._shell.streams.stdin,
 				input = new Input({
 					editable: true
 				});			
 
 			this._currentInput = input;
-
 			input.appendTo(this.$el).focus();
 
 			input.events.on('enter', function(input) {
-				var stream = stdin.pipe();
-				var data = input.value;
+				var stream = new OutputStream(),
+					data = input.value;
 
-				stream.write(data);
-				stdin.end();
+				promise.done(data);
 
 				// Print out the input data
 				this.output.print(data);
@@ -1440,63 +1514,6 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 	return Display;
 });
 
-/**
- * Terminus.js
- * Copyright © 2012 Ramón Lamana
- */
-define('io/outputstream',['require','core/events'],function(require) {
-	
-	
-
-	var Events = require('core/events');
-
-	/**
-	 * @class
-	 */
-	var OutputStream = function() {
-		this.events = new Events();
-		this.close = false;
-
-		this._buffer = [];
-	};
-
-	OutputStream.prototype = {
-		events: null,
-
-		/** 
-		 * @property {bool} close 
-		 */
-		set close(value) {
-			// Cannot be reopened
-			if(this._close) return; 
-
-			if(value === true)
-				this.events.emit('close');
-
-			this._close = !!value;
-		},
-
-		get close() {
-			return this._close;
-		},
-
-		/**
-		 * Writes the content of output to the stream.
-		 * @param {String} output
-		 */
-		write: function(output) {
-			if(this.close) 
-				return;
-
-			output += ''; // Stringify output
-
-			this._buffer.push(output);
-			this.events.emit('data', output);
-		}
-	};
-
-	return OutputStream;
-});
 /**
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
@@ -1533,13 +1550,20 @@ define('io/outputstream',['require','core/events'],function(require) {
 		this.pid = ProcessTable.register(this);
 		this.events = new Events;
 		this.streams = streams;
+		this.bus = Process.bus;
 
 		this._promise = new Promise();
 	};
 
+	/**
+	 * Global process bus
+	 */
+	Process.bus = new Events;
+
 	Process.prototype = {
 		pid: null,
-
+		bus: null,
+		
 		_promise: null,
 
 		toString: function() {
@@ -1609,9 +1633,6 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 	
 	
 
-	/**
-	 * @dependecies
-	 */
 	var Promise = require('core/promise');
 	var Events = require('core/events');
 
@@ -1619,33 +1640,43 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 
 	/**
 	 * @class
-	 *
-	 * events: read, data, end
 	 */
 	var InputStream = function() {
 		this.events = new Events();
-
 		this._buffer = [];
-		this._promise = null;
+
+		// Default reader function
+		this.reader = function(promise) {
+			var data = this._buffer.join('');
+			this._buffer = [];
+			promise.done(data);
+		};
 	};
 
 	InputStream.prototype = {
-		read: function() {
-			this.events.emit('read');
-			this._promise = this._promise || (new Promise());
+		events: null,
 
-			return this._promise;
+		/**
+		 * @return {Promise}
+		 */
+		read: function() {
+			var promise = new Promise();
+
+			// Call reader function
+			this._reader.call(this, promise);
+			this.events.emit('read');
+		
+			return promise;
 		}, 
 
-		end: function() {
-			var data;
-			if(!this._promise)
-				return;
-
-			var data = this._buffer.join('');
-			this._buffer = []; // Empty buffer
-			this._promise.done(data);
-			this._promise = null;
+		/**
+		 * Set reader function. 
+		 * This function receives promise.
+		 *    function(promise){}
+		 * @writeonly
+		 */
+		set reader(func) {
+			this._reader = func;
 		},
 
 		/**
@@ -1653,16 +1684,11 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 		 */ 
 		pipe: function(outputstream) {
 			var self = this;
+			outputstream.writer = function(data) {
+				self._buffer.push(data);	
+			};
 
-			if(!outputstream)
-				outputstream = new OutputStream();
-			
-			outputstream.events.on('data', function(input) {
-				this._buffer.push(input);
-				this.events.emit('data', input);
-			}, this);
-
-			return outputstream;
+			return this;
 		}
 	};
 
@@ -1701,6 +1727,13 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 			web: new OutputStream()
 		};
 
+		// Global process bus
+		this.bus = Process.bus;
+
+		// Debug purposes
+		this.streams.stdin.id = "STDIN";
+		this.streams.stdout.id = "STDOUT";
+
 		this.commands = [];
 		this.history = [];
 	};
@@ -1708,6 +1741,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 	Shell.prototype = {
 		commands: null,
 		streams: null,
+		bus: null,
 		history: null,
 
 		_environment: null,
@@ -1717,33 +1751,62 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 		},
 
 		exec: function(input) {
-			var group, commands, proc;
+			var group, commands, proc, 
+				finishQueue = [];
+
+			var streams = {
+				stdin: this.streams.stdin,
+				stdout: this.streams.stdout,
+				stderr: this.streams.stderr,
+				web: this.streams.web
+			};
 
 			this.history.push(input);
 
 			commands = this._parse(input);
-			console.log(commands);
 			commands.forEach(function(command, index) {
-				// Execute first shell native commands
-				if (this.native[command.name]) {
-					this.native[command.name].apply(this, command.args);
-					return Promise.done();
-				} else {
-					// Search command in commander stack
-					for(var i = this.commands.length; i--;) {
-						group = this.commands[i];
-						if (group[command.name]) {
-							var proc = new Process(this.streams);
-							return proc.exec(group[command.name], command.args); // Return promise
-						} 
-					}
-				}
+				var promise, futureinput;
 
-				this.streams.stderr.write("Command '"+command.name+"' not found.");
+				// Setup processes streams
+				if(index < commands.length-1) {
+					streams.stdout = new OutputStream();
+					futureinput = (new InputStream()).pipe(streams.stdout);
+				}
+				else {
+					streams.stdout = this.streams.stdout;
+					futureinput = null;
+				}
+					
+				promise = (function(streams) {
+					// Execute first shell native commands
+					if (this.native[command.name]) {
+						this.native[command.name].apply(this, command.args);
+						return Promise.done();
+					} else {
+						// Search command in commander stack
+						for(var i = this.commands.length; i--;) {
+							group = this.commands[i];
+							if (group[command.name]) {
+								var proc = new Process(streams);
+								return proc.exec(group[command.name], command.args);
+							} 
+						}
+					}
+
+					this.streams.stderr.write("Command '"+command.name+"' not found.");
+					return Promise.done();
+				})
+				.call(this, streams);
+
+				// Setup input stream for next process
+				if(futureinput)
+					streams.stdin = futureinput;
+
+				finishQueue.push(promise);
 			}, 
 			this);
 
-			return Promise.done();
+			return Promise.parallel(finishQueue);
 		},
 
 		search: function(key) {
@@ -1806,7 +1869,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 			},
 
 			clear: function() {
-				this.streams.stdin.events.emit('clear');
+				this.bus.emit('clear');
 			}
 		}
 	};
@@ -1884,7 +1947,7 @@ define('terminus',['require','vendor/domready','ui/display','system/shell','syst
 		}
 	};
 	
-	Terminus.version = '0.5.2';
+	Terminus.version = '0.6';
 
 	Terminus.Display = require('ui/display');
 	Terminus.Shell 	 = require('system/shell');

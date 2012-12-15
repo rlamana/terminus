@@ -10,6 +10,7 @@
 
 	var Events 	= require('core/events');
 	var Promise = require('core/promise');
+	var Util = require('core/util');
 
 	var Prompt = require('ui/prompt');
 	var Input = require('ui/input');
@@ -41,7 +42,7 @@
 
 		// Create DOM elements structure
 		this.$el = element;
-		this.$el.className = 'terminusjs';
+		Util.Styles.addClass(this.$el, 'terminusjs');
 
 		// Create DOM output element
 		this.output = new Output();
