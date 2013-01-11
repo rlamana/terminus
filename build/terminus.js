@@ -860,7 +860,7 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
 		// DOM elements structure
 		this.$el = document.createElement('div');
 		this.$el.className = 'terminusjs-prompt';
-		Util.Styles.addClass(this.$el, 'terminusjs-box');
+		this.$el.className += ' terminusjs-box';
 
 		this.$ps = document.createElement('div');
 		this.$ps.className = 'terminusjs-ps';
@@ -923,7 +923,7 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
 		},
 
 		show: function () {
-			Util.Styles.removeClass(this.$el, 'terminusjs-box');
+			Util.Styles.removeClass(this.$el, 'hidden');
 			return this;
 		},
 
