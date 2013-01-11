@@ -35,6 +35,7 @@ define(function(require) {
 		// DOM elements structure
 		this.$el = document.createElement('div');
 		this.$el.className = 'terminusjs-prompt';
+		this.$el.className += ' terminusjs-box';
 
 		this.$ps = document.createElement('div');
 		this.$ps.className = 'terminusjs-ps';
@@ -97,12 +98,12 @@ define(function(require) {
 		},
 
 		show: function () {
-			Util.Styles.addClass(this.$el, 'terminusjs-box');
+			Util.Styles.removeClass(this.$el, 'hidden');
 			return this;
 		},
 
 		hide: function () {
-			Util.Styles.removeClass(this.$el, 'terminusjs-box');
+			Util.Styles.addClass(this.$el, 'hidden');
 			return this;
 		},
 

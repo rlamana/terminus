@@ -345,7 +345,7 @@ define("../vendor/almond", function(){});
   */
 !function (name, definition) {
   if (typeof module != 'undefined') module.exports = definition()
-  else if (typeof define == 'function' && typeof define.amd == 'object') define('vendor/domready',definition)
+  else if (typeof define == 'function' && typeof define.amd == 'object') define('vendor/domready',[],definition)
   else this[name] = definition()
 }('domready', function (ready) {
 
@@ -860,6 +860,7 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
 		// DOM elements structure
 		this.$el = document.createElement('div');
 		this.$el.className = 'terminusjs-prompt';
+		Util.Styles.addClass(this.$el, 'terminusjs-box');
 
 		this.$ps = document.createElement('div');
 		this.$ps.className = 'terminusjs-ps';
@@ -922,12 +923,12 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
 		},
 
 		show: function () {
-			Util.Styles.addClass(this.$el, 'terminusjs-box');
+			Util.Styles.removeClass(this.$el, 'terminusjs-box');
 			return this;
 		},
 
 		hide: function () {
-			Util.Styles.removeClass(this.$el, 'terminusjs-box');
+			Util.Styles.addClass(this.$el, 'hidden');
 			return this;
 		},
 
