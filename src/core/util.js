@@ -2,8 +2,8 @@
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
-define(function(require) {
-	
+define(function() {
+
 	'use strict';
 
 	/**
@@ -12,14 +12,16 @@ define(function(require) {
 	var Util = {
 		String: {
 			htmlEntities: function (str) {
-				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 			},
 
 			htmlStrip: function (str) {
-				return String(str).replace(/&/g, '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+				return String(str).replace(/&/g, '').replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 			},
 		},
-		
+
 		Array: {
 			merge: function(/* variable number of arrays */){
 				var result = [];
@@ -41,8 +43,8 @@ define(function(require) {
 			},
 
 			addClass: function(element, className) {
-				if (!this.hasClass(element, className)) 
-					element.className += " " + className;
+				if (!this.hasClass(element, className))
+					element.className += ' ' + className;
 			},
 
 			removeClass: function(element, className) {

@@ -3,12 +3,12 @@
  * Copyright © 2012 Ramón Lamana
  */
 define(function(require) {
-	
+
 	'use strict';
 
 	var Events = require('core/events');
 	var Util = require('core/util');
-	
+
 	var Input = require('ui/input');
 
 	/**
@@ -24,9 +24,9 @@ define(function(require) {
 		};
 
 		for(var key in settings) {
-			if (!settings.hasOwnProperty(key))
-				continue;
-			this.settings[key] = settings[key];
+			if (settings.hasOwnProperty(key)) {
+				this.settings[key] = settings[key];
+			}
 		}
 
 		// Events support
@@ -48,32 +48,32 @@ define(function(require) {
 		if(!!this.settings.editable) {
 			this.input.$el.addEventListener('keydown', function(e) {
 				switch(e.keyCode) {
-					case 13: // Enter key
-						e.preventDefault();
-						e.stopPropagation();
-						self.events.emit('enter', self.input);
-						break;
+				case 13: // Enter key
+					e.preventDefault();
+					e.stopPropagation();
+					self.events.emit('enter', self.input);
+					break;
 
-					case 38: // Up key
-						self.events.emit('historyBack', self.input);
+				case 38: // Up key
+					self.events.emit('historyBack', self.input);
 
-						e.preventDefault();
-						e.stopPropagation();
-						break;
+					e.preventDefault();
+					e.stopPropagation();
+					break;
 
-					case 40: // Down key
-						self.events.emit('historyForward', self.input);
+				case 40: // Down key
+					self.events.emit('historyForward', self.input);
 
-						e.preventDefault();
-						e.stopPropagation();
-						break;
+					e.preventDefault();
+					e.stopPropagation();
+					break;
 
-					case 9: // Tab key
-						self.events.emit('autocomplete', self.input);
+				case 9: // Tab key
+					self.events.emit('autocomplete', self.input);
 
-						e.preventDefault();
-						e.stopPropagation();
-						break;
+					e.preventDefault();
+					e.stopPropagation();
+					break;
 				}
 			});
 		}

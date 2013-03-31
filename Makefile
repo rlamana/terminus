@@ -11,10 +11,16 @@ targets = config.js
 
 all: debug release
 
-debug: ${targets} less
+jshint:
+	@echo Executing jshint...
+	@echo ---------------------------------------
+	@jshint $(srcdir)
+	@echo done.
+
+debug: jshint ${targets} less
 	r.js -o config.js optimize=none out=${builddir}/${buildname}.js
 
-release: ${targets} less
+release: jshint ${targets} less
 	r.js -o config.js out=${builddir}/${buildname}.min.js
 
 less: $(lessfiles:.less=.css)

@@ -3,14 +3,13 @@
  * Copyright © 2012 Ramón Lamana
  */
 define(function(require) {
-	
+
 	'use strict';
 
-	var Events = require('core/events');
 	var Util = require('core/util');
-	
+
 	var OutputLine = require('ui/outputline');
-	
+
 	/**
 	 * Client Output class
 	 * @class
@@ -20,7 +19,7 @@ define(function(require) {
 		this.element.className = 'terminusjs-output';
 	};
 
-	Output.prototype = {	
+	Output.prototype = {
 		/**
 		 * @param {String} target The output target: 'stdout', 'stderr', 'web'.
 		 * @param {String} content Output content to be printed.
@@ -30,14 +29,14 @@ define(function(require) {
 			var output;
 			target = target || 'stdout';
 			switch(target) {
-				case 'stdout': 
-					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stdout');
+			case 'stdout':
+				output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stdout');
 				break;
-				case 'stderr':
-					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stderr');
+			case 'stderr':
+				output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stderr');
 				break;
-				case 'web':
-					output = this._print(content, 'terminusjs-web');
+			case 'web':
+				output = this._print(content, 'terminusjs-web');
 				break;
 			}
 

@@ -3,7 +3,7 @@
  * Copyright © 2012 Ramón Lamana
  */
 define(function(require) {
-	
+
 	'use strict';
 
 	var Events = require('core/events');
@@ -21,16 +21,15 @@ define(function(require) {
 		};
 
 		for(var key in settings) {
-			if (!settings.hasOwnProperty(key))
-				continue;
-			this.settings[key] = settings[key];
+			if (settings.hasOwnProperty(key))
+				this.settings[key] = settings[key];
 		}
 
 		// Events support
 		this.events = new Events();
 
 		// DOM elements structure
-		this.$el = document.createElement('div');	
+		this.$el = document.createElement('div');
 		this.$el.className = 'terminusjs-input';
 		this.$el.innerHTML = '';
 
@@ -38,11 +37,11 @@ define(function(require) {
 			this.$el.contentEditable = true;
 			this.$el.addEventListener('keydown', function(e) {
 				switch(e.keyCode) {
-					case 13: // Enter key
-						e.preventDefault();
-						e.stopPropagation();
-						self.events.emit('enter', self);
-						break;
+				case 13: // Enter key
+					e.preventDefault();
+					e.stopPropagation();
+					self.events.emit('enter', self);
+					break;
 				}
 			});
 		}
@@ -52,7 +51,7 @@ define(function(require) {
 		get value() {
 			var input = this.$el.innerText || this.$el.textContent;
 			var value = input ? input.replace(/\n/g, '') : '';
-			value = value.replace(/^\s+|\s+$/g,"");
+			value = value.replace(/^\s+|\s+$/g, '');
 			return value;
 		},
 
@@ -80,7 +79,7 @@ define(function(require) {
 		focus: function () {
 			this.$el.focus();
 			this.placeCursorToEnd();
-			
+
 			this.events.emit('focus', this);
 
 			return this;
@@ -104,7 +103,7 @@ define(function(require) {
 		        selection = window.getSelection();
 		        selection.removeAllRanges();
 		        selection.addRange(range);
-		    } 
+		    }
 
 		    return this;
 		}

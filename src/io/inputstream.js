@@ -3,13 +3,11 @@
  * Copyright © 2012 Ramón Lamana
  */
 define(function(require) {
-	
+
 	'use strict';
 
 	var Promise = require('core/promise');
 	var Events = require('core/events');
-
-	var OutputStream = require('io/outputstream');
 
 	/**
 	 * @class
@@ -38,27 +36,30 @@ define(function(require) {
 			// Call reader function
 			this._reader.call(this, promise);
 			this.events.emit('read');
-		
+
 			return promise;
-		}, 
+		},
 
 		/**
-		 * Set reader function. 
+		 * Set reader function.
 		 * This function receives promise.
 		 *    function(promise){}
-		 * @writeonly
 		 */
 		set reader(func) {
 			this._reader = func;
 		},
 
+		get reader() {
+			return this._reader;
+		},
+
 		/**
 		 * Connects an output stream with this input stream
-		 */ 
+		 */
 		pipe: function(outputstream) {
 			var self = this;
 			outputstream.writer = function(data) {
-				self._buffer.push(data);	
+				self._buffer.push(data);
 			};
 
 			return this;
@@ -66,5 +67,5 @@ define(function(require) {
 	};
 
 	return InputStream;
-	
+
 });

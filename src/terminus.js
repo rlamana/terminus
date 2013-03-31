@@ -3,16 +3,16 @@
  * Copyright © 2012 Ramón Lamana
  */
 define(function(require) {
-	
+
 	'use strict';
 
 	var domready = require('vendor/domready');
 
 	/**
 	 * Helper that creates a terminal with a default display and shell.
-	 * 
+	 *
 	 * @param {String|Element} DOM element or selector where display will be rendered
-	 * @param {Object} displaySettings Optional display parameters 
+	 * @param {Object} displaySettings Optional display parameters
 	 * @constructor
 	 */
 	var Terminus = function(element, displaySettings) {
@@ -28,7 +28,7 @@ define(function(require) {
 
 		// Setup display
 		domready(function(){
-			element = (typeof element === 'string') ? 
+			element = (typeof element === 'string') ?
 				document.querySelector(element) :
 				element;
 
@@ -38,7 +38,7 @@ define(function(require) {
 
 	Terminus.prototype = {
 		/**
-		 * @property {Terminus.Shell} shell 
+		 * @property {Terminus.Shell} shell
 		 * @readonly
 		 */
 		set shell(value) {
@@ -51,7 +51,7 @@ define(function(require) {
 		},
 
 		/**
-		 * @property {Terminus.Display} display 
+		 * @property {Terminus.Display} display
 		 * @readonly
 		 */
 		set display(value) {
@@ -63,11 +63,11 @@ define(function(require) {
 			return this._display;
 		}
 	};
-	
+
 	Terminus.version = '0.6';
 
 	Terminus.Display = require('ui/display');
-	Terminus.Shell 	 = require('system/shell');
+	Terminus.Shell = require('system/shell');
 	Terminus.Process = require('system/process');
 
 	return Terminus;

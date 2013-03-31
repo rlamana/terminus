@@ -2,8 +2,8 @@
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
- define(function(require) {
-	
+define(function(require) {
+
 	'use strict';
 
 	var Process;
@@ -47,7 +47,7 @@
 	Process.prototype = {
 		pid: null,
 		bus: null,
-		
+
 		_promise: null,
 
 		toString: function() {
@@ -84,19 +84,18 @@
 		},
 
 		exit: function(value) {
-			this._promise.done();
+			this._promise.done(value);
 		},
 
 		/**
-		 * Execute the command in the process context. That is 
+		 * Execute the command in the process context. That is
 		 * calls the function passed as a parametes with this process
 		 * as scope.
 		 */
 		exec: function(command, args) {
-			var promise = new Promise();
-
 			if(typeof command !== 'function') {
-				console.error(this.toString + ': Could not execute process because the given command is not a function');
+				console.error(this.toString + ': Could not execute process ' +
+					'because the given command is not a function');
 				this.exit(1);
 			}
 
@@ -106,5 +105,5 @@
 	};
 
 	return Process;
-	
+
 });

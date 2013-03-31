@@ -2,9 +2,8 @@
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
- define(function(require) {
-
- 	'use strict';
+define(function() {
+	'use strict';
 
 	/**
 	 * @class
@@ -35,11 +34,11 @@
 				return;
 
 			data.shift();
-			for(var i=this.__listeners[eventName].length; i--; )
+			for(var i=this.__listeners[eventName].length; i--;)
 				this.__listeners[eventName][i].apply(null, data); // Listeners have been binded
 		}
 	};
 
 	return Events;
-	
+
 });

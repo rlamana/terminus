@@ -3,7 +3,7 @@
  * Copyright © 2012 Ramón Lamana
  */
 define(function(require) {
-	
+
 	'use strict';
 
 	var Events = require('core/events');
@@ -26,12 +26,12 @@ define(function(require) {
 	OutputStream.prototype = {
 		events: null,
 
-		/** 
-		 * @property {bool} close 
+		/**
+		 * @property {bool} close
 		 */
 		set close(value) {
 			// Cannot be reopened
-			if(this._close) return; 
+			if(this._close) return;
 
 			if(value === true)
 				this.events.emit('close');
@@ -44,13 +44,16 @@ define(function(require) {
 		},
 
 		/**
-		 * Set writer function. 
+		 * Set writer function.
 		 * The function will receive data to write.
 		 *    function(data){}
-		 * @writeonly
 		 */
 		set writer(func) {
 			this._writer = func;
+		},
+
+		get writer() {
+			return this._writer;
 		},
 
 		/**

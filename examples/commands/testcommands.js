@@ -47,7 +47,7 @@
 		read: function() {
 			var self = this;
 			this.read().then(function(data){
-				self.write(data);
+				self.write("Response: " + data);
 				self.exit(0);
 			});
 		}

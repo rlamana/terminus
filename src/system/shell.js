@@ -2,8 +2,8 @@
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
- define(function(require) {
-	
+define(function(require) {
+
 	'use strict';
 
 	var Util = require('core/util');
@@ -34,8 +34,8 @@
 		this.bus = Process.bus;
 
 		// Debug purposes
-		this.streams.stdin.id = "STDIN";
-		this.streams.stdout.id = "STDOUT";
+		this.streams.stdin.id = 'STDIN';
+		this.streams.stdout.id = 'STDOUT';
 
 		this.commands = [];
 		this.history = [];
@@ -48,13 +48,13 @@
 		history: null,
 
 		_environment: null,
-		
+
 		getEnv: function(key) {
 			return this._environment[key] ? this._environment[key] : null;
 		},
 
 		exec: function(input) {
-			var group, commands, proc, 
+			var group, commands,
 				finishQueue = [];
 
 			var streams = {
@@ -79,7 +79,7 @@
 					streams.stdout = this.streams.stdout;
 					futureinput = null;
 				}
-					
+
 				promise = (function(streams) {
 					// Execute first shell native commands
 					if (this.native[command.name]) {
@@ -92,11 +92,11 @@
 							if (group[command.name]) {
 								var proc = new Process(streams);
 								return proc.exec(group[command.name], command.args);
-							} 
+							}
 						}
 					}
 
-					this.streams.stderr.write("Command '"+command.name+"' not found.");
+					this.streams.stderr.write('Command \''+command.name+'\' not found.');
 					return Promise.done();
 				})
 				.call(this, streams);
@@ -106,7 +106,7 @@
 					streams.stdin = futureinput;
 
 				finishQueue.push(promise);
-			}, 
+			},
 			this);
 
 			return Promise.parallel(finishQueue);
@@ -115,18 +115,18 @@
 		search: function(key) {
 			var found = [], commands = [];
 
-			for(var i = this.commands.length; i--;) 
+			for(var i = this.commands.length; i--;)
 				commands = Util.Array.merge(commands, Object.keys(this.commands[i]));
-			
-			var regexp = new RegExp('^'+key, "i");
+
+			var regexp = new RegExp('^'+key, 'i');
 
 			// Proposal only for commands not for arguments
 			//if(arguments.length <= 1) {
-				for (var i = commands.length; i--;) {
-					if (regexp.test(commands[i])) {
-						found.push(commands[i]);
-					}
+			for (var j = commands.length; j--;) {
+				if (regexp.test(commands[j])) {
+					found.push(commands[j]);
 				}
+			}
 			//}
 			// @todo proposal for arguments asking the commander. Adding else here.
 
@@ -138,7 +138,7 @@
 		 * @param {Array} List of commands
 		 */
 		include: function(commands) {
-			this.commands = this.commands.concat(commands); 
+			this.commands = this.commands.concat(commands);
 		},
 
 		/**
@@ -155,7 +155,7 @@
 				return {
 					name: command,
 					args: args
-				}
+				};
 			});
 		},
 
@@ -164,7 +164,7 @@
 		 */
 		native: {
 			history: function() {
-				var output = ''
+				var output = '';
 				for(var i=0, l=this.history.length; i<l; i++)
 					output += ' ' + i + ': ' + this.history[i] + '\n';
 

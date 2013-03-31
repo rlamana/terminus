@@ -345,7 +345,7 @@ define("../vendor/almond", function(){});
   */
 !function (name, definition) {
   if (typeof module != 'undefined') module.exports = definition()
-  else if (typeof define == 'function' && typeof define.amd == 'object') define('vendor/domready',[],definition)
+  else if (typeof define == 'function' && typeof define.amd == 'object') define('vendor/domready',definition)
   else this[name] = definition()
 }('domready', function (ready) {
 
@@ -398,9 +398,8 @@ define("../vendor/almond", function(){});
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
- define('core/events',['require'],function(require) {
-
- 	
+define('core/events',[],function() {
+	
 
 	/**
 	 * @class
@@ -431,20 +430,20 @@ define("../vendor/almond", function(){});
 				return;
 
 			data.shift();
-			for(var i=this.__listeners[eventName].length; i--; )
+			for(var i=this.__listeners[eventName].length; i--;)
 				this.__listeners[eventName][i].apply(null, data); // Listeners have been binded
 		}
 	};
 
 	return Events;
-	
+
 });
 /**
  * jsBase
  * Copyright © 2009-2012 A. Matías Quezada
  * https://github.com/amatiasq
  */
- define('core/promise',['require'],function(require) {
+define('core/promise',['require'],function(require) {
 
 	
 
@@ -455,7 +454,7 @@ define("../vendor/almond", function(){});
 		this._onerror = [];
 		this._onprogress = [];
 		this._state = 'unfulfilled';
-		this._args = null; 
+		this._args = null;
 	}
 
 	Promise.prototype = {
@@ -630,7 +629,7 @@ define("../vendor/almond", function(){});
 				prom.fail.apply(prom, arguments);
 		});
 	}
-	
+
 	function nextSequential(prom, callbacks, index, args) {
 		if (index === callbacks.length)
 			return prom.done.apply(prom, args);
@@ -654,8 +653,8 @@ define("../vendor/almond", function(){});
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
-define('core/util',['require'],function(require) {
-	
+define('core/util',[],function() {
+
 	
 
 	/**
@@ -664,14 +663,16 @@ define('core/util',['require'],function(require) {
 	var Util = {
 		String: {
 			htmlEntities: function (str) {
-				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 			},
 
 			htmlStrip: function (str) {
-				return String(str).replace(/&/g, '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+				return String(str).replace(/&/g, '').replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 			},
 		},
-		
+
 		Array: {
 			merge: function(/* variable number of arrays */){
 				var result = [];
@@ -693,8 +694,8 @@ define('core/util',['require'],function(require) {
 			},
 
 			addClass: function(element, className) {
-				if (!this.hasClass(element, className)) 
-					element.className += " " + className;
+				if (!this.hasClass(element, className))
+					element.className += ' ' + className;
 			},
 
 			removeClass: function(element, className) {
@@ -713,7 +714,7 @@ define('core/util',['require'],function(require) {
  * Copyright © 2012 Ramón Lamana
  */
 define('ui/input',['require','core/events','core/util'],function(require) {
-	
+
 	
 
 	var Events = require('core/events');
@@ -731,16 +732,15 @@ define('ui/input',['require','core/events','core/util'],function(require) {
 		};
 
 		for(var key in settings) {
-			if (!settings.hasOwnProperty(key))
-				continue;
-			this.settings[key] = settings[key];
+			if (settings.hasOwnProperty(key))
+				this.settings[key] = settings[key];
 		}
 
 		// Events support
 		this.events = new Events();
 
 		// DOM elements structure
-		this.$el = document.createElement('div');	
+		this.$el = document.createElement('div');
 		this.$el.className = 'terminusjs-input';
 		this.$el.innerHTML = '';
 
@@ -748,11 +748,11 @@ define('ui/input',['require','core/events','core/util'],function(require) {
 			this.$el.contentEditable = true;
 			this.$el.addEventListener('keydown', function(e) {
 				switch(e.keyCode) {
-					case 13: // Enter key
-						e.preventDefault();
-						e.stopPropagation();
-						self.events.emit('enter', self);
-						break;
+				case 13: // Enter key
+					e.preventDefault();
+					e.stopPropagation();
+					self.events.emit('enter', self);
+					break;
 				}
 			});
 		}
@@ -762,7 +762,7 @@ define('ui/input',['require','core/events','core/util'],function(require) {
 		get value() {
 			var input = this.$el.innerText || this.$el.textContent;
 			var value = input ? input.replace(/\n/g, '') : '';
-			value = value.replace(/^\s+|\s+$/g,"");
+			value = value.replace(/^\s+|\s+$/g, '');
 			return value;
 		},
 
@@ -790,7 +790,7 @@ define('ui/input',['require','core/events','core/util'],function(require) {
 		focus: function () {
 			this.$el.focus();
 			this.placeCursorToEnd();
-			
+
 			this.events.emit('focus', this);
 
 			return this;
@@ -814,7 +814,7 @@ define('ui/input',['require','core/events','core/util'],function(require) {
 		        selection = window.getSelection();
 		        selection.removeAllRanges();
 		        selection.addRange(range);
-		    } 
+		    }
 
 		    return this;
 		}
@@ -828,12 +828,12 @@ define('ui/input',['require','core/events','core/util'],function(require) {
  * Copyright © 2012 Ramón Lamana
  */
 define('ui/prompt',['require','core/events','core/util','ui/input'],function(require) {
-	
+
 	
 
 	var Events = require('core/events');
 	var Util = require('core/util');
-	
+
 	var Input = require('ui/input');
 
 	/**
@@ -849,9 +849,9 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
 		};
 
 		for(var key in settings) {
-			if (!settings.hasOwnProperty(key))
-				continue;
-			this.settings[key] = settings[key];
+			if (settings.hasOwnProperty(key)) {
+				this.settings[key] = settings[key];
+			}
 		}
 
 		// Events support
@@ -860,7 +860,7 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
 		// DOM elements structure
 		this.$el = document.createElement('div');
 		this.$el.className = 'terminusjs-prompt';
-		Util.Styles.addClass(this.$el, 'terminusjs-box');
+		this.$el.className += ' terminusjs-box';
 
 		this.$ps = document.createElement('div');
 		this.$ps.className = 'terminusjs-ps';
@@ -873,32 +873,32 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
 		if(!!this.settings.editable) {
 			this.input.$el.addEventListener('keydown', function(e) {
 				switch(e.keyCode) {
-					case 13: // Enter key
-						e.preventDefault();
-						e.stopPropagation();
-						self.events.emit('enter', self.input);
-						break;
+				case 13: // Enter key
+					e.preventDefault();
+					e.stopPropagation();
+					self.events.emit('enter', self.input);
+					break;
 
-					case 38: // Up key
-						self.events.emit('historyBack', self.input);
+				case 38: // Up key
+					self.events.emit('historyBack', self.input);
 
-						e.preventDefault();
-						e.stopPropagation();
-						break;
+					e.preventDefault();
+					e.stopPropagation();
+					break;
 
-					case 40: // Down key
-						self.events.emit('historyForward', self.input);
+				case 40: // Down key
+					self.events.emit('historyForward', self.input);
 
-						e.preventDefault();
-						e.stopPropagation();
-						break;
+					e.preventDefault();
+					e.stopPropagation();
+					break;
 
-					case 9: // Tab key
-						self.events.emit('autocomplete', self.input);
+				case 9: // Tab key
+					self.events.emit('autocomplete', self.input);
 
-						e.preventDefault();
-						e.stopPropagation();
-						break;
+					e.preventDefault();
+					e.stopPropagation();
+					break;
 				}
 			});
 		}
@@ -923,7 +923,7 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
 		},
 
 		show: function () {
-			Util.Styles.removeClass(this.$el, 'terminusjs-box');
+			Util.Styles.removeClass(this.$el, 'hidden');
 			return this;
 		},
 
@@ -945,22 +945,22 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
  * Copyright © 2012 Ramón Lamana
  */
 define('ui/outputline',['require','core/util'],function(require) {
-	
+
 	
 
 	var Util = require('core/util');
 
-	var animations = true;
+	var animations = false;
 
 	/**
 	 * Client OutputLine class.
 	 * Represents a line output element in the whole output stream.
 	 * @class
 	 */
-	var OutputLine = function(className) {
+	var OutputLine = function() {
 		var outputContent, outputLine = this.element = document.createElement('div');
 		outputLine.className = 'terminusjs-output-line';
-		Util.Styles.addClass(outputLine, 'animate')
+		Util.Styles.addClass(outputLine, 'animate');
 
 		outputContent = this.outputContent = document.createElement('div');
 		outputContent.className = 'terminusjs-output-content';
@@ -985,14 +985,16 @@ define('ui/outputline',['require','core/util'],function(require) {
 
 		show: function() {
 			var self = this;
-			var animations = false; //Client.animations;
 
 			var func = function() {
 				Util.Styles.addClass(self.element, 'visible');
 				self.element.style.height = animations ? self.outputContent.clientHeight + 'px' : 'auto';
 			};
 
-			animations ? setTimeout(func, 30) : func();
+			if(animations)
+				setTimeout(func, 30);
+			else
+				func.call(this);
 		},
 
 		hide: function() {
@@ -1007,15 +1009,14 @@ define('ui/outputline',['require','core/util'],function(require) {
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
-define('ui/output',['require','core/events','core/util','ui/outputline'],function(require) {
-	
+define('ui/output',['require','core/util','ui/outputline'],function(require) {
+
 	
 
-	var Events = require('core/events');
 	var Util = require('core/util');
-	
+
 	var OutputLine = require('ui/outputline');
-	
+
 	/**
 	 * Client Output class
 	 * @class
@@ -1025,7 +1026,7 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 		this.element.className = 'terminusjs-output';
 	};
 
-	Output.prototype = {	
+	Output.prototype = {
 		/**
 		 * @param {String} target The output target: 'stdout', 'stderr', 'web'.
 		 * @param {String} content Output content to be printed.
@@ -1035,14 +1036,14 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
 			var output;
 			target = target || 'stdout';
 			switch(target) {
-				case 'stdout': 
-					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stdout');
+			case 'stdout':
+				output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stdout');
 				break;
-				case 'stderr':
-					output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stderr');
+			case 'stderr':
+				output = this._print(Util.String.htmlEntities(content).replace(/\n/g, '<br/>'), 'terminusjs-stderr');
 				break;
-				case 'web':
-					output = this._print(content, 'terminusjs-web');
+			case 'web':
+				output = this._print(content, 'terminusjs-web');
 				break;
 			}
 
@@ -1073,81 +1074,11 @@ define('ui/output',['require','core/events','core/util','ui/outputline'],functio
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
-define('io/outputstream',['require','core/events'],function(require) {
-	
+define('ui/display',['require','core/events','core/promise','core/util','ui/prompt','ui/input','ui/output'],function(require) {
+
 	
 
 	var Events = require('core/events');
-
-	/**
-	 * @class
-	 */
-	var OutputStream = function() {
-		this.events = new Events();
-		this.close = false;
-
-		this._buffer = [];
-
-		// Default writer
-		this.writer = function(data) {
-			this._buffer.push(data);
-		};
-	};
-
-	OutputStream.prototype = {
-		events: null,
-
-		/** 
-		 * @property {bool} close 
-		 */
-		set close(value) {
-			// Cannot be reopened
-			if(this._close) return; 
-
-			if(value === true)
-				this.events.emit('close');
-
-			this._close = !!value;
-		},
-
-		get close() {
-			return this._close;
-		},
-
-		/**
-		 * Set writer function. 
-		 * The function will receive data to write.
-		 *    function(data){}
-		 * @writeonly
-		 */
-		set writer(func) {
-			this._writer = func;
-		},
-
-		/**
-		 * Writes the content of output to the stream.
-		 * @param {String} output
-		 */
-		write: function(data) {
-			if(this.close) return;
-
-			data += ''; // Stringify output
-			this.events.emit('write', data);
-			this._writer.call(this, data);
-		}
-	};
-
-	return OutputStream;
-});
-/**
- * Terminus.js
- * Copyright © 2012 Ramón Lamana
- */
- define('ui/display',['require','core/events','core/promise','core/util','ui/prompt','ui/input','ui/output','io/outputstream'],function(require) {
-
-	
-
-	var Events 	= require('core/events');
 	var Promise = require('core/promise');
 	var Util = require('core/util');
 
@@ -1155,10 +1086,8 @@ define('io/outputstream',['require','core/events'],function(require) {
 	var Input = require('ui/input');
 	var Output = require('ui/output');
 
-	var OutputStream = require('io/outputstream');
-
 	/**
-	 * Widget 
+	 * Widget
 	 */
 	var Display = function(element, settings) {
 		var self = this;
@@ -1174,9 +1103,8 @@ define('io/outputstream',['require','core/events'],function(require) {
 
 		// Load settings
 		for(var key in settings) {
-			if (!settings.hasOwnProperty(key))
-				continue;
-			this.settings[key] = settings[key];
+			if (settings.hasOwnProperty(key))
+				this.settings[key] = settings[key];
 		}
 
 		// Create DOM elements structure
@@ -1200,21 +1128,21 @@ define('io/outputstream',['require','core/events'],function(require) {
 		this.prompt.events.on('focus', function(){
 			// When a key event, always scroll to bottom
 			//window.scrollTo(0, document.body.scrollHeight);
-		}, this)
+		}, this);
 
 		this._currentInput = this.prompt.input;
-		
+
 		// CTRL + Z support
 		this.$el.addEventListener('keydown', function(e) {
-			if(e.ctrlKey && e.keyCode == 90) {
+			if(e.ctrlKey && e.keyCode === 90) {
 				self.cancel();
 			}
 		});
 
 		this.output.print(this.settings.welcome, 'web');
 		this.showPrompt();
-		
-		element.addEventListener('click', function(e){
+
+		element.addEventListener('click', function(){
 			self.focus();
 		});
 
@@ -1230,7 +1158,7 @@ define('io/outputstream',['require','core/events'],function(require) {
 		_currentInput: null,
 
 		settings: {
-	 		welcome: '<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>'
+			welcome: '<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>'
 		},
 
 		focus: function(){
@@ -1255,9 +1183,9 @@ define('io/outputstream',['require','core/events'],function(require) {
 			this._historyIndex++;
 			var command = this._shell.history[this._historyIndex];
 
-			if (command) 
+			if (command)
 				this.prompt.input.value = command;
-			else 
+			else
 				this.historyReset();
 		},
 
@@ -1287,7 +1215,7 @@ define('io/outputstream',['require','core/events'],function(require) {
 				promise = new Promise(),
 				self = this;
 
-			// Show command entered in output and hide 
+			// Show command entered in output and hide
 			// prompt waiting for next read operation
 			this._printPrompt();
 			this.idle();
@@ -1352,16 +1280,16 @@ define('io/outputstream',['require','core/events'],function(require) {
 		},
 
 		reader: function(promise) {
-			var stdin =  this._shell.streams.stdin,
+			var /*stdin = this._shell.streams.stdin,*/
 				input = new Input({
 					editable: true
-				});			
+				});
 
 			this._currentInput = input;
 			input.appendTo(this.$el).focus();
 
 			input.events.on('enter', function(input) {
-				var stream = new OutputStream(),
+				var /*stream = new OutputStream(),*/
 					data = input.value;
 
 				promise.done(data);
@@ -1393,8 +1321,81 @@ define('io/outputstream',['require','core/events'],function(require) {
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
- define('system/process',['require','core/events','core/promise','io/outputstream'],function(require) {
+define('io/outputstream',['require','core/events'],function(require) {
+
 	
+
+	var Events = require('core/events');
+
+	/**
+	 * @class
+	 */
+	var OutputStream = function() {
+		this.events = new Events();
+		this.close = false;
+
+		this._buffer = [];
+
+		// Default writer
+		this.writer = function(data) {
+			this._buffer.push(data);
+		};
+	};
+
+	OutputStream.prototype = {
+		events: null,
+
+		/**
+		 * @property {bool} close
+		 */
+		set close(value) {
+			// Cannot be reopened
+			if(this._close) return;
+
+			if(value === true)
+				this.events.emit('close');
+
+			this._close = !!value;
+		},
+
+		get close() {
+			return this._close;
+		},
+
+		/**
+		 * Set writer function.
+		 * The function will receive data to write.
+		 *    function(data){}
+		 */
+		set writer(func) {
+			this._writer = func;
+		},
+
+		get writer() {
+			return this._writer;
+		},
+
+		/**
+		 * Writes the content of output to the stream.
+		 * @param {String} output
+		 */
+		write: function(data) {
+			if(this.close) return;
+
+			data += ''; // Stringify output
+			this.events.emit('write', data);
+			this._writer.call(this, data);
+		}
+	};
+
+	return OutputStream;
+});
+/**
+ * Terminus.js
+ * Copyright © 2012 Ramón Lamana
+ */
+define('system/process',['require','core/events','core/promise','io/outputstream'],function(require) {
+
 	
 
 	var Process;
@@ -1438,7 +1439,7 @@ define('io/outputstream',['require','core/events'],function(require) {
 	Process.prototype = {
 		pid: null,
 		bus: null,
-		
+
 		_promise: null,
 
 		toString: function() {
@@ -1475,19 +1476,18 @@ define('io/outputstream',['require','core/events'],function(require) {
 		},
 
 		exit: function(value) {
-			this._promise.done();
+			this._promise.done(value);
 		},
 
 		/**
-		 * Execute the command in the process context. That is 
+		 * Execute the command in the process context. That is
 		 * calls the function passed as a parametes with this process
 		 * as scope.
 		 */
 		exec: function(command, args) {
-			var promise = new Promise();
-
 			if(typeof command !== 'function') {
-				console.error(this.toString + ': Could not execute process because the given command is not a function');
+				console.error(this.toString + ': Could not execute process ' +
+					'because the given command is not a function');
 				this.exit(1);
 			}
 
@@ -1497,21 +1497,19 @@ define('io/outputstream',['require','core/events'],function(require) {
 	};
 
 	return Process;
-	
+
 });
 
 /**
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
-define('io/inputstream',['require','core/promise','core/events','io/outputstream'],function(require) {
-	
+define('io/inputstream',['require','core/promise','core/events'],function(require) {
+
 	
 
 	var Promise = require('core/promise');
 	var Events = require('core/events');
-
-	var OutputStream = require('io/outputstream');
 
 	/**
 	 * @class
@@ -1540,27 +1538,30 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 			// Call reader function
 			this._reader.call(this, promise);
 			this.events.emit('read');
-		
+
 			return promise;
-		}, 
+		},
 
 		/**
-		 * Set reader function. 
+		 * Set reader function.
 		 * This function receives promise.
 		 *    function(promise){}
-		 * @writeonly
 		 */
 		set reader(func) {
 			this._reader = func;
 		},
 
+		get reader() {
+			return this._reader;
+		},
+
 		/**
 		 * Connects an output stream with this input stream
-		 */ 
+		 */
 		pipe: function(outputstream) {
 			var self = this;
 			outputstream.writer = function(data) {
-				self._buffer.push(data);	
+				self._buffer.push(data);
 			};
 
 			return this;
@@ -1568,14 +1569,14 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 	};
 
 	return InputStream;
-	
+
 });
 /**
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
- define('system/shell',['require','core/util','core/promise','system/process','io/inputstream','io/outputstream'],function(require) {
-	
+define('system/shell',['require','core/util','core/promise','system/process','io/inputstream','io/outputstream'],function(require) {
+
 	
 
 	var Util = require('core/util');
@@ -1606,8 +1607,8 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 		this.bus = Process.bus;
 
 		// Debug purposes
-		this.streams.stdin.id = "STDIN";
-		this.streams.stdout.id = "STDOUT";
+		this.streams.stdin.id = 'STDIN';
+		this.streams.stdout.id = 'STDOUT';
 
 		this.commands = [];
 		this.history = [];
@@ -1620,13 +1621,13 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 		history: null,
 
 		_environment: null,
-		
+
 		getEnv: function(key) {
 			return this._environment[key] ? this._environment[key] : null;
 		},
 
 		exec: function(input) {
-			var group, commands, proc, 
+			var group, commands,
 				finishQueue = [];
 
 			var streams = {
@@ -1651,7 +1652,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 					streams.stdout = this.streams.stdout;
 					futureinput = null;
 				}
-					
+
 				promise = (function(streams) {
 					// Execute first shell native commands
 					if (this.native[command.name]) {
@@ -1664,11 +1665,11 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 							if (group[command.name]) {
 								var proc = new Process(streams);
 								return proc.exec(group[command.name], command.args);
-							} 
+							}
 						}
 					}
 
-					this.streams.stderr.write("Command '"+command.name+"' not found.");
+					this.streams.stderr.write('Command \''+command.name+'\' not found.');
 					return Promise.done();
 				})
 				.call(this, streams);
@@ -1678,7 +1679,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 					streams.stdin = futureinput;
 
 				finishQueue.push(promise);
-			}, 
+			},
 			this);
 
 			return Promise.parallel(finishQueue);
@@ -1687,18 +1688,18 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 		search: function(key) {
 			var found = [], commands = [];
 
-			for(var i = this.commands.length; i--;) 
+			for(var i = this.commands.length; i--;)
 				commands = Util.Array.merge(commands, Object.keys(this.commands[i]));
-			
-			var regexp = new RegExp('^'+key, "i");
+
+			var regexp = new RegExp('^'+key, 'i');
 
 			// Proposal only for commands not for arguments
 			//if(arguments.length <= 1) {
-				for (var i = commands.length; i--;) {
-					if (regexp.test(commands[i])) {
-						found.push(commands[i]);
-					}
+			for (var j = commands.length; j--;) {
+				if (regexp.test(commands[j])) {
+					found.push(commands[j]);
 				}
+			}
 			//}
 			// @todo proposal for arguments asking the commander. Adding else here.
 
@@ -1710,7 +1711,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 		 * @param {Array} List of commands
 		 */
 		include: function(commands) {
-			this.commands = this.commands.concat(commands); 
+			this.commands = this.commands.concat(commands);
 		},
 
 		/**
@@ -1727,7 +1728,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 				return {
 					name: command,
 					args: args
-				}
+				};
 			});
 		},
 
@@ -1736,7 +1737,7 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
 		 */
 		native: {
 			history: function() {
-				var output = ''
+				var output = '';
 				for(var i=0, l=this.history.length; i<l; i++)
 					output += ' ' + i + ': ' + this.history[i] + '\n';
 
@@ -1761,16 +1762,16 @@ define('io/inputstream',['require','core/promise','core/events','io/outputstream
  * Copyright © 2012 Ramón Lamana
  */
 define('terminus',['require','vendor/domready','ui/display','system/shell','system/process'],function(require) {
-	
+
 	
 
 	var domready = require('vendor/domready');
 
 	/**
 	 * Helper that creates a terminal with a default display and shell.
-	 * 
+	 *
 	 * @param {String|Element} DOM element or selector where display will be rendered
-	 * @param {Object} displaySettings Optional display parameters 
+	 * @param {Object} displaySettings Optional display parameters
 	 * @constructor
 	 */
 	var Terminus = function(element, displaySettings) {
@@ -1786,7 +1787,7 @@ define('terminus',['require','vendor/domready','ui/display','system/shell','syst
 
 		// Setup display
 		domready(function(){
-			element = (typeof element === 'string') ? 
+			element = (typeof element === 'string') ?
 				document.querySelector(element) :
 				element;
 
@@ -1796,7 +1797,7 @@ define('terminus',['require','vendor/domready','ui/display','system/shell','syst
 
 	Terminus.prototype = {
 		/**
-		 * @property {Terminus.Shell} shell 
+		 * @property {Terminus.Shell} shell
 		 * @readonly
 		 */
 		set shell(value) {
@@ -1809,7 +1810,7 @@ define('terminus',['require','vendor/domready','ui/display','system/shell','syst
 		},
 
 		/**
-		 * @property {Terminus.Display} display 
+		 * @property {Terminus.Display} display
 		 * @readonly
 		 */
 		set display(value) {
@@ -1821,11 +1822,11 @@ define('terminus',['require','vendor/domready','ui/display','system/shell','syst
 			return this._display;
 		}
 	};
-	
+
 	Terminus.version = '0.6';
 
 	Terminus.Display = require('ui/display');
-	Terminus.Shell 	 = require('system/shell');
+	Terminus.Shell = require('system/shell');
 	Terminus.Process = require('system/process');
 
 	return Terminus;

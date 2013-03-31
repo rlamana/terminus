@@ -3,22 +3,22 @@
  * Copyright © 2012 Ramón Lamana
  */
 define(function(require) {
-	
+
 	'use strict';
 
 	var Util = require('core/util');
 
-	var animations = true;
+	var animations = false;
 
 	/**
 	 * Client OutputLine class.
 	 * Represents a line output element in the whole output stream.
 	 * @class
 	 */
-	var OutputLine = function(className) {
+	var OutputLine = function() {
 		var outputContent, outputLine = this.element = document.createElement('div');
 		outputLine.className = 'terminusjs-output-line';
-		Util.Styles.addClass(outputLine, 'animate')
+		Util.Styles.addClass(outputLine, 'animate');
 
 		outputContent = this.outputContent = document.createElement('div');
 		outputContent.className = 'terminusjs-output-content';
@@ -43,14 +43,16 @@ define(function(require) {
 
 		show: function() {
 			var self = this;
-			var animations = false; //Client.animations;
 
 			var func = function() {
 				Util.Styles.addClass(self.element, 'visible');
 				self.element.style.height = animations ? self.outputContent.clientHeight + 'px' : 'auto';
 			};
 
-			animations ? setTimeout(func, 30) : func();
+			if(animations)
+				setTimeout(func, 30);
+			else
+				func.call(this);
 		},
 
 		hide: function() {

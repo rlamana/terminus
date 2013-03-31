@@ -3,7 +3,7 @@
  * Copyright © 2009-2012 A. Matías Quezada
  * https://github.com/amatiasq
  */
- define(function(require) {
+define(function(require) {
 
 	'use strict';
 
@@ -14,7 +14,7 @@
 		this._onerror = [];
 		this._onprogress = [];
 		this._state = 'unfulfilled';
-		this._args = null; 
+		this._args = null;
 	}
 
 	Promise.prototype = {
@@ -189,7 +189,7 @@
 				prom.fail.apply(prom, arguments);
 		});
 	}
-	
+
 	function nextSequential(prom, callbacks, index, args) {
 		if (index === callbacks.length)
 			return prom.done.apply(prom, args);

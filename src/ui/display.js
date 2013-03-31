@@ -2,11 +2,11 @@
  * Terminus.js
  * Copyright © 2012 Ramón Lamana
  */
- define(function(require) {
+define(function(require) {
 
 	'use strict';
 
-	var Events 	= require('core/events');
+	var Events = require('core/events');
 	var Promise = require('core/promise');
 	var Util = require('core/util');
 
@@ -14,10 +14,8 @@
 	var Input = require('ui/input');
 	var Output = require('ui/output');
 
-	var OutputStream = require('io/outputstream');
-
 	/**
-	 * Widget 
+	 * Widget
 	 */
 	var Display = function(element, settings) {
 		var self = this;
@@ -33,9 +31,8 @@
 
 		// Load settings
 		for(var key in settings) {
-			if (!settings.hasOwnProperty(key))
-				continue;
-			this.settings[key] = settings[key];
+			if (settings.hasOwnProperty(key))
+				this.settings[key] = settings[key];
 		}
 
 		// Create DOM elements structure
@@ -59,21 +56,21 @@
 		this.prompt.events.on('focus', function(){
 			// When a key event, always scroll to bottom
 			//window.scrollTo(0, document.body.scrollHeight);
-		}, this)
+		}, this);
 
 		this._currentInput = this.prompt.input;
-		
+
 		// CTRL + Z support
 		this.$el.addEventListener('keydown', function(e) {
-			if(e.ctrlKey && e.keyCode == 90) {
+			if(e.ctrlKey && e.keyCode === 90) {
 				self.cancel();
 			}
 		});
 
 		this.output.print(this.settings.welcome, 'web');
 		this.showPrompt();
-		
-		element.addEventListener('click', function(e){
+
+		element.addEventListener('click', function(){
 			self.focus();
 		});
 
@@ -89,7 +86,7 @@
 		_currentInput: null,
 
 		settings: {
-	 		welcome: '<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>'
+			welcome: '<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>'
 		},
 
 		focus: function(){
@@ -114,9 +111,9 @@
 			this._historyIndex++;
 			var command = this._shell.history[this._historyIndex];
 
-			if (command) 
+			if (command)
 				this.prompt.input.value = command;
-			else 
+			else
 				this.historyReset();
 		},
 
@@ -146,7 +143,7 @@
 				promise = new Promise(),
 				self = this;
 
-			// Show command entered in output and hide 
+			// Show command entered in output and hide
 			// prompt waiting for next read operation
 			this._printPrompt();
 			this.idle();
@@ -211,16 +208,16 @@
 		},
 
 		reader: function(promise) {
-			var stdin =  this._shell.streams.stdin,
+			var /*stdin = this._shell.streams.stdin,*/
 				input = new Input({
 					editable: true
-				});			
+				});
 
 			this._currentInput = input;
 			input.appendTo(this.$el).focus();
 
 			input.events.on('enter', function(input) {
-				var stream = new OutputStream(),
+				var /*stream = new OutputStream(),*/
 					data = input.value;
 
 				promise.done(data);
