@@ -40,14 +40,16 @@
 		},
 
 		echo: function(str) {
-			this.write(str);
+			if(str)
+				this.write(str);
+
 			this.exit(0);
 		},
 
 		read: function() {
 			var self = this;
 			this.read().then(function(data){
-				self.write("Response: " + data);
+				self.write(data);
 				self.exit(0);
 			});
 		}
