@@ -86,7 +86,7 @@ define(function(require) {
 		_currentInput: null,
 
 		settings: {
-			welcome: '<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>'
+			welcome: '<p>Terminus.js<br/>Copyright 2011-2013 Ramón Lamana.</p>'
 		},
 
 		focus: function(){

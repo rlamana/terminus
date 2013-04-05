@@ -91,6 +91,7 @@ define(function(require) {
 		 * Execute the command in the process context. That is
 		 * calls the function passed as a parametes with this process
 		 * as scope.
+		 * @return {Promise}
 		 */
 		exec: function(command, args) {
 			if(typeof command !== 'function') {

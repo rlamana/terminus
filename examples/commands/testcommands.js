@@ -8,12 +8,11 @@
 
 	var TestCommands = {
 		block: function() {
-
 			setTimeout.call(this, function(){
 				this.write('Process has finished');
 				this.exit();
 			}, 3000);
-			
+
 		},
 
 		exit: function() {
@@ -24,7 +23,7 @@
 			if(arguments.length < 2)
 				this.write('Please insert two numeric values (ex. > sum 5 6)', 'stderr');
 			else
-				this.write(parseInt(op1) + parseInt(op2));
+				this.write(parseInt(op1,10) + parseInt(op2,10));
 
 			this.exit();
 		},
@@ -32,16 +31,16 @@
 		hi: function() {
 			var self = this;
 
-			this.write('What\'s your name?');
+			this.write('What\'s your name?', 'stderr');
 			this.read().then(function(data){
-				self.write("Hello " + data + "!!!");
+				self.write('Hello ' + data + '!!!');
 				self.exit(0);
 			});
 		},
 
-		echo: function(str) {
-			if(str)
-				this.write(str);
+		echo: function() {
+			var args = Array.prototype.slice.call(arguments, 0);
+			this.write(args.join(' '));
 
 			this.exit(0);
 		},
@@ -53,9 +52,8 @@
 				self.exit(0);
 			});
 		}
-
 	};
 
 	global.TestCommands = TestCommands;
 
-})( this );
+})(this);
