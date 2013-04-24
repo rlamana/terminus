@@ -125,6 +125,8 @@ define(function(require) {
 
 			this.prompt.show();
 			this.prompt.input.focus();
+
+			this.events.emit('prompt');
 		},
 
 		idle: function() {

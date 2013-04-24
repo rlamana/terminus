@@ -1158,7 +1158,7 @@ define('ui/display',['require','core/events','core/promise','core/util','ui/prom
 		_currentInput: null,
 
 		settings: {
-			welcome: '<p>Terminus.js<br/>Copyright 2011-2012 Ramón Lamana.</p>'
+			welcome: '<p>Terminus.js<br/>Copyright 2011-2013 Ramón Lamana.</p>'
 		},
 
 		focus: function(){
@@ -1197,6 +1197,8 @@ define('ui/display',['require','core/events','core/promise','core/util','ui/prom
 
 			this.prompt.show();
 			this.prompt.input.focus();
+
+			this.events.emit('prompt');
 		},
 
 		idle: function() {
@@ -1483,6 +1485,7 @@ define('system/process',['require','core/events','core/promise','io/outputstream
 		 * Execute the command in the process context. That is
 		 * calls the function passed as a parametes with this process
 		 * as scope.
+		 * @return {Promise}
 		 */
 		exec: function(command, args) {
 			if(typeof command !== 'function') {
