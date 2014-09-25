@@ -1,5 +1,4 @@
-(function(exports) {
-/**
+(function(exports) {/**
  * almond 0.1.3 Copyright (c) 2011, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/almond for details
@@ -1834,5 +1833,6 @@ define('terminus',['require','vendor/domready','ui/display','system/shell','syst
 
 	return Terminus;
 });
+
 exports.Terminus = require('terminus');
 })(window);
