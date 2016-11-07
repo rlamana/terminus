@@ -38,7 +38,6 @@
 	"boss"          : false,     // true: Tolerate assignments where comparisons would be expected
 	"debug"         : true,      // true: Allow debugger statements e.g. browser breakpoints.
 	"eqnull"        : true,      // true: Tolerate use of `== null`
-	"es5"           : true,      // true: Allow ES5 syntax (ex: getters and setters)
 	"esnext"        : false,     // true: Allow ES.next (ES6) syntax (ex: `const`)
 	"evil"          : false,     // true: Tolerate use of `eval` and `new Function()`
 	"expr"          : false,     // true: Tolerate `ExpressionStatement` as Programs

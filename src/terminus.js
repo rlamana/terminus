@@ -6,8 +6,6 @@ define(function(require) {
 
 	'use strict';
 
-	var domready = require('vendor/domready');
-
 	/**
 	 * Helper that creates a terminal with a default display and shell.
 	 *
@@ -27,13 +25,11 @@ define(function(require) {
 		displaySettings.shell = this.shell;
 
 		// Setup display
-		domready(function(){
-			element = (typeof element === 'string') ?
-				document.querySelector(element) :
-				element;
+		element = (typeof element === 'string') ?
+			document.querySelector(element) :
+			element;
 
-			self.display = new Terminus.Display(element, displaySettings);
-		});
+		self.display = new Terminus.Display(element, displaySettings);
 	};
 
 	Terminus.prototype = {

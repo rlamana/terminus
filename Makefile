@@ -30,6 +30,9 @@ less: $(lessfiles:.less=.css)
 	@echo Compiling $<
 	@lessc --yui-compress $< >> ${cssfile}
 
+test:
+	karma start karma.conf.js
+
 clean:
 	rm -f ${builddir}/${buildname}.js
 	rm -f ${builddir}/${buildname}.min.js
@@ -38,5 +41,10 @@ clean:
 install:
 	npm install requirejs
 	npm install less
+	npm install mocha
+	npm install karma
+	npm install karma-mocha --save-dev
+	npm install karma-requirejs --save-dev
+	npm install karma-chrome-launcher --save-dev
 
 
