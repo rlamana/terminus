@@ -3,7 +3,7 @@ Terminus.js
 
 An open javascript library to create your own shells.
 
-<a href="http://rlamana.es/terminus">Try it!</a> (http://rlamana.com/terminus)
+<a href="http://www.rlamana.com/terminus">Try it!</a> (http://rlamana.com/terminus)
 
 License
 -------
