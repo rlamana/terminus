@@ -5,6 +5,8 @@ An open javascript library to create your own shells.
 
 <a href="http://www.rlamana.com/terminus">Try it!</a> (http://rlamana.com/terminus)
 
+<img src="http://www.rlamana.com/img/terminus2.png" width="550"/>
+
 License
 -------
 
