@@ -14,6 +14,8 @@ define(function(require) {
 	var Input = require('ui/input');
 	var Output = require('ui/output');
 
+	require('./display.less');
+
 	/**
 	 * Widget
 	 */

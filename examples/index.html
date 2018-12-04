@@ -11,7 +11,7 @@
 
 		<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css' />
 		<link href='http://fonts.googleapis.com/css?family=Arvo:400,400italic,700,700italic' rel='stylesheet' type='text/css' />
-		<link href='../build/terminus.css' rel='stylesheet' type='text/css' />
+		<link href='../dist/terminus.css' rel='stylesheet' type='text/css' />
 		<style type="text/css">
 			html {
 				height: 100%;
@@ -58,7 +58,7 @@
 		<![endif]-->
 
 		<div id="terminal"></div>
-		<script type="text/javascript" src="../build/terminus.min.js"></script>
+		<script type="text/javascript" src="../dist/terminus.js"></script>
 
 		<!-- Example commands -->
 		<script type="text/javascript" src="commands/testcommands.js"></script>
@@ -69,16 +69,18 @@
 		<script type="text/javascript" src="commands/shapecommands.js"></script>
 
 		<script type="text/javascript">
-			var terminus = new Terminus('#terminal', {
-				welcome: "<div class='identity'><img src='images/logo.png' /><h1>Terminus.js</h1> "+Terminus.version+"</div>Copyright 2012 Ramón Lamana.<br/>Press <span style='color:green'>&lt; tab &gt;</span> to see a list of available commands."
-			});
+			document.addEventListener("DOMContentLoaded", function () {
+				var terminus = new Terminus('#terminal', {
+					welcome: "<div class='identity'><img src='images/logo.png' /><h1>Terminus.js</h1> "+Terminus.version+"</div>Copyright 2012 Ramón Lamana.<br/>Press <span style='color:green'>&lt; tab &gt;</span> to see a list of available commands."
+				});
 
-			terminus.shell.include([TestCommands, ShapeCommands, {
-				hello: function() {
-					this.write('<span style="color:blue">Hello World!</span>', 'web');
-					this.exit(0);
-				}
-			}]);
+				terminus.shell.include([TestCommands, ShapeCommands, {
+					hello: function() {
+						this.write('<span style="color:blue">Hello World!</span>', 'web');
+						this.exit(0);
+					}
+				}]);
+			});
 		</script>
 	</body>
 </html>
