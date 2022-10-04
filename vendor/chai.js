@@ -53,7 +53,7 @@ require.relative = function (parent) {
 require.register("assertion.js", function(module, exports, require){
 /*!
  * chai
- * http://chaijs.com
+ * https://chaijs.com
  * Copyright(c) 2011-2012 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */

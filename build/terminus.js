@@ -1,7 +1,7 @@
 (function(exports) {/**
  * almond 0.1.3 Copyright (c) 2011, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
- * see: http://github.com/jrburke/almond for details
+ * see: https://github.com/jrburke/almond for details
  */
 //Going sloppy to avoid 'use strict' string cost, but strict practices should
 //be followed.
@@ -398,7 +398,7 @@ define("../vendor/almond", function(){});
  * Copyright © 2012 Ramón Lamana
  */
 define('core/events',[],function() {
-	
+
 
 	/**
 	 * @class
@@ -444,7 +444,7 @@ define('core/events',[],function() {
  */
 define('core/promise',['require'],function(require) {
 
-	
+
 
 	var slice = Array.prototype.slice;
 
@@ -654,7 +654,7 @@ define('core/promise',['require'],function(require) {
  */
 define('core/util',[],function() {
 
-	
+
 
 	/**
 	 * @singleton
@@ -714,7 +714,7 @@ define('core/util',[],function() {
  */
 define('ui/input',['require','core/events','core/util'],function(require) {
 
-	
+
 
 	var Events = require('core/events');
 	var Util = require('core/util');
@@ -828,7 +828,7 @@ define('ui/input',['require','core/events','core/util'],function(require) {
  */
 define('ui/prompt',['require','core/events','core/util','ui/input'],function(require) {
 
-	
+
 
 	var Events = require('core/events');
 	var Util = require('core/util');
@@ -945,7 +945,7 @@ define('ui/prompt',['require','core/events','core/util','ui/input'],function(req
  */
 define('ui/outputline',['require','core/util'],function(require) {
 
-	
+
 
 	var Util = require('core/util');
 
@@ -1010,7 +1010,7 @@ define('ui/outputline',['require','core/util'],function(require) {
  */
 define('ui/output',['require','core/util','ui/outputline'],function(require) {
 
-	
+
 
 	var Util = require('core/util');
 
@@ -1075,7 +1075,7 @@ define('ui/output',['require','core/util','ui/outputline'],function(require) {
  */
 define('ui/display',['require','core/events','core/promise','core/util','ui/prompt','ui/input','ui/output'],function(require) {
 
-	
+
 
 	var Events = require('core/events');
 	var Promise = require('core/promise');
@@ -1324,7 +1324,7 @@ define('ui/display',['require','core/events','core/promise','core/util','ui/prom
  */
 define('io/outputstream',['require','core/events'],function(require) {
 
-	
+
 
 	var Events = require('core/events');
 
@@ -1397,7 +1397,7 @@ define('io/outputstream',['require','core/events'],function(require) {
  */
 define('system/process',['require','core/events','core/promise','io/outputstream'],function(require) {
 
-	
+
 
 	var Process;
 	var Events = require('core/events');
@@ -1508,7 +1508,7 @@ define('system/process',['require','core/events','core/promise','io/outputstream
  */
 define('io/inputstream',['require','core/promise','core/events'],function(require) {
 
-	
+
 
 	var Promise = require('core/promise');
 	var Events = require('core/events');
@@ -1579,7 +1579,7 @@ define('io/inputstream',['require','core/promise','core/events'],function(requir
  */
 define('system/shell',['require','core/util','core/promise','system/process','io/inputstream','io/outputstream'],function(require) {
 
-	
+
 
 	var Util = require('core/util');
 	var Promise = require('core/promise');
@@ -1765,7 +1765,7 @@ define('system/shell',['require','core/util','core/promise','system/process','io
  */
 define('terminus',['require','vendor/domready','ui/display','system/shell','system/process'],function(require) {
 
-	
+
 
 	var domready = require('vendor/domready');
 
